@@ -89,6 +89,17 @@ Repositório para a atividade do Projeto de Trabalho Final da Disciplina de Web 
 
 ## 🚀 Fluxo de Trabalho
 
+### Pré-requisitos
+- Node.js 18+
+- PostgreSQL (Neon)
+- npm ou yarn
+
+### Instalação
+1. Clone o repositório
+2. Instale dependências:
+   ```bash
+   npm install
+
 ### 1. Iniciar uma Nova Feature
 ```bash
 # Atualizar develop

@@ -1,0 +1,112 @@
+// schema.prisma refletindo o modelo conceitual do projeto
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ENUMS para status (Não tinha no modelo conceitual, mas está definido para melhor controle)
+enum StatusPedido {
+  PENDENTE      // Aguardando pagamento
+  CONFIRMADO    // Pago e confirmado
+  PREPARACAO    // Em preparação
+  CANCELADO     // Cancelado (Na seguinte ordem pensando no cenário que o usuário só possa cancelar o pedido antes dele ser enviado)
+  ENVIADO       // Enviado para entrega
+  ENTREGUE      // Entregue
+}
+
+// MODELO ADMINISTRADOR como foi definido anteriormente com seus atributos e tipos,
+// Pensei no id cuid pois grante unicidade gerado automaticamente é mais facil de ser compreendido já que tem menos caracteres
+model Administrador {
+  id        String    @id @default(cuid())
+  nome      String
+  email     String    @unique
+  senha     String
+  telefone  String
+  
+  // RELACIONAMENTO: Um Administrador pode ter MUITOS Pedidos (0,N)
+  pedidos   Pedido[]
+  
+  //Vão se repetir mas basicamente é a coleta de quando foi criado e quando foi atualizado
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  
+  @@map("administradores")
+}
+
+// MODELO PERFUME, com a quantidade em estoque que por padrão é 0 quando criado
+model Perfume {
+  id                  String        @id @default(cuid())
+  nome                String
+  marca               String
+  quantidade_estoque  Int           @default(0) @map("quantidade_estoque")
+  foto                String?
+  preco               Float
+  descricao           String?
+  frasco              Float?        // ml do frasco
+  
+  // RELACIONAMENTO N:N com Pedido (através de PedidoItem)
+  pedidoItens         PedidoItem[]
+  
+  // Timestamps
+  createdAt           DateTime      @default(now()) @map("created_at")
+  updatedAt           DateTime      @updatedAt @map("updated_at")
+  
+  @@map("perfumes")
+}
+
+// MODELO PEDIDO
+model Pedido {
+  id                String        @id @default(cuid())
+  valor_total       Float         @map("valor_total")
+  nome_cliente      String        @map("nome_cliente")
+  telefone_cliente  String        @map("telefone_cliente")
+  status            StatusPedido  @default(PENDENTE)
+  data_pedido       DateTime      @default(now()) @map("data_pedido")
+  
+  // RELACIONAMENTO: Um Pedido pertence a UM Administrador
+  administradorId   String        @map("administrador_id")
+  administrador     Administrador @relation(fields: [administradorId], references: [id], onDelete: Cascade)
+  
+  // RELACIONAMENTO N:N com Perfume (através de PedidoItem)
+  itens             PedidoItem[]
+  
+  // Campos para integração WhatsApp que vão checar a mensagem que será enviado no whatsapp e se foi enviada
+  //idealizada pensando em Controle, Link direto, Personalização e Mensagem automática
+  mensagem_whatsapp String?       @map("mensagem_whatsapp")
+  enviado_whatsapp  Boolean       @default(false) @map("enviado_whatsapp")
+  
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+  
+  @@map("pedidos")
+}
+
+// TABELA INTERMEDIÁRIA para relacionamento N:N (Pedido ←→ Perfume)
+// Problemas sem PedidoItem:
+//    Como armazenar QUANTOS de cada perfume?
+//    Como armazenar o PREÇO NA HORA da compra (pois o preço pode mudar depois)?
+//    Como saber quais perfumes estão em quais pedidos?
+// Pensada para melhor ter Controle de estoque, Relatórios detalhados, Flexibilidadee Histórico de preços. 
+
+model PedidoItem {
+  id         String   @id @default(cuid())
+  quantidade Int      @default(1)
+  preco_unitario Float @map("preco_unitario") // Preço na hora da compra
+  
+  // RELACIONAMENTOS
+  perfumeId  String   @map("perfume_id")
+  perfume    Perfume  @relation(fields: [perfumeId], references: [id], onDelete: Cascade)
+  
+  pedidoId   String   @map("pedido_id")
+  pedido     Pedido   @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  
+  createdAt  DateTime @default(now()) @map("created_at")
+  
+  // Garante que não tenha o mesmo perfume duas vezes no mesmo pedido
+  @@unique([perfumeId, pedidoId])
+  @@map("pedido_itens")
+}
