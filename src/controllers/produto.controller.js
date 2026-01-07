@@ -64,4 +64,17 @@ export const editarPerfume = async (req, res) => {
     }
 };
 
+export const deletarPerfume = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await prisma.perfume.delete({
+            where: { id: parseInt(id) },
+        });
+        res.status(200).json({ message: "Perfume deletado com sucesso!" });
+    } catch (error) {
+        return res.status(500).json({ message: "Error ao deletar perfume!", error: error.message });
+    }
+};
+
+
 
