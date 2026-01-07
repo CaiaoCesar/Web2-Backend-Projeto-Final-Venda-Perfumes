@@ -41,3 +41,27 @@ export const listarPerfumes = async (req, res) => {
     }
 };
 
+export const editarPerfume = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { nome, marca, preco } = req.body;
+
+        await prisma.perfume.update({
+            where: { id: parseInt(id) },
+            data: {
+                nome, 
+                marca,
+                foto,
+                preco, 
+                descricao,
+                frasco,
+            },
+        });
+
+        res.status(200).json({ message: "Perfume atualizado com sucesso!" });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+
