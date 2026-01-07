@@ -32,3 +32,12 @@ export const criaPerfume = async (req, res) => {
     }
 };
 
+export const listarPerfumes = async (req, res) => {
+    try {
+        const perfumes = await prisma.perfume.findMany();
+        res.status(200).json({ message: "Perfumes listados com sucesso!", perfumes });
+    } catch (error) {
+        return res.status(500).json({ message:"Ocorreu um erro ao listar perfumes!", error:error.message });
+    }
+};
+
