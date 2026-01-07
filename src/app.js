@@ -1,10 +1,13 @@
-// src/app.js
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import 'express-async-errors';
 import setupSwagger from './docs/swagger.js';
+
+// Importar rotas
+import produtoRoutes from './routes/produto.routes.js';
+// Importar outras rotas depois...
 
 const app = express();
 
@@ -15,8 +18,8 @@ app.use(helmet());
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100, // limite de 100 requisições por IP
   message: 'Muitas requisições deste IP. Tente novamente em 15 minutos.',
 });
 app.use('/api', limiter);
@@ -24,19 +27,33 @@ app.use('/api', limiter);
 // Configurar Swagger
 setupSwagger(app);
 
+// Rotas da API com prefixo /api
+app.use('/api/produtos', produtoRoutes);
+// app.use('/api/auth', authRoutes);
+// app.use('/api/pedidos', pedidoRoutes);
+
 // Rota de teste
 app.get('/', (req, res) => {
-  res.json({
+  res.json({ 
     message: 'API Sistema de Vendas de Perfumes',
     status: 'online',
-    version: '1.0.0',
+    version: '1.1.0',
     docs: 'http://localhost:3000/api-docs',
+    endpoints: {
+      produtos: '/api/produtos',
+      // auth: '/api/auth',
+      // pedidos: '/api/pedidos',
+    }
   });
 });
 
 // Rota de health check
 app.get('/health', (req, res) => {
-  res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+  res.json({ 
+    status: 'healthy', 
+    timestamp: new Date().toISOString(),
+    database: 'connected', // Você pode verificar conexão com DB aqui
+  });
 });
 
 // Middleware de erro (deve vir por último)
@@ -44,6 +61,7 @@ app.use((err, req, res, next) => {
   console.error('Erro:', err);
   res.status(err.status || 500).json({
     error: err.message || 'Erro interno do servidor',
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
   });
 });
 
