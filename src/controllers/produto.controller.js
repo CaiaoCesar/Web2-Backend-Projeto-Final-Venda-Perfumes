@@ -1,6 +1,6 @@
 import prisma from '../config/database.js';
 
-export const criaPerfume = async (req, res) => {
+export const criarPerfume = async (req, res) => {
   try {
     const { nome, marca, preco } = req.body;
     if (!nome || !marca || !preco) {
