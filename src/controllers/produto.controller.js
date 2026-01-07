@@ -64,6 +64,38 @@ export const editarPerfume = async (req, res) => {
     }
 };
 
+export const editarEstoquePerfume = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { quantidade_estoque } = req.body;
+
+    const perfumeAtual = await prisma.perfume.findUnique({
+        where: { id: parseInt(id) },
+    });
+
+    if (!perfumeAtual) {
+        return res.status(404).json({ message: "Perfume não encontrado!" });
+    }
+
+    const  novoEstoque = (perfumeAtual.quantidade_estoque || 0) + quantidade_estoque;
+
+    if (novoEstoque < 0) {
+        return res.status(400).json({ message: "Quantidade insuficiente para adicionar ao estoque!" });
+    }
+    
+    await prisma.perfume.update({
+        where: { id: parseInt(id) },
+        data: {
+            quantidade_estoque: novoEstoque,
+        },
+    });
+
+    res.status(200).json({ message: "Estoque do perfume atualizado com sucesso!" });
+    } catch (error) {
+        return res.status(500).json({ message: "Ocorreu um erro ao atualizar o estoque do perfume", error: error.message });
+    }  
+};
+
 export const deletarPerfume = async (req, res) => {
     try {
         const { id } = req.params;
