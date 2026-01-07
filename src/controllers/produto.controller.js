@@ -1,112 +1,115 @@
-import prisma from "../config/database.js";
+import prisma from '../config/database.js';
 
 export const criaPerfume = async (req, res) => {
-    try {
-        const  {nome, marca, preco } = req.body;    
-        if (!nome || !marca || !preco) {
-            return res.status(400).json({ message: 'Todos os campos devem ser preenchidos' });
-        }
-    
+  try {
+    const { nome, marca, preco } = req.body;
+    if (!nome || !marca || !preco) {
+      return res.status(400).json({ message: 'Todos os campos devem ser preenchidos' });
+    }
+
     const perfumeExistente = await prisma.perfume.findFirst({
-        where : {nome},
-    }); 
+      where: { nome },
+    });
 
     if (perfumeExistente) {
-        return res.status(400).json({ message: 'Ja existe um perfume com esse nome' });
+      return res.status(400).json({ message: 'Ja existe um perfume com esse nome' });
     }
 
-    const novoPerfume = await prisma.perfume.create ({
-        data: {
-            nome,
-            marca,
-            preco,
-        },
+    const novoPerfume = await prisma.perfume.create({
+      data: {
+        nome,
+        marca,
+        preco,
+      },
     });
 
-    res.status(201).json ({
-        message: "Perfume criado com sucesso!",
-        produto: novoPerfume,
+    res.status(201).json({
+      message: 'Perfume criado com sucesso!',
+      produto: novoPerfume,
     });
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
 };
 
 export const listarPerfumes = async (req, res) => {
-    try {
-        const perfumes = await prisma.perfume.findMany();
-        res.status(200).json({ message: "Perfumes listados com sucesso!", perfumes });
-    } catch (error) {
-        return res.status(500).json({ message:"Ocorreu um erro ao listar perfumes!", error:error.message });
-    }
+  try {
+    const perfumes = await prisma.perfume.findMany();
+    res.status(200).json({ message: 'Perfumes listados com sucesso!', perfumes });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: 'Ocorreu um erro ao listar perfumes!', error: error.message });
+  }
 };
 
 export const editarPerfume = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { nome, marca, preco } = req.body;
+  try {
+    const { id } = req.params;
+    const { nome, marca, preco } = req.body;
 
-        await prisma.perfume.update({
-            where: { id: parseInt(id) },
-            data: {
-                nome, 
-                marca,
-                foto,
-                preco, 
-                descricao,
-                frasco,
-            },
-        });
+    await prisma.perfume.update({
+      where: { id: parseInt(id) },
+      data: {
+        nome,
+        marca,
+        foto,
+        preco,
+        descricao,
+        frasco,
+      },
+    });
 
-        res.status(200).json({ message: "Perfume atualizado com sucesso!" });
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
+    res.status(200).json({ message: 'Perfume atualizado com sucesso!' });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
 };
 
 export const editarEstoquePerfume = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { quantidade_estoque } = req.body;
+  try {
+    const { id } = req.params;
+    const { quantidade_estoque } = req.body;
 
     const perfumeAtual = await prisma.perfume.findUnique({
-        where: { id: parseInt(id) },
+      where: { id: parseInt(id) },
     });
 
     if (!perfumeAtual) {
-        return res.status(404).json({ message: "Perfume não encontrado!" });
+      return res.status(404).json({ message: 'Perfume não encontrado!' });
     }
 
-    const  novoEstoque = (perfumeAtual.quantidade_estoque || 0) + quantidade_estoque;
+    const novoEstoque = (perfumeAtual.quantidade_estoque || 0) + quantidade_estoque;
 
     if (novoEstoque < 0) {
-        return res.status(400).json({ message: "Quantidade insuficiente para adicionar ao estoque!" });
+      return res
+        .status(400)
+        .json({ message: 'Quantidade insuficiente para adicionar ao estoque!' });
     }
-    
+
     await prisma.perfume.update({
-        where: { id: parseInt(id) },
-        data: {
-            quantidade_estoque: novoEstoque,
-        },
+      where: { id: parseInt(id) },
+      data: {
+        quantidade_estoque: novoEstoque,
+      },
     });
 
-    res.status(200).json({ message: "Estoque do perfume atualizado com sucesso!" });
-    } catch (error) {
-        return res.status(500).json({ message: "Ocorreu um erro ao atualizar o estoque do perfume", error: error.message });
-    }  
+    res.status(200).json({ message: 'Estoque do perfume atualizado com sucesso!' });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: 'Ocorreu um erro ao atualizar o estoque do perfume', error: error.message });
+  }
 };
 
 export const deletarPerfume = async (req, res) => {
-    try {
-        const { id } = req.params;
-        await prisma.perfume.delete({
-            where: { id: parseInt(id) },
-        });
-        res.status(200).json({ message: "Perfume deletado com sucesso!" });
-    } catch (error) {
-        return res.status(500).json({ message: "Error ao deletar perfume!", error: error.message });
-    }
+  try {
+    const { id } = req.params;
+    await prisma.perfume.delete({
+      where: { id: parseInt(id) },
+    });
+    res.status(200).json({ message: 'Perfume deletado com sucesso!' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error ao deletar perfume!', error: error.message });
+  }
 };
-
-
-
