@@ -116,7 +116,7 @@ export const atualizarPerfume = async (id, perfumeDados) => {
     throw new Error('ID inválido. Deve ser um número positivo');
   }
 
-  // 2. Verificar se usuário existe
+  // 2. Verificar se perfume existe
   const perfumeExistente = await prisma.perfume.findUnique({
     where: { id: parseInt(id) },
   });
@@ -148,10 +148,6 @@ export const atualizarPerfume = async (id, perfumeDados) => {
       dadosAtualizados.preco = perfumeDados.preco;
     }
 
-    if (perfumeDados.quantidade_estoque) {
-      dadosAtualizados.quantidade_estoque = perfumeDados.quantidade_estoque;
-    }
-
     if (perfumeDados.foto) {
       dadosAtualizados.foto = perfumeDados.foto;
     }
@@ -172,7 +168,6 @@ export const atualizarPerfume = async (id, perfumeDados) => {
         id: true,
         nome: true,
         marca: true,
-        quantidade_estoque: true,
         foto: true, 
         descricao: true, 
         frasco: true,
@@ -182,6 +177,51 @@ export const atualizarPerfume = async (id, perfumeDados) => {
     });
 
     return perfumeAtualizado;
+};
+
+
+/**
+ * Atualiza o estoque de um perfume existente
+ * @param {number} id - ID do perfume
+ * @param {Object} perfumeDados - Dados para atualizar
+ * @returns {Promise<Object>} Perfume atualizado
+ * @throws {Error} Se validação falhar ou perfume não existir
+ */
+export const AtualizarEstoquePerfume = async (id, perfumeDados) => {
+  // 1. Validar ID
+  if (!id || isNaN(id) || id <= 0) {
+    throw new Error('ID inválido. Deve ser um número positivo');
+  }
+
+  // 2. Verificar se perfume existe
+  const perfumeExistente = await prisma.perfume.findUnique({
+    where: { id: parseInt(id) },
+  });
+
+  if (!perfumeExistente) {
+    throw new Error(`Perfume com ID ${id} não encontrado`);
+  }
+
+    // 3. Preparar dado de estoque para atualização
+    const estoqueAtualizado = {};
+
+    if (perfumeDados.quantidade_estoque) {
+      estoqueAtualizado.quantidade_estoque = perfumeDados.quantidade_estoque;
+    }
+
+    // 4. Atualizar o estoque do perfume no banco
+    const perfumeEstoqueAtualizado = await prisma.perfume.update({
+      where: { id: parseInt(id) },
+      data: estoqueAtualizado,
+      select: {
+        id: true,
+        quantidade_estoque: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return perfumeEstoqueAtualizado;
 };
 
 /**
