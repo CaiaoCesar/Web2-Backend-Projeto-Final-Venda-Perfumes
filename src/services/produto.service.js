@@ -31,3 +31,16 @@ export const listarPerfumes = async () => {
 
     return perfumes; 
 };
+
+/**
+ * Verifica se um perfume já está cadastrado
+ * @param {string} nome - Nome do perfume a ser verificado
+ * @returns {Promise<boolean>} True se o perfume existe, false caso contrário
+ */
+const perfumeExiste = async (nome) => {
+  const perfume = await prisma.perfume.findUnique({
+    where: { email: nome },
+  });
+
+  return !!perfume; // Converte para boolean
+};
