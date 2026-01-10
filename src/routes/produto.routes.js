@@ -15,7 +15,7 @@ const router = express.Router();
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             type: object
  *             required:
@@ -25,7 +25,7 @@ const router = express.Router();
  *             properties:
  *               nome:
  *                 type: string
- *                 example: "Nova Fragrância"
+ *                 example: "Chanel No 5"
  *               marca:
  *                 type: string
  *                 example: "Chanel"
@@ -45,7 +45,7 @@ const router = express.Router();
  *                 example: 50
  *               foto:
  *                 type: string
- *                 format: binary
+ *                 example: "https://example.com/foto.jpg"
  *     responses:
  *       201:
  *         description: Perfume criado com sucesso
@@ -54,13 +54,6 @@ const router = express.Router();
  *       401:
  *         description: Não autenticado
  */
-
-/**
- * Rotas de perfumes
- * Base URL: /api/produtos
- */
-
-//CREATE - Criar um novo perfume
 router.post('/', perfumeController.criarPerfume);
 
 /**
@@ -102,8 +95,6 @@ router.post('/', perfumeController.criarPerfume);
  *       200:
  *         description: Lista de perfumes retornada com sucesso
  */
-
-//READ - Listar todos os perfumes
 router.get('/', perfumeController.listarPerfumes);
 
 /**
@@ -144,6 +135,9 @@ router.get('/', perfumeController.listarPerfumes);
  *               frasco:
  *                 type: number
  *                 example: 150.0
+ *               foto:
+ *                 type: string
+ *                 example: "https://example.com/nova-foto.jpg"
  *     responses:
  *       200:
  *         description: Perfume atualizado com sucesso
@@ -152,8 +146,6 @@ router.get('/', perfumeController.listarPerfumes);
  *       401:
  *         description: Não autenticado
  */
-
-//UPDATE - Atualizar um perfume
 router.put('/:id', perfumeController.editarPerfume);
 
 /**
@@ -192,7 +184,6 @@ router.put('/:id', perfumeController.editarPerfume);
  *       404:
  *         description: Perfume não encontrado
  */
-
 router.put('/estoque/:id', perfumeController.editarEstoquePerfume);
 
 /**
@@ -219,8 +210,6 @@ router.put('/estoque/:id', perfumeController.editarEstoquePerfume);
  *       401:
  *         description: Não autenticado
  */
-
-// DELETE - Deletar um perfume
 router.delete('/:id', perfumeController.deletarPerfume);
 
 export default router;
