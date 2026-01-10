@@ -44,3 +44,17 @@ const perfumeExiste = async (nome) => {
 
   return !!perfume; // Converte para boolean
 };
+
+/**
+ * Valida os dados de um usuário
+ * @param {Object} perfumeDados - Dados do perfume
+ * @throws {Error} Se validação falhar
+ */
+const validarPerfume = (perfumeDados) => {
+  const { nome, marca, preco } = perfumeDados;
+  
+  if (!nome || !marca || !preco) {
+    throw new Error('Nome, email e senha são obrigatórios');
+  }
+
+};
