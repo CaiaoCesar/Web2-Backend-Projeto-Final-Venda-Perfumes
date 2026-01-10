@@ -1,13 +1,7 @@
-import { Router } from 'express';
-import {
-  criarPerfume,
-  listarPerfumes,
-  editarPerfume,
-  editarEstoquePerfume,
-  deletarPerfume,
-} from '../controllers/produto.controller.js';
+import express from "express";
+import * as perfumeController from '../controllers/produto.controller.js';
 
-const router = Router();
+const router = express.Router();
 
 /**
  * @swagger
@@ -60,7 +54,14 @@ const router = Router();
  *       401:
  *         description: Não autenticado
  */
-router.post('/', criarPerfume);
+
+/**
+ * Rotas de perfumes
+ * Base URL: /api/produtos
+ */
+
+//CREATE - Criar um novo perfume
+router.post('/', perfumeController.criarPerfume);
 
 /**
  * @swagger
@@ -101,7 +102,9 @@ router.post('/', criarPerfume);
  *       200:
  *         description: Lista de perfumes retornada com sucesso
  */
-router.get('/', listarPerfumes);
+
+//READ - Listar todos os perfumes
+router.get('/', perfumeController.listarPerfumes);
 
 /**
  * @swagger
@@ -149,7 +152,9 @@ router.get('/', listarPerfumes);
  *       401:
  *         description: Não autenticado
  */
-router.put('/:id', editarPerfume);
+
+//UPDATE - Atualizar um perfume
+router.put('/:id', perfumeController.editarPerfume);
 
 /**
  * @swagger
@@ -187,6 +192,7 @@ router.put('/:id', editarPerfume);
  *       404:
  *         description: Perfume não encontrado
  */
+
 router.put('/estoque/:id', editarEstoquePerfume);
 
 /**
@@ -213,6 +219,8 @@ router.put('/estoque/:id', editarEstoquePerfume);
  *       401:
  *         description: Não autenticado
  */
-router.delete('/:id', deletarPerfume);
+
+// DELETE - Deletar um perfume
+router.delete('/:id', perfumeController.deletarPerfume);
 
 export default router;
