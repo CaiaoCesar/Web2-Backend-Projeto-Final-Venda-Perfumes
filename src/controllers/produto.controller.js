@@ -47,26 +47,21 @@ export const listarPerfumes = async (req, res) => {
   }
 };
 
+/**
+ * PUT /api/produtos/:id
+ * Atualiza um perfume existente
+ */
 export const editarPerfume = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nome, marca, preco } = req.body;
+    const perfumeAtualizado = await perfumeService.atualizarPerfume(id, req.body);
 
-    await prisma.perfume.update({
-      where: { id: parseInt(id) },
-      data: {
-        nome,
-        marca,
-        foto,
-        preco,
-        descricao,
-        frasco,
-      },
-    });
-
-    res.status(200).json({ message: 'Perfume atualizado com sucesso!' });
+    res.status(200).json({ message: 'Perfume atualizado com sucesso!', success: true, data: perfumeAtualizado });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    console.error('Ocorreu um erro ao atualizar perfume:', error);
+    return res
+      .status(500)
+      .json({ message: 'Ocorreu um erro ao atualizar perfume!', success: false, error: error.message });
   }
 };
 
@@ -106,14 +101,18 @@ export const editarEstoquePerfume = async (req, res) => {
   }
 };
 
+/**
+ * DELETE /api/produtos/:id
+ * Deleta um perfume existente
+ */
 export const deletarPerfume = async (req, res) => {
   try {
     const { id } = req.params;
-    await prisma.perfume.delete({
-      where: { id: parseInt(id) },
-    });
-    res.status(200).json({ message: 'Perfume deletado com sucesso!' });
+    const perfumeDeletado = await perfumeService.excluirPerfume(id);
+
+    res.status(200).json({ message: 'Perfume deletado com sucesso!', success: true, data: perfumeDeletado });
   } catch (error) {
-    return res.status(500).json({ message: 'Error ao deletar perfume!', error: error.message });
+    console.error('Ocorreu um erro ao deletar perfume:', error);
+    return res.status(500).json({ message: 'Error ao deletar perfume!', success: false, error: error.message });
   }
 };
