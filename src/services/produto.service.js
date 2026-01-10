@@ -184,9 +184,52 @@ export const atualizarPerfume = async (id, perfumeDados) => {
     return perfumeAtualizado;
 };
 
+/**
+ * Remove um perfume do sistema
+ * @param {number} id - ID do perfume
+ * @returns {Promise<Object>} Dados do perfume removido
+ * @throws {Error} Se usuário não existir
+ */
+
+export const excluirPerfume = async (id) => {
+    // 1. Validar ID
+    if (!id || isNaN(id) || id <= 0) {
+      throw new Error('ID inválido. Deve ser um número positivo');
+    }
+
+    // 2. Verificar se perfume existe
+    const perfumeExistente = await prisma.perfume.findUnique({
+      where: { id: parseInt(id) },
+      select: {
+        id: true,
+        nome: true,
+        marca: true,
+        quantidade_estoque: true,
+        foto: true, 
+        descricao: true, 
+        frasco: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!perfumeExistente) {
+      throw new Error(`Perfume com ID ${id} não encontrado`);
+    }
+
+    // 3. Remover perfume do banco
+    await prisma.perfume.delete({
+      where: { id: parseInt(id) },
+    });
+
+    // 4. Retornar dados do usuário removido (para confirmação)
+    return usuarioExistente;  
+};
+
 // Exportações nomeadas para facilitar testes e imports
 export default {
   listarPerfumes,
   criarPerfume,
-  atualizarPerfume
+  atualizarPerfume,
+  excluirPerfume,
 };
