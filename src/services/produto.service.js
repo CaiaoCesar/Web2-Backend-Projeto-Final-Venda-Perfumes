@@ -103,8 +103,90 @@ export const criarPerfume = async (perfumeDados) => {
   return novoPerfume;
 };
 
+/**
+ * Atualiza um perfume existente
+ * @param {number} id - ID do perfume
+ * @param {Object} perfumeDados - Dados para atualizar
+ * @returns {Promise<Object>} Perfume atualizado
+ * @throws {Error} Se validação falhar ou perfume não existir
+ */
+export const atualizarPerfume = async (id, perfumeDados) => {
+  // 1. Validar ID
+  if (!id || isNaN(id) || id <= 0) {
+    throw new Error('ID inválido. Deve ser um número positivo');
+  }
+
+  // 2. Verificar se usuário existe
+  const perfumeExistente = await prisma.perfume.findUnique({
+    where: { id: parseInt(id) },
+  });
+
+  if (!perfumeExistente) {
+    throw new Error(`Perfume com ID ${id} não encontrado`);
+  }
+
+  // 3. Se nome está sendo alterado, verificar unicidade
+  if (perfumeDados.nome && (perfumeDados.nome !== perfumeExistente.nome)) {
+    const nomeJaExiste = await perfumeExiste(perfumeDados.nome);
+    if (nomeJaExiste) {
+      throw new Error('Nome já está em uso por outro perfume');
+    }
+  }
+
+    // 4. Preparar dados para atualização (apenas campos fornecidos)
+    const dadosAtualizados = {};
+
+    if (perfumeDados.nome) {
+      dadosAtualizados.nome = perfumeDados.nome;
+    }
+
+    if (perfumeDados.marca) {
+      dadosAtualizados.marca = perfumeDados.marca;
+    }
+
+    if (perfumeDados.preco) {
+      dadosAtualizados.preco = perfumeDados.preco;
+    }
+
+    if (perfumeDados.quantidade_estoque) {
+      dadosAtualizados.quantidade_estoque = perfumeDados.quantidade_estoque;
+    }
+
+    if (perfumeDados.foto) {
+      dadosAtualizados.foto = perfumeDados.foto;
+    }
+
+    if (perfumeDados.descricao) {
+      dadosAtualizados.descricao = perfumeDados.descricao;
+    }
+
+    if (perfumeDados.frasco) {
+      dadosAtualizados.frasco = perfumeDados.frasco;
+    }
+
+    // 5. Atualizar perfume no banco
+    const perfumeAtualizado = await prisma.perfume.update({
+      where: { id: parseInt(id) },
+      data: dadosAtualizados,
+      select: {
+        id: true,
+        nome: true,
+        marca: true,
+        quantidade_estoque: true,
+        foto: true, 
+        descricao: true, 
+        frasco: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return perfumeAtualizado;
+};
+
 // Exportações nomeadas para facilitar testes e imports
 export default {
   listarPerfumes,
-  criarPerfume
+  criarPerfume,
+  atualizarPerfume
 };
