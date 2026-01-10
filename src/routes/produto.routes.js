@@ -193,7 +193,7 @@ router.put('/:id', perfumeController.editarPerfume);
  *         description: Perfume não encontrado
  */
 
-router.put('/estoque/:id', editarEstoquePerfume);
+router.put('/estoque/:id', perfumeController.editarEstoquePerfume);
 
 /**
  * @swagger

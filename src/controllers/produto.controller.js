@@ -66,7 +66,7 @@ export const editarPerfume = async (req, res) => {
 };
 
 /**
- * PUT /api/produtos/:id
+ * PUT /api/estoque/:id
  * Atualiza o estoque de um perfume existente
  */
 export const editarEstoquePerfume = async (req, res) => {

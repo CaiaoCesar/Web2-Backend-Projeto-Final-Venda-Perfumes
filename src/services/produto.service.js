@@ -271,5 +271,6 @@ export default {
   listarPerfumes,
   criarPerfume,
   atualizarPerfume,
+  AtualizarEstoquePerfume,
   excluirPerfume,
 };
