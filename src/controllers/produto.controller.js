@@ -1,5 +1,16 @@
-import prisma from '../config/database.js';
+import { success } from 'zod/v4';
+import * as perfumeService from '../services/produto.service.js';
 
+/**
+ * Perfume Controller
+ * Responsável por gerenciar requisições HTTP relacionadas aos perfumes
+ * Delega a lógica de negócio para o perfumeService
+ */
+
+/**
+ * POST /api/produtos
+ * cria um novo perfume
+ */
 export const criarPerfume = async (req, res) => {
   try {
     const { nome, marca, preco } = req.body;
@@ -7,39 +18,32 @@ export const criarPerfume = async (req, res) => {
       return res.status(400).json({ message: 'Todos os campos devem ser preenchidos' });
     }
 
-    const perfumeExistente = await prisma.perfume.findFirst({
-      where: { nome },
-    });
-
-    if (perfumeExistente) {
-      return res.status(400).json({ message: 'Ja existe um perfume com esse nome' });
-    }
-
-    const novoPerfume = await prisma.perfume.create({
-      data: {
-        nome,
-        marca,
-        preco,
-      },
-    });
+    const novoPerfume = await perfumeService.criarPerfume(req.body);
 
     res.status(201).json({
+      success: true,
       message: 'Perfume criado com sucesso!',
-      produto: novoPerfume,
+      data: novoPerfume,
     });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    console.error('Ocorreu um erro ao criar perfume:', error);
+    return res.status(500).json({ success: false, message: 'Ocorreu um erro ao criar perfume!', error: error.message });
   }
 };
 
+/** 
+ * GET /api/produtos
+ * listar todos os perfumes
+*/
 export const listarPerfumes = async (req, res) => {
   try {
-    const perfumes = await prisma.perfume.findMany();
-    res.status(200).json({ message: 'Perfumes listados com sucesso!', perfumes });
+    const perfumes = await perfumeService.listarPerfumes();
+    res.status(200).json({ message: 'Perfumes listados com sucesso!', success: true, data: perfumes, total: perfumes.length });
   } catch (error) {
+    console.error('Ocorreu um erro ao listar perfumes:', error);
     return res
       .status(500)
-      .json({ message: 'Ocorreu um erro ao listar perfumes!', error: error.message });
+      .json({ message: 'Ocorreu um erro ao listar perfumes!', success: false, error: error.message });
   }
 };
 
