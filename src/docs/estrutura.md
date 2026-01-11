@@ -79,3 +79,4 @@
 ├── .prettierrc        # Configuração do Prettier
 ├── README.md          # Documentação principal
 └── vitest.config.js   # Configuração dos testes
+```
