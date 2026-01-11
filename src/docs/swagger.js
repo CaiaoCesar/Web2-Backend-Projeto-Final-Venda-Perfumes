@@ -71,5 +71,5 @@ export default (app) => {
     customSiteTitle: "API Vendas de Perfumes",
   }));
   
-  console.log('📚 Swagger UI disponível em http://localhost:3000/api-docs');
+  console.log('\n📚 Swagger UI disponível em http://localhost:3000/api-docs');
 };
