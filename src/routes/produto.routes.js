@@ -1,4 +1,4 @@
-import express from "express";
+import express from 'express';
 import * as perfumeController from '../controllers/produto.controller.js';
 
 const router = express.Router();

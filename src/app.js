@@ -34,7 +34,7 @@ app.use('/api/produtos', produtoRoutes);
 
 // Rota de teste
 app.get('/', (req, res) => {
-  res.json({ 
+  res.json({
     message: 'API Sistema de Vendas de Perfumes',
     status: 'online',
     version: '1.1.0',
@@ -43,14 +43,14 @@ app.get('/', (req, res) => {
       produtos: '/api/produtos',
       // auth: '/api/auth',
       // pedidos: '/api/pedidos',
-    }
+    },
   });
 });
 
 // Rota de health check
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'healthy', 
+  res.json({
+    status: 'healthy',
     timestamp: new Date().toISOString(),
     database: 'connected', // Você pode verificar conexão com DB aqui
   });

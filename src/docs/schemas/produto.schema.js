@@ -51,7 +51,7 @@
  *           type: string
  *           format: date-time
  *           description: Data de atualização
- * 
+ *
  *     PerfumeInput:
  *       type: object
  *       required:
@@ -79,7 +79,7 @@
  *         quantidade_estoque:
  *           type: integer
  *           example: 50
- * 
+ *
  *     Erro:
  *       type: object
  *       properties:

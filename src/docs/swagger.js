@@ -57,19 +57,23 @@ const options = {
     ],
   },
   apis: [
-    './src/routes/*.js',          // Rotas com anotações
-    './src/docs/schemas/*.js',    // Schemas reutilizáveis
+    './src/routes/*.js', // Rotas com anotações
+    './src/docs/schemas/*.js', // Schemas reutilizáveis
   ],
 };
 
 const specs = swaggerJsdoc(options);
 
 export default (app) => {
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
-    explorer: true,
-    customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: "API Vendas de Perfumes",
-  }));
-  
+  app.use(
+    '/api-docs',
+    swaggerUi.serve,
+    swaggerUi.setup(specs, {
+      explorer: true,
+      customCss: '.swagger-ui .topbar { display: none }',
+      customSiteTitle: 'API Vendas de Perfumes',
+    })
+  );
+
   console.log('\n📚 Swagger UI disponível em http://localhost:3000/api-docs');
 };

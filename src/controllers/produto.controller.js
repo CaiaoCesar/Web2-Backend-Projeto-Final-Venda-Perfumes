@@ -27,23 +27,36 @@ export const criarPerfume = async (req, res) => {
     });
   } catch (error) {
     console.error('Ocorreu um erro ao criar perfume:', error);
-    return res.status(500).json({ success: false, message: 'Ocorreu um erro ao criar perfume!', error: error.message });
+    return res
+      .status(500)
+      .json({ success: false, message: 'Ocorreu um erro ao criar perfume!', error: error.message });
   }
 };
 
-/** 
+/**
  * GET /api/produtos
  * listar todos os perfumes
-*/
+ */
 export const listarPerfumes = async (req, res) => {
   try {
     const perfumes = await perfumeService.listarPerfumes();
-    res.status(200).json({ message: 'Perfumes listados com sucesso!', success: true, data: perfumes, total: perfumes.length });
+    res
+      .status(200)
+      .json({
+        message: 'Perfumes listados com sucesso!',
+        success: true,
+        data: perfumes,
+        total: perfumes.length,
+      });
   } catch (error) {
     console.error('Ocorreu um erro ao listar perfumes:', error);
     return res
       .status(500)
-      .json({ message: 'Ocorreu um erro ao listar perfumes!', success: false, error: error.message });
+      .json({
+        message: 'Ocorreu um erro ao listar perfumes!',
+        success: false,
+        error: error.message,
+      });
   }
 };
 
@@ -56,12 +69,18 @@ export const editarPerfume = async (req, res) => {
     const { id } = req.params;
     const perfumeAtualizado = await perfumeService.atualizarPerfume(id, req.body);
 
-    res.status(200).json({ message: 'Perfume atualizado com sucesso!', success: true, data: perfumeAtualizado });
+    res
+      .status(200)
+      .json({ message: 'Perfume atualizado com sucesso!', success: true, data: perfumeAtualizado });
   } catch (error) {
     console.error('Ocorreu um erro ao atualizar perfume:', error);
     return res
       .status(500)
-      .json({ message: 'Ocorreu um erro ao atualizar perfume!', success: false, error: error.message });
+      .json({
+        message: 'Ocorreu um erro ao atualizar perfume!',
+        success: false,
+        error: error.message,
+      });
   }
 };
 
@@ -74,12 +93,22 @@ export const editarEstoquePerfume = async (req, res) => {
     const { id } = req.params;
     const estoqueAtualizado = await perfumeService.atualizarEstoquePerfume(id, req.body);
 
-    res.status(200).json({ message: 'Estoque do perfume atualizado com sucesso!', success: true, data: estoqueAtualizado });
+    res
+      .status(200)
+      .json({
+        message: 'Estoque do perfume atualizado com sucesso!',
+        success: true,
+        data: estoqueAtualizado,
+      });
   } catch (error) {
-    console.log({'Ocorreu um erro ao atualizar o estoque do perfume': error});  
+    console.log({ 'Ocorreu um erro ao atualizar o estoque do perfume': error });
     return res
       .status(500)
-      .json({ message: 'Ocorreu um erro ao atualizar o estoque do perfume', success: false, error: error.message });
+      .json({
+        message: 'Ocorreu um erro ao atualizar o estoque do perfume',
+        success: false,
+        error: error.message,
+      });
   }
 };
 
@@ -92,9 +121,13 @@ export const deletarPerfume = async (req, res) => {
     const { id } = req.params;
     const perfumeDeletado = await perfumeService.excluirPerfume(id);
 
-    res.status(200).json({ message: 'Perfume deletado com sucesso!', success: true, data: perfumeDeletado });
+    res
+      .status(200)
+      .json({ message: 'Perfume deletado com sucesso!', success: true, data: perfumeDeletado });
   } catch (error) {
     console.error('Ocorreu um erro ao deletar perfume:', error);
-    return res.status(500).json({ message: 'Error ao deletar perfume!', success: false, error: error.message });
+    return res
+      .status(500)
+      .json({ message: 'Error ao deletar perfume!', success: false, error: error.message });
   }
 };
