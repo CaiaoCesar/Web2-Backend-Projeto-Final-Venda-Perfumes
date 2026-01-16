@@ -1,7 +1,13 @@
-import express from 'express';
+import { Router } from 'express';
 import * as perfumeController from '../controllers/produto.controller.js';
+// Importa os métodos do middleware de validação
+import { 
+  validarCriacaoProduto, 
+  validarEditarProduto, 
+  validarEditarEstoque 
+} from '../middlewares/validation.middleware.js';
 
-const router = express.Router();
+const router = Router();
 
 /**
  * @swagger
@@ -54,7 +60,16 @@ const router = express.Router();
  *       401:
  *         description: Não autenticado
  */
-router.post('/', perfumeController.criarPerfume);
+
+
+// Rota de criação do produto
+router.post('/', validarCriacaoProduto, perfumeController.criarPerfume);
+
+// Rota de edição do estoque do produto
+router.put('/estoque/:id', validarEditarEstoque, perfumeController.editarEstoquePerfume);
+
+// Rota de edição de dados do produto 
+router.put('/:id', validarEditarProduto, perfumeController.editarPerfume);
 
 /**
  * @swagger
@@ -146,7 +161,8 @@ router.get('/', perfumeController.listarPerfumes);
  *       401:
  *         description: Não autenticado
  */
-router.put('/:id', perfumeController.editarPerfume);
+
+//router.put('/:id', perfumeController.editarPerfume);
 
 /**
  * @swagger
@@ -184,7 +200,8 @@ router.put('/:id', perfumeController.editarPerfume);
  *       404:
  *         description: Perfume não encontrado
  */
-router.put('/estoque/:id', perfumeController.editarEstoquePerfume);
+
+//router.put('/estoque/:id', perfumeController.editarEstoquePerfume);
 
 /**
  * @swagger
@@ -210,6 +227,7 @@ router.put('/estoque/:id', perfumeController.editarEstoquePerfume);
  *       401:
  *         description: Não autenticado
  */
+
 router.delete('/:id', perfumeController.deletarPerfume);
 
 export default router;

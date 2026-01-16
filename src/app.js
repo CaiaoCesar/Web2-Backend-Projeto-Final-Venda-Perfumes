@@ -5,6 +5,9 @@ import rateLimit from 'express-rate-limit';
 import 'express-async-errors';
 import setupSwagger from './docs/swagger.js';
 
+// Importação do middleware
+import { errorHandler } from './middlewares/error.middleware.js';
+
 // Importar rotas
 import produtoRoutes from './routes/produto.routes.js';
 // Importar outras rotas depois...
@@ -65,4 +68,11 @@ app.use((err, req, res, next) => {
   });
 });
 
+
+
+
+
+
+// Deve ser a última linha
+app.use(errorHandler);
 export default app;

@@ -48,7 +48,9 @@ const perfumeExiste = async (nome) => {
  * @param {Object} perfumeDados - Dados do perfume
  * @throws {Error} Se validação falhar
  */
-const validarPerfume = (perfumeDados) => {
+
+// Essa função é do middleware
+/*const validarPerfume = (perfumeDados) => {
   const { nome, marca, preco } = perfumeDados;
 
   if (!nome || !marca || preco === undefined || preco === null) {
@@ -58,7 +60,7 @@ const validarPerfume = (perfumeDados) => {
   if (preco < 0) {
     throw new Error('Preço não pode ser negativo');
   }
-};
+};*/
 
 /**
  * Cria um novo perfume
@@ -68,7 +70,7 @@ const validarPerfume = (perfumeDados) => {
  */
 export const criarPerfume = async (perfumeDados) => {
   // 1. Validar dados de entrada
-  validarPerfume(perfumeDados);
+  //validarPerfume(perfumeDados);
 
   // 2. Verificar se o nome do perfume já existe
   const verificaPerfumeExiste = await perfumeExiste(perfumeDados.nome);
@@ -171,19 +173,19 @@ export const atualizarPerfume = async (id, perfumeDados) => {
  * @throws {Error} Se validação falhar ou perfume não existir
  */
 export const atualizarEstoquePerfume = async (id, perfumeDados) => {
-  // 1. Validar ID
-  if (!id) {
+  // 1. Validar ID/*
+  /*if (!id) {
     throw new Error('ID inválido');
-  }
-
+  }*/
+/*
   // 2. Validar quantidade
   if (perfumeDados.quantidade_estoque === undefined || perfumeDados.quantidade_estoque === null) {
     throw new Error('Quantidade de estoque é obrigatória');
   }
 
-  if (perfumeDados.quantidade_estoque < 0) {
+ /* if (perfumeDados.quantidade_estoque < 0) {
     throw new Error('Quantidade não pode ser negativa');
-  }
+  }*/
 
   // 3. Verificar se perfume existe
   const perfumeExistente = await prisma.perfume.findUnique({
