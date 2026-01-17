@@ -5,6 +5,7 @@ O commit semântico possui elementos estruturais (**tipos**) que informam a inte
 ## 🎯 Tipos de Commits
 
 ### feat
+
 **Descrição:** Commits do tipo `feat` indicam que o código está incluindo um novo recurso.  
 **Relacionado com:** `MINOR` do versionamento semântico.
 
@@ -17,6 +18,7 @@ Copy code
 ---
 
 ### fix
+
 **Descrição:** Commits do tipo `fix` indicam a correção de um problema (bug fix).  
 **Relacionado com:** `PATCH` do versionamento semântico.
 
@@ -29,6 +31,7 @@ Copy code
 ---
 
 ### docs
+
 **Descrição:** Commits do tipo `docs` indicam mudanças na documentação.  
 **Não inclui:** Alterações em código.
 
@@ -41,6 +44,7 @@ Copy code
 ---
 
 ### test
+
 **Descrição:** Commits do tipo `test` são utilizados quando há alterações em testes.  
 **Inclui:** Criar, alterar ou excluir testes unitários.  
 **Não inclui:** Alterações em código de produção.
@@ -54,6 +58,7 @@ Copy code
 ---
 
 ### build
+
 **Descrição:** Commits do tipo `build` são utilizados para modificações em arquivos de build ou dependências.
 
 **Exemplo:**
@@ -65,6 +70,7 @@ Copy code
 ---
 
 ### perf
+
 **Descrição:** Commits do tipo `perf` indicam alterações relacionadas à performance.
 
 **Exemplo:**
@@ -76,6 +82,7 @@ Copy code
 ---
 
 ### style
+
 **Descrição:** Commits do tipo `style` indicam alterações de formatação de código.  
 **Inclui:** Ponto e vírgula, espaços em branco, lint, formatação.  
 **Não inclui:** Alterações de funcionalidade.
@@ -89,6 +96,7 @@ Copy code
 ---
 
 ### refactor
+
 **Descrição:** Commits do tipo `refactor` referem-se a refatorações que não alteram a funcionalidade.  
 **Inclui:** Melhorias de performance e reorganização de código.
 
@@ -101,6 +109,7 @@ Copy code
 ---
 
 ### chore
+
 **Descrição:** Commits do tipo `chore` indicam tarefas de manutenção, configurações ou pacotes.  
 **Não inclui:** Alterações em código de funcionalidade.
 
@@ -113,6 +122,7 @@ Copy code
 ---
 
 ### ci
+
 **Descrição:** Commits do tipo `ci` indicam mudanças relacionadas à integração contínua.
 
 **Exemplo:**
@@ -124,6 +134,7 @@ Copy code
 ---
 
 ### raw
+
 **Descrição:** Commits do tipo `raw` indicam mudanças em arquivos de configuração, dados ou parâmetros.
 
 **Exemplo:**
@@ -135,6 +146,7 @@ Copy code
 ---
 
 ### cleanup
+
 **Descrição:** Commits do tipo `cleanup` são usados para remover código comentado ou desnecessário.  
 **Objetivo:** Melhorar legibilidade e manutenibilidade.
 
@@ -147,6 +159,7 @@ Copy code
 ---
 
 ### remove
+
 **Descrição:** Commits do tipo `remove` indicam a exclusão de arquivos, diretórios ou funcionalidades obsoletas.  
 **Objetivo:** Reduzir tamanho e complexidade do projeto.
 
