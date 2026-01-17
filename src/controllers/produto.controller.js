@@ -1,4 +1,3 @@
-import { success } from 'zod/v4';
 import * as perfumeService from '../services/produto.service.js';
 
 /**
@@ -11,12 +10,13 @@ import * as perfumeService from '../services/produto.service.js';
  * POST /api/produtos
  * cria um novo perfume
  */
-export const criarPerfume = async (req, res) => {
+export const criarPerfume = async (req, res, next) => {
   try {
-    const { nome, marca, preco } = req.body;
+    // Essa parte vai no middlware
+    /*const { nome, marca, preco } = req.body;
     if (!nome || !marca || !preco) {
       return res.status(400).json({ message: 'Todos os campos devem ser preenchidos' });
-    }
+    }*/
 
     const novoPerfume = await perfumeService.criarPerfume(req.body);
 
@@ -26,10 +26,9 @@ export const criarPerfume = async (req, res) => {
       data: novoPerfume,
     });
   } catch (error) {
-    console.error('Ocorreu um erro ao criar perfume:', error);
-    return res
-      .status(500)
-      .json({ success: false, message: 'Ocorreu um erro ao criar perfume!', error: error.message });
+    /*console.error('Ocorreu um erro ao criar perfume:', error);
+    return res*/
+    next(error);
   }
 };
 
@@ -37,7 +36,7 @@ export const criarPerfume = async (req, res) => {
  * GET /api/produtos
  * listar todos os perfumes
  */
-export const listarPerfumes = async (req, res) => {
+export const listarPerfumes = async (req, res, next) => {
   try {
     const perfumes = await perfumeService.listarPerfumes();
     res
@@ -49,14 +48,15 @@ export const listarPerfumes = async (req, res) => {
         total: perfumes.length,
       });
   } catch (error) {
-    console.error('Ocorreu um erro ao listar perfumes:', error);
+    /*console.error('Ocorreu um erro ao listar perfumes:', error);
     return res
       .status(500)
       .json({
         message: 'Ocorreu um erro ao listar perfumes!',
         success: false,
         error: error.message,
-      });
+      });*/
+    next(error);
   }
 };
 
@@ -64,7 +64,7 @@ export const listarPerfumes = async (req, res) => {
  * PUT /api/produtos/:id
  * Atualiza um perfume existente
  */
-export const editarPerfume = async (req, res) => {
+export const editarPerfume = async (req, res, next) => {
   try {
     const { id } = req.params;
     const perfumeAtualizado = await perfumeService.atualizarPerfume(id, req.body);
@@ -73,14 +73,15 @@ export const editarPerfume = async (req, res) => {
       .status(200)
       .json({ message: 'Perfume atualizado com sucesso!', success: true, data: perfumeAtualizado });
   } catch (error) {
-    console.error('Ocorreu um erro ao atualizar perfume:', error);
+    /*console.error('Ocorreu um erro ao atualizar perfume:', error);
     return res
       .status(500)
       .json({
         message: 'Ocorreu um erro ao atualizar perfume!',
         success: false,
         error: error.message,
-      });
+      });*/
+    next(error);
   }
 };
 
@@ -88,7 +89,7 @@ export const editarPerfume = async (req, res) => {
  * PUT /api/estoque/:id
  * Atualiza o estoque de um perfume existente
  */
-export const editarEstoquePerfume = async (req, res) => {
+export const editarEstoquePerfume = async (req, res, next) => {
   try {
     const { id } = req.params;
     const estoqueAtualizado = await perfumeService.atualizarEstoquePerfume(id, req.body);
@@ -101,14 +102,15 @@ export const editarEstoquePerfume = async (req, res) => {
         data: estoqueAtualizado,
       });
   } catch (error) {
-    console.log({ 'Ocorreu um erro ao atualizar o estoque do perfume': error });
+    /*console.log({ 'Ocorreu um erro ao atualizar o estoque do perfume': error });
     return res
       .status(500)
       .json({
         message: 'Ocorreu um erro ao atualizar o estoque do perfume',
         success: false,
         error: error.message,
-      });
+      });*/
+    next(error);
   }
 };
 
@@ -116,7 +118,7 @@ export const editarEstoquePerfume = async (req, res) => {
  * DELETE /api/produtos/:id
  * Deleta um perfume existente
  */
-export const deletarPerfume = async (req, res) => {
+export const deletarPerfume = async (req, res, next) => {
   try {
     const { id } = req.params;
     const perfumeDeletado = await perfumeService.excluirPerfume(id);
@@ -125,9 +127,11 @@ export const deletarPerfume = async (req, res) => {
       .status(200)
       .json({ message: 'Perfume deletado com sucesso!', success: true, data: perfumeDeletado });
   } catch (error) {
-    console.error('Ocorreu um erro ao deletar perfume:', error);
+    /*console.error('Ocorreu um erro ao deletar perfume:', error);
     return res
-      .status(500)
+       .status(500)
       .json({ message: 'Error ao deletar perfume!', success: false, error: error.message });
+      */
+    next(error);
   }
 };
