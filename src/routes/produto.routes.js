@@ -1,5 +1,6 @@
 import express from 'express';
 import * as perfumeController from '../controllers/produto.controller.js';
+import upload from '../config/upload.js';
 
 const router = express.Router();
 
@@ -54,7 +55,7 @@ const router = express.Router();
  *       401:
  *         description: Não autenticado
  */
-router.post('/', perfumeController.criarPerfume);
+router.post('/', upload.single('foto'), perfumeController.criarPerfume);
 
 /**
  * @swagger
@@ -146,7 +147,7 @@ router.get('/', perfumeController.listarPerfumes);
  *       401:
  *         description: Não autenticado
  */
-router.put('/:id', perfumeController.editarPerfume);
+router.put('/:id',  upload.single('foto'), perfumeController.editarPerfume);
 
 /**
  * @swagger

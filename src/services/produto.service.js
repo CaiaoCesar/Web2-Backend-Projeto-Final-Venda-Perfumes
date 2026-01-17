@@ -1,4 +1,5 @@
 import prisma from '../config/database.js';
+import { uploadImgUploadcare} from './upload.service.js'
 
 /**
  * Perfume Service
@@ -63,6 +64,7 @@ const validarPerfume = (perfumeDados) => {
 /**
  * Cria um novo perfume
  * @param {Object} perfumeDados - Dados do novo perfume
+ * @param {Object} file - Arquivo de imagem do perfume
  * @returns {Promise<Object>} perfume criado
  * @throws {Error} Se validação falhar ou perfume já existir
  */
@@ -76,13 +78,19 @@ export const criarPerfume = async (perfumeDados) => {
     throw new Error('Perfume já cadastrado no sistema');
   }
 
+  let fotoUrl = null; 
+  if (file) {
+    console.log("Arquivo recebido para upload:", file.originalname);
+    fotoUrl = await uploadImgUploadcare(file.buffer, file.originalname, file.mimetype);
+  }
+
   // 3. Criar perfume no banco
   const novoPerfume = await prisma.perfume.create({
     data: {
       nome: perfumeDados.nome,
       marca: perfumeDados.marca,
       quantidade_estoque: perfumeDados.quantidade_estoque || 0,
-      foto: perfumeDados.foto || null,
+      foto: fotoUrl || perfumeDados.foto || null,
       preco: perfumeDados.preco,
       descricao: perfumeDados.descricao || null,
       frasco: perfumeDados.frasco || null,
@@ -133,6 +141,13 @@ export const atualizarPerfume = async (id, perfumeDados) => {
     }
   }
 
+  let fotoUrl = null; 
+  if (file) {
+    console.log("Arquivo recebido para upload:", file.originalname);
+    fotoUrl = await uploadImgUploadcare(file.buffer, file.originalname, file.mimetype);
+    console.log("Nova foto enviada:", fotoUrl);
+  }
+
   // 4. Preparar dados para atualização (apenas campos fornecidos)
   const dadosAtualizados = {};
 
@@ -142,6 +157,13 @@ export const atualizarPerfume = async (id, perfumeDados) => {
   if (perfumeDados.foto !== undefined) dadosAtualizados.foto = perfumeDados.foto;
   if (perfumeDados.descricao !== undefined) dadosAtualizados.descricao = perfumeDados.descricao;
   if (perfumeDados.frasco !== undefined) dadosAtualizados.frasco = perfumeDados.frasco;
+
+  if (file) {
+    dadosAtualizados.foto = fotoUrl;
+  } else if (perfumeDados.foto !== undefined) {
+    dadosAtualizados.foto = perfumeDados.foto;
+  }
+
 
   // 5. Atualizar perfume no banco
   const perfumeAtualizado = await prisma.perfume.update({
@@ -159,6 +181,8 @@ export const atualizarPerfume = async (id, perfumeDados) => {
       updatedAt: true,
     },
   });
+
+  console.log("Perfume atualizado com sucesso:", perfumeAtualizado);
 
   return perfumeAtualizado;
 };
