@@ -1,6 +1,6 @@
 // src/routes/produto.routes.js
 import { Router } from 'express';
-import * as perfumeController from '../controllers/produto.controller.js';
+import * as produtoController from '../controllers/produto.controller.js';
 import upload from '../config/upload.js';
 import { 
   validarCriacaoProduto, 
@@ -12,11 +12,11 @@ const router = Router();
 
 /**
  * @swagger
- * /api/produtos:
+ * /api/v2/perfumes:
  *   post:
  *     summary: Criar um novo perfume
  *     description: Cria um novo perfume no sistema (apenas vendedores autenticados)
- *     tags: [Produtos]
+ *     tags: [Perfumes]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -66,15 +66,15 @@ const router = Router();
  *       401:
  *         description: Não autenticado
  */
-router.post('/', upload.single('foto'), validarCriacaoProduto, perfumeController.criarPerfume);
+router.post('/', upload.single('foto'), validarCriacaoProduto, produtoController.criarPerfume);
 
 /**
  * @swagger
- * /api/produtos:
+ * /api/v2/perfumes:
  *   get:
  *     summary: Listar todos os perfumes
  *     description: Retorna uma lista de todos os perfumes disponíveis (pública)
- *     tags: [Produtos]
+ *     tags: [Perfumes]
  *     parameters:
  *       - in: query
  *         name: page
@@ -107,15 +107,15 @@ router.post('/', upload.single('foto'), validarCriacaoProduto, perfumeController
  *       200:
  *         description: Lista de perfumes retornada com sucesso
  */
-router.get('/', perfumeController.listarPerfumes);
+router.get('/', produtoController.listarPerfumes);
 
 /**
  * @swagger
- * /api/produtos/estoque/{id}:
+ * /api/v2/perfumes/estoque/{id}:
  *   put:
  *     summary: Atualizar estoque de um perfume
  *     description: Atualiza apenas a quantidade em estoque de um perfume
- *     tags: [Produtos]
+ *     tags: [Perfumes]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -145,15 +145,15 @@ router.get('/', perfumeController.listarPerfumes);
  *       404:
  *         description: Perfume não encontrado
  */
-router.put('/estoque/:id', validarEditarEstoque, perfumeController.editarEstoquePerfume);
+router.put('/estoque/:id', validarEditarEstoque, produtoController.editarEstoquePerfume);
 
 /**
  * @swagger
- * /api/produtos/{id}:
+ * /api/v2/perfumes/{id}:
  *   put:
  *     summary: Atualizar um perfume
  *     description: Atualiza os dados de um perfume existente (apenas vendedores autenticados)
- *     tags: [Produtos]
+ *     tags: [Perfumes]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -197,15 +197,15 @@ router.put('/estoque/:id', validarEditarEstoque, perfumeController.editarEstoque
  *       401:
  *         description: Não autenticado
  */
-router.put('/:id', upload.single('foto'), validarEditarProduto, perfumeController.editarPerfume);
+router.put('/:id', upload.single('foto'), validarEditarProduto, produtoController.editarPerfume);
 
 /**
  * @swagger
- * /api/produtos/{id}:
+ * /api/v2/perfumes/{id}:
  *   delete:
  *     summary: Deletar um perfume
  *     description: Remove um perfume do sistema (apenas vendedores autenticados)
- *     tags: [Produtos]
+ *     tags: [Perfumes]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -223,6 +223,6 @@ router.put('/:id', upload.single('foto'), validarEditarProduto, perfumeControlle
  *       401:
  *         description: Não autenticado
  */
-router.delete('/:id', perfumeController.deletarPerfume);
+router.delete('/:id', produtoController.deletarPerfume);
 
 export default router;

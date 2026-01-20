@@ -1,6 +1,6 @@
 {
   "name": "sistema-vendas-perfumes-backend",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Backend para sistema de vendas de perfumes com checkout via WhatsApp",
   "type": "module",
   "main": "src/server.js",
