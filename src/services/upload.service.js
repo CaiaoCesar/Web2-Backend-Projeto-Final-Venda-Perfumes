@@ -17,8 +17,9 @@ export const uploadImgUploadcare = async (fileBuffer, fileName, mimeType) => {
             throw new Error('Arquivo inválido ou vazio');
         }
 
-        if (!process.env.UPLOADCARE_PUBLIC_KEY) {
-            throw new Error('Chave pública (UPLOADCARE_PUBLIC_KEY) do Uploadcare não está configurada nas variáveis de ambiente.');
+        // Validação das chaves de ambiente
+        if (!process.env.UPLOADCARE_PUBLIC_KEY || !process.env.UPLOADCARE_SECRET_KEY) {
+            throw new Error('As chaves do Uploadcare (PUBLIC e/ou SECRET) não estão configuradas no .env');
         }
 
         console.log('Iniciando upload do arquivo para o Uploadcare:', {
@@ -56,8 +57,17 @@ export const uploadImgUploadcare = async (fileBuffer, fileName, mimeType) => {
             console.warn('Aviso ao confirmar armazenamento:', storeError.message);
         }
 
-        // url cdn do uploadcare default
-        const urlCdnUploadcare = `https://2a8kfg8gba.ucarecd.net/${arquivo.uuid}/`;
+        // Buscamos a base do .env
+        const cdnBase = process.env.UPLOADCARE_CDN_BASE;
+
+        // Se a variável não existir, lançamos um erro
+        if (!cdnBase) {
+            throw new Error('A variável UPLOADCARE_CDN_BASE não foi configurada no arquivo .env');
+        }
+
+        // Se chegou aqui, é porque a variável existe, então tratamos a barra final
+        const cdnUrlLimpa = cdnBase.endsWith('/') ? cdnBase : `${cdnBase}/`;
+        const urlCdnUploadcare = `${cdnUrlLimpa}${arquivo.uuid}/`;
         
         console.log("Upload concluído com sucesso!");
         console.log("UUID:", arquivo.uuid);
@@ -78,11 +88,40 @@ export const uploadImgUploadcare = async (fileBuffer, fileName, mimeType) => {
  */
 export const apagaDoUploadCare = async (fileId) => {
     try {
-        console.log("Deleção ainda não implementada:", fileId);
-        // TODO: Implementar usando DeleteFileCommand do Uploadcare REST API
+        if (!fileId) return false;
+
+        const response = await fetch(
+            `https://api.uploadcare.com/files/${fileId}/storage/`,
+            {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Uploadcare.Simple ${process.env.UPLOADCARE_PUBLIC_KEY}:${process.env.UPLOADCARE_SECRET_KEY}`,
+                    'Accept': 'application/vnd.uploadcare-v0.7+json',
+                },
+            }
+        );
+
+        // 
+        if (response.ok) {
+            console.log(`✅ Sucesso: O arquivo ${fileId} não está mais no storage.`);
+            return true;
+        }
+
+        // Status é de erro (4xx ou 5xx)
+        const status = response.status;
+        const erroCorpo = await response.text();
+        
+        // Caso o arquivo já tenha sido removido anteriormente, o Uploadcare pode retornar 404
+        if (status === 404) {
+            console.warn(`Aviso: Arquivo ${fileId} já não existia ou já foi removido.`);
+            return true; // Retorna true já que o objetivo era nao ter arquivo
+        }
+
+        console.error(`Erro na API (Status ${status}):`, erroCorpo);
         return false;
+
     } catch (error) {
-        console.error("Erro ao deletar arquivo:", error);
+        console.error("Erro de conexão ao remover do storage:", error.message);
         return false;
     }
 };

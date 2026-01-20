@@ -5,7 +5,8 @@ import upload from '../config/upload.js';
 import { 
   validarCriacaoProduto, 
   validarEditarProduto, 
-  validarEditarEstoque 
+  validarEditarEstoque,
+  validarId 
 } from '../middlewares/validation.middleware.js';
 
 const router = Router();
@@ -66,6 +67,8 @@ const router = Router();
  *       401:
  *         description: Não autenticado
  */
+
+// Rota para criar novo perfume
 router.post('/', upload.single('foto'), validarCriacaoProduto, produtoController.criarPerfume);
 
 /**
@@ -107,6 +110,8 @@ router.post('/', upload.single('foto'), validarCriacaoProduto, produtoController
  *       200:
  *         description: Lista de perfumes retornada com sucesso
  */
+
+// Rota para listar produtos
 router.get('/', produtoController.listarPerfumes);
 
 /**
@@ -145,7 +150,9 @@ router.get('/', produtoController.listarPerfumes);
  *       404:
  *         description: Perfume não encontrado
  */
-router.put('/estoque/:id', validarEditarEstoque, produtoController.editarEstoquePerfume);
+
+// Rota para editar estoque perfume, é necessário validar o ID
+router.put('/estoque/:id', validarId, validarEditarEstoque, produtoController.editarEstoquePerfume);
 
 /**
  * @swagger
@@ -172,19 +179,19 @@ router.put('/estoque/:id', validarEditarEstoque, produtoController.editarEstoque
  *             properties:
  *               nome:
  *                 type: string
- *                 example: "Perfume Atualizado"
+ *                 example: ""
  *               marca:
  *                 type: string
- *                 example: "Dior"
+ *                 example: ""
  *               descricao:
  *                 type: string
- *                 example: "Descrição atualizada"
+ *                 example: ""
  *               preco:
  *                 type: number
- *                 example: 349.90
+ *                 example: ""
  *               frasco:
  *                 type: number
- *                 example: 150.0
+ *                 example: ""
  *               foto:
  *                 type: string
  *                 format: binary
@@ -197,7 +204,9 @@ router.put('/estoque/:id', validarEditarEstoque, produtoController.editarEstoque
  *       401:
  *         description: Não autenticado
  */
-router.put('/:id', upload.single('foto'), validarEditarProduto, produtoController.editarPerfume);
+
+// Rota para editar perfume, é necessário validar ID
+router.put('/:id', validarId, upload.single('foto'), validarEditarProduto, produtoController.editarPerfume);
 
 /**
  * @swagger
@@ -223,6 +232,8 @@ router.put('/:id', upload.single('foto'), validarEditarProduto, produtoControlle
  *       401:
  *         description: Não autenticado
  */
-router.delete('/:id', produtoController.deletarPerfume);
+
+// Rota para deletar um produto, é necessário validar o ID
+router.delete('/:id', validarId, produtoController.deletarPerfume);
 
 export default router;
