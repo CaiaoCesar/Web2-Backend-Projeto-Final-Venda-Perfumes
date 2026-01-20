@@ -29,6 +29,10 @@ const router = Router();
  *               - nome
  *               - marca
  *               - preco
+ *               - descricao
+ *               - frasco
+ *               - quantidade_estoque
+ *               - foto
  *             properties:
  *               nome:
  *                 type: string
