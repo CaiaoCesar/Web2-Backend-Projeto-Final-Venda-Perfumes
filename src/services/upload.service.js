@@ -30,13 +30,40 @@ export const uploadImgUploadcare = async (fileBuffer, fileName, mimeType) => {
         const arquivo = await clientUploadcare.uploadFile(fileBuffer, {
             fileName: fileName, 
             contentType: mimeType,
-            store: '1', // '1' força armazenamento imediato, 'auto' pode deixar temporário
+            store: '1', // '1' força armazenamento imediato
         });
 
-        // FIX: Era 'file.uuid' mas a variável é 'arquivo'
-        const urlCdnUploadcare = `https://ucarecdn.com/${arquivo.uuid}/`;
-        console.log("Upload concluído com sucesso:", urlCdnUploadcare);
+        console.log("Arquivo enviado. UUID:", arquivo.uuid);
 
+        // Aguardar um momento para o Uploadcare processar
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Confirmar armazenamento do arquivo (caso "Automatic file storing" esteja OFF)
+        try {
+            const storeResponse = await fetch(`https://api.uploadcare.com/files/${arquivo.uuid}/storage/`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Uploadcare.Simple ${process.env.UPLOADCARE_PUBLIC_KEY}:${process.env.UPLOADCARE_SECRET_KEY}`,
+                },
+            });
+
+            if (!storeResponse.ok) {
+                console.warn('Aviso: Não foi possível confirmar armazenamento, mas arquivo pode estar salvo.');
+            } else {
+                console.log("Armazenamento confirmado com sucesso!");
+            }
+        } catch (storeError) {
+            console.warn('Aviso ao confirmar armazenamento:', storeError.message);
+        }
+
+        // url cdn do uploadcare default
+        const urlCdnUploadcare = `https://2a8kfg8gba.ucarecd.net/${arquivo.uuid}/`;
+        
+        console.log("Upload concluído com sucesso!");
+        console.log("UUID:", arquivo.uuid);
+        console.log("URL gerada (Correta):", urlCdnUploadcare);
+
+        // Retornar a URL que o Uploadcare forneceu diretamente
         return urlCdnUploadcare;
     } catch (error) {
         console.error('Erro no upload:', error);
