@@ -1,7 +1,7 @@
+// src/routes/produto.routes.js
 import { Router } from 'express';
 import * as perfumeController from '../controllers/produto.controller.js';
 import upload from '../config/upload.js';
-// Importa os métodos do middleware de validação
 import { 
   validarCriacaoProduto, 
   validarEditarProduto, 
@@ -22,7 +22,7 @@ const router = Router();
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -52,7 +52,8 @@ const router = Router();
  *                 example: 50
  *               foto:
  *                 type: string
- *                 example: "https://example.com/foto.jpg"
+ *                 format: binary
+ *                 description: Arquivo de imagem (JPEG, PNG, WEBP, GIF - máx 5MB)
  *     responses:
  *       201:
  *         description: Perfume criado com sucesso
@@ -61,17 +62,7 @@ const router = Router();
  *       401:
  *         description: Não autenticado
  */
-router.post('/', upload.single('foto'), perfumeController.criarPerfume);
-
-
-// Rota de criação do produto
-router.post('/', validarCriacaoProduto, perfumeController.criarPerfume);
-
-// Rota de edição do estoque do produto
-router.put('/estoque/:id', validarEditarEstoque, perfumeController.editarEstoquePerfume);
-
-// Rota de edição de dados do produto 
-router.put('/:id', validarEditarProduto, perfumeController.editarPerfume);
+router.post('/', upload.single('foto'), validarCriacaoProduto, perfumeController.criarPerfume);
 
 /**
  * @swagger
@@ -116,59 +107,6 @@ router.get('/', perfumeController.listarPerfumes);
 
 /**
  * @swagger
- * /api/produtos/{id}:
- *   put:
- *     summary: Atualizar um perfume
- *     description: Atualiza os dados de um perfume existente (apenas vendedores autenticados)
- *     tags: [Produtos]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: ID do perfume
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               nome:
- *                 type: string
- *                 example: "Perfume Atualizado"
- *               marca:
- *                 type: string
- *                 example: "Dior"
- *               descricao:
- *                 type: string
- *                 example: "Descrição atualizada"
- *               preco:
- *                 type: number
- *                 example: 349.90
- *               frasco:
- *                 type: number
- *                 example: 150.0
- *               foto:
- *                 type: string
- *                 example: "https://example.com/nova-foto.jpg"
- *     responses:
- *       200:
- *         description: Perfume atualizado com sucesso
- *       404:
- *         description: Perfume não encontrado
- *       401:
- *         description: Não autenticado
- */
-router.put('/:id',  upload.single('foto'), perfumeController.editarPerfume);
-
-//router.put('/:id', perfumeController.editarPerfume);
-
-/**
- * @swagger
  * /api/produtos/estoque/{id}:
  *   put:
  *     summary: Atualizar estoque de um perfume
@@ -181,7 +119,7 @@ router.put('/:id',  upload.single('foto'), perfumeController.editarPerfume);
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *         description: ID do perfume
  *     requestBody:
  *       required: true
@@ -203,8 +141,59 @@ router.put('/:id',  upload.single('foto'), perfumeController.editarPerfume);
  *       404:
  *         description: Perfume não encontrado
  */
+router.put('/estoque/:id', validarEditarEstoque, perfumeController.editarEstoquePerfume);
 
-//router.put('/estoque/:id', perfumeController.editarEstoquePerfume);
+/**
+ * @swagger
+ * /api/produtos/{id}:
+ *   put:
+ *     summary: Atualizar um perfume
+ *     description: Atualiza os dados de um perfume existente (apenas vendedores autenticados)
+ *     tags: [Produtos]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do perfume
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nome:
+ *                 type: string
+ *                 example: "Perfume Atualizado"
+ *               marca:
+ *                 type: string
+ *                 example: "Dior"
+ *               descricao:
+ *                 type: string
+ *                 example: "Descrição atualizada"
+ *               preco:
+ *                 type: number
+ *                 example: 349.90
+ *               frasco:
+ *                 type: number
+ *                 example: 150.0
+ *               foto:
+ *                 type: string
+ *                 format: binary
+ *                 description: Nova foto do produto (JPEG, PNG, WEBP, GIF - máx 5MB)
+ *     responses:
+ *       200:
+ *         description: Perfume atualizado com sucesso
+ *       404:
+ *         description: Perfume não encontrado
+ *       401:
+ *         description: Não autenticado
+ */
+router.put('/:id', upload.single('foto'), validarEditarProduto, perfumeController.editarPerfume);
 
 /**
  * @swagger
@@ -220,7 +209,7 @@ router.put('/:id',  upload.single('foto'), perfumeController.editarPerfume);
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *         description: ID do perfume
  *     responses:
  *       200:
@@ -230,7 +219,6 @@ router.put('/:id',  upload.single('foto'), perfumeController.editarPerfume);
  *       401:
  *         description: Não autenticado
  */
-
 router.delete('/:id', perfumeController.deletarPerfume);
 
 export default router;
