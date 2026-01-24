@@ -1,27 +1,39 @@
-import express from 'express';
-import * as perfumeController from '../controllers/produto.controller.js';
+// src/routes/produto.routes.js
+import { Router } from 'express';
+import * as produtoController from '../controllers/produto.controller.js';
+import upload from '../config/upload.js';
+import { 
+  validarCriacaoProduto, 
+  validarEditarProduto, 
+  validarEditarEstoque,
+  validarId 
+} from '../middlewares/validation.middleware.js';
 
-const router = express.Router();
+const router = Router();
 
 /**
  * @swagger
- * /api/produtos:
+ * /api/v2/perfumes:
  *   post:
  *     summary: Criar um novo perfume
  *     description: Cria um novo perfume no sistema (apenas vendedores autenticados)
- *     tags: [Produtos]
+ *     tags: [Perfumes]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
  *               - nome
  *               - marca
  *               - preco
+ *               - descricao
+ *               - frasco
+ *               - quantidade_estoque
+ *               - foto
  *             properties:
  *               nome:
  *                 type: string
@@ -45,7 +57,8 @@ const router = express.Router();
  *                 example: 50
  *               foto:
  *                 type: string
- *                 example: "https://example.com/foto.jpg"
+ *                 format: binary
+ *                 description: Arquivo de imagem (JPEG, PNG, WEBP, GIF - máx 5MB)
  *     responses:
  *       201:
  *         description: Perfume criado com sucesso
@@ -54,15 +67,17 @@ const router = express.Router();
  *       401:
  *         description: Não autenticado
  */
-router.post('/', perfumeController.criarPerfume);
+
+// Rota para criar novo perfume
+router.post('/', upload.single('foto'), validarCriacaoProduto, produtoController.criarPerfume);
 
 /**
  * @swagger
- * /api/produtos:
+ * /api/v2/perfumes:
  *   get:
  *     summary: Listar todos os perfumes
  *     description: Retorna uma lista de todos os perfumes disponíveis (pública)
- *     tags: [Produtos]
+ *     tags: [Perfumes]
  *     parameters:
  *       - in: query
  *         name: page
@@ -95,66 +110,17 @@ router.post('/', perfumeController.criarPerfume);
  *       200:
  *         description: Lista de perfumes retornada com sucesso
  */
-router.get('/', perfumeController.listarPerfumes);
+
+// Rota para listar produtos
+router.get('/', produtoController.listarPerfumes);
 
 /**
  * @swagger
- * /api/produtos/{id}:
- *   put:
- *     summary: Atualizar um perfume
- *     description: Atualiza os dados de um perfume existente (apenas vendedores autenticados)
- *     tags: [Produtos]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: ID do perfume
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               nome:
- *                 type: string
- *                 example: "Perfume Atualizado"
- *               marca:
- *                 type: string
- *                 example: "Dior"
- *               descricao:
- *                 type: string
- *                 example: "Descrição atualizada"
- *               preco:
- *                 type: number
- *                 example: 349.90
- *               frasco:
- *                 type: number
- *                 example: 150.0
- *               foto:
- *                 type: string
- *                 example: "https://example.com/nova-foto.jpg"
- *     responses:
- *       200:
- *         description: Perfume atualizado com sucesso
- *       404:
- *         description: Perfume não encontrado
- *       401:
- *         description: Não autenticado
- */
-router.put('/:id', perfumeController.editarPerfume);
-
-/**
- * @swagger
- * /api/produtos/estoque/{id}:
+ * /api/v2/perfumes/estoque/{id}:
  *   put:
  *     summary: Atualizar estoque de um perfume
  *     description: Atualiza apenas a quantidade em estoque de um perfume
- *     tags: [Produtos]
+ *     tags: [Perfumes]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -162,7 +128,7 @@ router.put('/:id', perfumeController.editarPerfume);
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *         description: ID do perfume
  *     requestBody:
  *       required: true
@@ -184,15 +150,17 @@ router.put('/:id', perfumeController.editarPerfume);
  *       404:
  *         description: Perfume não encontrado
  */
-router.put('/estoque/:id', perfumeController.editarEstoquePerfume);
+
+// Rota para editar estoque perfume, é necessário validar o ID
+router.put('/estoque/:id', validarId, validarEditarEstoque, produtoController.editarEstoquePerfume);
 
 /**
  * @swagger
- * /api/produtos/{id}:
- *   delete:
- *     summary: Deletar um perfume
- *     description: Remove um perfume do sistema (apenas vendedores autenticados)
- *     tags: [Produtos]
+ * /api/v2/perfumes/{id}:
+ *   put:
+ *     summary: Atualizar um perfume
+ *     description: Atualiza os dados de um perfume existente (apenas vendedores autenticados)
+ *     tags: [Perfumes]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -200,7 +168,61 @@ router.put('/estoque/:id', perfumeController.editarEstoquePerfume);
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
+ *         description: ID do perfume
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nome:
+ *                 type: string
+ *                 example: ""
+ *               marca:
+ *                 type: string
+ *                 example: ""
+ *               descricao:
+ *                 type: string
+ *                 example: ""
+ *               preco:
+ *                 type: number
+ *                 example: ""
+ *               frasco:
+ *                 type: number
+ *                 example: ""
+ *               foto:
+ *                 type: string
+ *                 format: binary
+ *                 description: Nova foto do produto (JPEG, PNG, WEBP, GIF - máx 5MB)
+ *     responses:
+ *       200:
+ *         description: Perfume atualizado com sucesso
+ *       404:
+ *         description: Perfume não encontrado
+ *       401:
+ *         description: Não autenticado
+ */
+
+// Rota para editar perfume, é necessário validar ID
+router.put('/:id', validarId, upload.single('foto'), validarEditarProduto, produtoController.editarPerfume);
+
+/**
+ * @swagger
+ * /api/v2/perfumes/{id}:
+ *   delete:
+ *     summary: Deletar um perfume
+ *     description: Remove um perfume do sistema (apenas vendedores autenticados)
+ *     tags: [Perfumes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
  *         description: ID do perfume
  *     responses:
  *       200:
@@ -210,6 +232,8 @@ router.put('/estoque/:id', perfumeController.editarEstoquePerfume);
  *       401:
  *         description: Não autenticado
  */
-router.delete('/:id', perfumeController.deletarPerfume);
+
+// Rota para deletar um produto, é necessário validar o ID
+router.delete('/:id', validarId, produtoController.deletarPerfume);
 
 export default router;
