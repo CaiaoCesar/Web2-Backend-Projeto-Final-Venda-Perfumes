@@ -5,6 +5,9 @@ import rateLimit from 'express-rate-limit';
 import 'express-async-errors';
 import setupSwagger from './docs/swagger.js';
 
+// Importação do middleware
+import { errorHandler } from './middlewares/error.middleware.js';
+
 // Importar rotas
 import produtoRoutes from './routes/produto.routes.js';
 // Importar outras rotas depois...
@@ -27,8 +30,8 @@ app.use('/api', limiter);
 // Configurar Swagger
 setupSwagger(app);
 
-// Rotas da API com prefixo /api
-app.use('/api/produtos', produtoRoutes);
+// Rotas da API com prefixo /api/versão
+app.use('/api/v2/perfumes', produtoRoutes);
 // app.use('/api/auth', authRoutes);
 // app.use('/api/pedidos', pedidoRoutes);
 
@@ -37,10 +40,10 @@ app.get('/', (req, res) => {
   res.json({
     message: 'API Sistema de Vendas de Perfumes',
     status: 'online',
-    version: '1.1.0',
+    version: '2.0',
     docs: 'http://localhost:3000/api-docs',
     endpoints: {
-      produtos: '/api/produtos',
+      produtos: '/api/perfumes',
       // auth: '/api/auth',
       // pedidos: '/api/pedidos',
     },
@@ -65,4 +68,11 @@ app.use((err, req, res, next) => {
   });
 });
 
+
+
+
+
+
+// Deve ser a última linha
+app.use(errorHandler);
 export default app;
