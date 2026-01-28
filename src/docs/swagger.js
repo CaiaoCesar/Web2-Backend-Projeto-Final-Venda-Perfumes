@@ -6,7 +6,7 @@ const options = {
     openapi: '3.0.0',
     info: {
       title: 'API Sistema de Vendas de Perfumes',
-      version: '1.0.0',
+      version: '2.0.0',
       description: 'Backend para sistema de vendas de perfumes com checkout via WhatsApp',
     },
     servers: [

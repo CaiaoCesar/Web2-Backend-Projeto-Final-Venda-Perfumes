@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import 'express-async-errors';
 import setupSwagger from './docs/swagger.js';
+import authRoutes from './routes/auth.routes.js';
 
 const app = express();
 
@@ -24,13 +25,19 @@ app.use('/api', limiter);
 // Configurar Swagger
 setupSwagger(app);
 
+// Rotas da API com prefixo /api/versão
+app.use('/api/v2/vendedores', authRoutes);
+
 // Rota de teste
 app.get('/', (req, res) => {
   res.json({
     message: 'API Sistema de Vendas de Perfumes',
     status: 'online',
-    version: '1.0.0',
+    version: '2.0.0',
     docs: 'http://localhost:3000/api-docs',
+    endpoints: {
+      auth: '/api/v2/vendedores',
+    }
   });
 });
 

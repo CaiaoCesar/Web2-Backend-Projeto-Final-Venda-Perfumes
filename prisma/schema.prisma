@@ -10,22 +10,22 @@ datasource db {
 
 // ENUMS para status (Não tinha no modelo conceitual, mas está definido para melhor controle)
 enum StatusPedido {
-  PENDENTE      // Aguardando pagamento
-  CONFIRMADO    // Pago e confirmado
-  PREPARACAO    // Em preparação
-  CANCELADO     // Cancelado (Na seguinte ordem pensando no cenário que o usuário só possa cancelar o pedido antes dele ser enviado)
-  ENVIADO       // Enviado para entrega
-  ENTREGUE      // Entregue
+  PENDENTE      // Pedido criado, aguardando confirmação de compra do cliente
+  CONFIRMADO    // Pedido confirmado pelo cliente mediante o acordo dos seus detalhes
 }
 
-// MODELO ADMINISTRADOR como foi definido anteriormente com seus atributos e tipos,
-// Pensei no id cuid pois grante unicidade gerado automaticamente é mais facil de ser compreendido já que tem menos caracteres
-model Administrador {
+// MODELO VENDEDOR como foi definido anteriormente com seus atributos e tipos,
+// Pensei no id cuid pois grante unicidade gerado automaticamente e com segurança
+// Campos de endereço (estado e cidade) adicionados conforme solicitado para gerir a localização dos administradores
+
+model Vendedor {
   id        String    @id @default(cuid())
   nome      String
   email     String    @unique
   senha     String
   telefone  String
+  estado     String  
+  cidade    String
   
   // RELACIONAMENTO: Um Administrador pode ter MUITOS Pedidos (0,N)
   pedidos   Pedido[]
@@ -34,19 +34,21 @@ model Administrador {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   
-  @@map("administradores")
+  @@map("vendedores")
 }
 
 // MODELO PERFUME, com a quantidade em estoque que por padrão é 0 quando criado
+// Campos agora sendo todos obrigatórios conforme acordado
+
 model Perfume {
-  id                  String        @id @default(cuid())
+  id        Int       @id @default(autoincrement())  //Mudança do id para autoincremento  que antes era cuid
   nome                String
   marca               String
   quantidade_estoque  Int           @default(0) @map("quantidade_estoque")
-  foto                String?
+  foto                String
   preco               Float
-  descricao           String?
-  frasco              Float?        // ml do frasco
+  descricao           String
+  frasco              Float        // ml do frasco
   
   // RELACIONAMENTO N:N com Pedido (através de PedidoItem)
   pedidoItens         PedidoItem[]
@@ -66,11 +68,11 @@ model Pedido {
   telefone_cliente  String        @map("telefone_cliente")
   status            StatusPedido  @default(PENDENTE)
   data_pedido       DateTime      @default(now()) @map("data_pedido")
-  
-  // RELACIONAMENTO: Um Pedido pertence a UM Administrador
-  administradorId   String        @map("administrador_id")
-  administrador     Administrador @relation(fields: [administradorId], references: [id], onDelete: Cascade)
-  
+
+  // RELACIONAMENTO: Um Pedido pertence a UM Vendedor
+  vendedorId   String        @map("vendedor_id")
+  vendedor     Vendedor @relation(fields: [vendedorId], references: [id], onDelete: Cascade)
+
   // RELACIONAMENTO N:N com Perfume (através de PedidoItem)
   itens             PedidoItem[]
   
@@ -98,7 +100,7 @@ model PedidoItem {
   preco_unitario Float @map("preco_unitario") // Preço na hora da compra
   
   // RELACIONAMENTOS
-  perfumeId  String   @map("perfume_id")
+  perfumeId  Int   @map("perfume_id")
   perfume    Perfume  @relation(fields: [perfumeId], references: [id], onDelete: Cascade)
   
   pedidoId   String   @map("pedido_id")

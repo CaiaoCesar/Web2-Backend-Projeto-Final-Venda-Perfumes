@@ -1,10 +1,10 @@
-import { prisma } from "../database/prismaClient.js";
+import prisma from "../config/database.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 // REGISTRO DE VENDEDOR
 export const registerVendedor = async (req, res) => {
-  const { nome, email, senha } = req.body;
+  const { nome, email, senha, telefone, estado, cidade } = req.body;
 
   try {
     // Verifica se o email já existe
@@ -16,7 +16,7 @@ export const registerVendedor = async (req, res) => {
 
     // Cria o vendedor
     const vendedor = await prisma.vendedor.create({
-      data: { nome, email, senha: hashedPassword }
+      data: { nome, email, senha: hashedPassword, telefone, estado, cidade }
     });
 
     return res.status(201).json({ vendedor });
@@ -43,7 +43,7 @@ export const loginVendedor = async (req, res) => {
     const token = jwt.sign(
       { id: vendedor.id, email: vendedor.email },
       process.env.JWT_SECRET,
-      { expiresIn: "2h" }
+      { expiresIn: process.env.EXPIRATION_TIME }
     );
 
     return res.json({ vendedor, token });
