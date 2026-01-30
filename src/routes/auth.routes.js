@@ -1,5 +1,7 @@
 import { Router } from "express";
-import { registerVendedor, loginVendedor } from "../controllers/auth.controller.js";
+import { registrarVendedor, loginVendedor } from "../controllers/auth.controller.js";
+import multer from 'multer';
+const upload = multer();
 
 const router = Router();
 
@@ -52,7 +54,7 @@ const router = Router();
  */
 
 // Rota para criar novo usuário vendedor
-router.post("/register", registerVendedor);
+router.post("/register", upload.none(), registrarVendedor);
 
 /**
  * @swagger

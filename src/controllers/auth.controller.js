@@ -25,10 +25,11 @@ export const registrarVendedor = async (req, res, next) => {
       data: novoVendedor,
     });
   } catch (error) {
+    console.error(error);
     next(error);
   }
 };
-
+/*
 // REGISTRO DE VENDEDOR
 export const registerVendedor = async (req, res) => {
   const { nome, email, senha, telefone, estado, cidade } = req.body;
@@ -51,7 +52,7 @@ export const registerVendedor = async (req, res) => {
     console.error(error);
     return res.status(500).json({ message: "Erro ao registrar vendedor" });
   }
-};
+};*/
 
 // LOGIN DE VENDEDOR
 export const loginVendedor = async (req, res) => {
