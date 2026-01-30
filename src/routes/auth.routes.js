@@ -58,13 +58,13 @@ router.post("/register", registrarVendedor);
  * @swagger
  * /api/v2/vendedores/login:
  *   post:
- *     summary: Fazer login como vendedor
- *     description: Autentica um vendedor no sistema
+ *     summary: Faz login na conta de vendedor
+ *     description: Realiza login na conta de vendedor
  *     tags: [Vendedores]
  *     requestBody:
  *       required: true
  *       content:
- *          application/json:
+ *         application/json:
  *           schema:
  *             type: object
  *             required:
@@ -77,11 +77,11 @@ router.post("/register", registrarVendedor);
  *               senha:
  *                 type: string
  *                 example: "senhaSegura"
- *   responses:
+ *     responses:
  *       200:
- *         description: Login bem-sucedido
- *       400:
- *         description: Dados inválidos
+ *         description: Login realizado com sucesso com sucesso
+ *       401:
+ *         description: Não autenticado
  */
 
 router.post("/login", loginVendedor);

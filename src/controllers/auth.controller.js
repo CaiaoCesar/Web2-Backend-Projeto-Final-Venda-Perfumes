@@ -1,6 +1,3 @@
-import prisma from "../config/database.js";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 
 import * as authService from "../services/auth.service.js";
 
@@ -18,12 +15,14 @@ export const registrarVendedor = async (req, res, next) => {
   try {
     // req.file é populado pelo multer quando há upload
     const novoVendedor = await authService.criarVendedor(req.body);
-
+    console.log(authService.criarVendedor.token);
     res.status(201).json({
       success: true,
       message: 'Vendedor registrado com sucesso!',
       data: novoVendedor,
     });
+
+    
   } catch (error) {
     console.error(error);
     next(error);
@@ -32,32 +31,20 @@ export const registrarVendedor = async (req, res, next) => {
 
 // LOGIN DE VENDEDOR
 export const loginVendedor = async (req, res) => {
-  const novoLogin = await authService.criarVendedor(req.body);
-
   try {
-    // Verifica se existe
-    console.log("Entrou aqui");
-    const vendedor = await prisma.vendedor.findUnique({ where: { email } });
-    if (!vendedor) return res.status(400).json({ message: "Email ou senha inválidos" });
+      const { email, senha } = req.body;
+      
+      // Chama o service
+      const { vendedor, token } = await authService.autenticarVendedor(email, senha);
 
-    // Confere senha
-    const isValid = await bcrypt.compare(senha, vendedor.senha);
-    if (!isValid) return res.status(400).json({ message: "Email ou senha inválidos" });
+      console.log("Este é o token", token);
+      return res.json({
+        success: true,
+        data: { vendedor, token }
+      });
 
-    console.log("Usuario logou com sucesso");
-    // Gera JWT
-    /*
-    const token = jwt.sign(
-      { id: vendedor.id, email: vendedor.email },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.EXPIRATION_TIME }
-    );
-*/
-
-    return res.json({ vendedor, token });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Erro ao fazer login" });
+    } catch (error) {
+      return res.status(401).json({ message: error.message });
   }
 };
 
