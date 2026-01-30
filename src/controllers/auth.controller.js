@@ -1,4 +1,4 @@
-import * as authService from "../services/auth.service.js";
+import * as authService from '../services/auth.service.js';
 
 /**
  * Controller de autentificação de vendedores
@@ -19,10 +19,7 @@ export const registrarVendedor = async (req, res, next) => {
       message: 'Vendedor registrado com sucesso!',
       data: novoVendedor,
     });
-
-    
   } catch (error) {
-    console.error(error);
     next(error);
   }
 };
@@ -30,19 +27,18 @@ export const registrarVendedor = async (req, res, next) => {
 // LOGIN DE VENDEDOR
 export const loginVendedor = async (req, res) => {
   try {
-      const { email, senha } = req.body;
-      
-      // Chama o service
-      const { vendedor, token } = await authService.autenticarVendedor(email, senha);
+    const { email, senha } = req.body;
 
-      console.log("Este é o token", token);
-      return res.json({
-        success: true,
-        data: { vendedor, token }
-      });
+    // Chama o service
+    const { vendedor, token } = await authService.autenticarVendedor(email, senha);
 
-    } catch (error) {
-      return res.status(401).json({ message: error.message });
+    console.log('Este é o token', token);
+    return res.json({
+      success: true,
+      data: { vendedor, token },
+    });
+  } catch (error) {
+    return res.status(401).json({ message: error.message });
   }
 };
 

@@ -13,7 +13,7 @@ const helmetConfig = helmet({
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"], // Necessário para Swagger UI
       scriptSrc: ["'self'", "'unsafe-inline'"], // Necessário para Swagger UI
-      imgSrc: ["'self'", "data:", "https:"],
+      imgSrc: ["'self'", 'data:', 'https:'],
     },
   },
 

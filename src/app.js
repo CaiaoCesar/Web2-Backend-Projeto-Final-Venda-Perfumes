@@ -37,7 +37,7 @@ app.get('/', (req, res) => {
     docs: 'http://localhost:3000/api-docs',
     endpoints: {
       auth: '/api/v2/vendedores',
-    }
+    },
   });
 });
 

@@ -1,5 +1,7 @@
-import { Router } from "express";
-import { registrarVendedor, loginVendedor } from "../controllers/auth.controller.js";
+import { Router } from 'express';
+import { registrarVendedor, loginVendedor } from '../controllers/auth.controller.js';
+import { validacao } from '../middlewares/validation.middleware.js';
+import { vendedorSchema } from '../schemas/vendedor.schema.js';
 
 const router = Router();
 
@@ -35,7 +37,7 @@ const router = Router();
  *                 example: "senhaSegura"
  *               telefone:
  *                 type: string
- *                 example: "(38) 99999-9999"
+ *                 example: "38999999999"
  *               estado:
  *                 type: string
  *                 example: "MG"
@@ -51,8 +53,8 @@ const router = Router();
  *         description: Não autenticado
  */
 
-// Rota para criar novo usuário vendedor
-router.post("/register", registrarVendedor);
+// Rota para validar dados e criar novo usuário vendedor
+router.post('/register', validacao(vendedorSchema), registrarVendedor);
 
 /**
  * @swagger
@@ -84,6 +86,7 @@ router.post("/register", registrarVendedor);
  *         description: Não autenticado
  */
 
-router.post("/login", loginVendedor);
+// Rota para fazer login do vendedor
+router.post('/login', loginVendedor);
 
 export default router;
