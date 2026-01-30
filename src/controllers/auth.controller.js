@@ -2,6 +2,33 @@ import prisma from "../config/database.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+import * as authService from "../services/auth.service.js";
+
+/**
+ * Controller de autentificação de vendedores
+ * Responsável por gerenciar requisições HTTP relacionadas aos vendedores
+ * Delega a lógica de negócio para o authService
+ */
+
+/**
+ * POST /api/v2/vendedores
+ * Cria um novo vendedor
+ */
+export const registrarVendedor = async (req, res, next) => {
+  try {
+    // req.file é populado pelo multer quando há upload
+    const novoVendedor = await authService.criarVendedor(req.body);
+
+    res.status(201).json({
+      success: true,
+      message: 'Vendedor registrado com sucesso!',
+      data: novoVendedor,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // REGISTRO DE VENDEDOR
 export const registerVendedor = async (req, res) => {
   const { nome, email, senha, telefone, estado, cidade } = req.body;
@@ -51,4 +78,9 @@ export const loginVendedor = async (req, res) => {
     console.error(error);
     return res.status(500).json({ message: "Erro ao fazer login" });
   }
+};
+
+export default {
+  registrarVendedor,
+  loginVendedor,
 };
