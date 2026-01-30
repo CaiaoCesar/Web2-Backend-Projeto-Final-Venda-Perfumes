@@ -17,8 +17,10 @@ export const criarVendedor = async (vendedorDados) => {
         throw new Error('Existe um Vendedor com este email já registrado'); 
     }
 
+    // Transforma os saltos da variável do ambiente para numero
     const saltos = Number(process.env.SALTS_BYCRIPT) || 10;
 
+    // Criptografa a senha
     const senhaCriptografada = await bcrypt.hash(vendedorDados.senha, saltos);
     return await prisma.vendedor.create({
         data: {
@@ -60,7 +62,11 @@ export const autenticarVendedor = async (email, senha) => {
     { expiresIn: process.env.EXPIRATION_TIME || '5h' }
   );
 
-  return { vendedor, token };  
+  // Remove o campo senha do vendedor
+  const { senha: _, ...vendedorSemSenha } = vendedor;
+
+  // Retorna o vendedor sem a senha e o token
+  return { vendedor: vendedorSemSenha, token };  
 
 }
 

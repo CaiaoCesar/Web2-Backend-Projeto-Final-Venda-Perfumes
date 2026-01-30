@@ -1,4 +1,3 @@
-
 import * as authService from "../services/auth.service.js";
 
 /**
@@ -13,7 +12,6 @@ import * as authService from "../services/auth.service.js";
  */
 export const registrarVendedor = async (req, res, next) => {
   try {
-    // req.file é populado pelo multer quando há upload
     const novoVendedor = await authService.criarVendedor(req.body);
     console.log(authService.criarVendedor.token);
     res.status(201).json({
