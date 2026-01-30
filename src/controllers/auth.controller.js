@@ -29,34 +29,10 @@ export const registrarVendedor = async (req, res, next) => {
     next(error);
   }
 };
-/*
-// REGISTRO DE VENDEDOR
-export const registerVendedor = async (req, res) => {
-  const { nome, email, senha, telefone, estado, cidade } = req.body;
-
-  try {
-    // Verifica se o email já existe
-    const existing = await prisma.vendedor.findUnique({ where: { email } });
-    if (existing) return res.status(400).json({ message: "Email já cadastrado" });
-
-    // Criptografa a senha
-    const hashedPassword = await bcrypt.hash(senha, 10);
-
-    // Cria o vendedor
-    const vendedor = await prisma.vendedor.create({
-      data: { nome, email, senha: hashedPassword, telefone, estado, cidade }
-    });
-
-    return res.status(201).json({ vendedor });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Erro ao registrar vendedor" });
-  }
-};*/
 
 // LOGIN DE VENDEDOR
 export const loginVendedor = async (req, res) => {
-  const { email, senha } = req.body;
+  const novoLogin = await authService.criarVendedor(req.body);
 
   try {
     // Verifica se existe
@@ -70,13 +46,13 @@ export const loginVendedor = async (req, res) => {
 
     console.log("Usuario logou com sucesso");
     // Gera JWT
+    /*
     const token = jwt.sign(
       { id: vendedor.id, email: vendedor.email },
       process.env.JWT_SECRET,
       { expiresIn: process.env.EXPIRATION_TIME }
     );
-
-    
+*/
 
     return res.json({ vendedor, token });
   } catch (error) {

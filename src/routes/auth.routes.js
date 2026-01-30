@@ -1,7 +1,5 @@
 import { Router } from "express";
 import { registrarVendedor, loginVendedor } from "../controllers/auth.controller.js";
-import multer from 'multer';
-const upload = multer();
 
 const router = Router();
 
@@ -15,7 +13,7 @@ const router = Router();
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             type: object
  *             required:
@@ -54,7 +52,7 @@ const router = Router();
  */
 
 // Rota para criar novo usuário vendedor
-router.post("/register", upload.none(), registrarVendedor);
+router.post("/register", registrarVendedor);
 
 /**
  * @swagger
@@ -66,7 +64,7 @@ router.post("/register", upload.none(), registrarVendedor);
  *     requestBody:
  *       required: true
  *       content:
- *          multipart/form-data:
+ *          application/json:
  *           schema:
  *             type: object
  *             required:
@@ -86,6 +84,6 @@ router.post("/register", upload.none(), registrarVendedor);
  *         description: Dados inválidos
  */
 
-router.post("/login", upload.none(), loginVendedor);
+router.post("/login", loginVendedor);
 
 export default router;
