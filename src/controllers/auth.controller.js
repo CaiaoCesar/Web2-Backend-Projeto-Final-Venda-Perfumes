@@ -60,6 +60,7 @@ export const loginVendedor = async (req, res) => {
 
   try {
     // Verifica se existe
+    console.log("Entrou aqui");
     const vendedor = await prisma.vendedor.findUnique({ where: { email } });
     if (!vendedor) return res.status(400).json({ message: "Email ou senha inválidos" });
 
@@ -67,12 +68,15 @@ export const loginVendedor = async (req, res) => {
     const isValid = await bcrypt.compare(senha, vendedor.senha);
     if (!isValid) return res.status(400).json({ message: "Email ou senha inválidos" });
 
+    console.log("Usuario logou com sucesso");
     // Gera JWT
     const token = jwt.sign(
       { id: vendedor.id, email: vendedor.email },
       process.env.JWT_SECRET,
       { expiresIn: process.env.EXPIRATION_TIME }
     );
+
+    
 
     return res.json({ vendedor, token });
   } catch (error) {

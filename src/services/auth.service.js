@@ -1,19 +1,19 @@
 import prisma from '../config/database.js'; 
 
 // Verfica se o vendedor existe pelo email
-/*export const vendedorExiste = async (email) => {
+export const vendedorExiste = async (email) => {
     const vendedor = await prisma.vendedor.findFirst({
         where: { email: email}, 
     });
     return !!vendedor; 
-};*/
+};
 
 // Cria um novo vendedor
 export const criarVendedor = async (vendedorDados) => {
-    /*const verificaVendedorExiste = await vendedorExiste(vendedorDados.email);
+    const verificaVendedorExiste = await vendedorExiste(vendedorDados.email);
     if (verificaVendedorExiste) {
         throw new Error('Existe um Vendedor com este email já registrado'); 
-    }*/
+    }
 
     return await prisma.vendedor.create({
         data: {
@@ -36,6 +36,6 @@ export const criarVendedor = async (vendedorDados) => {
 };
 
 export default {
-    //vendedorExiste,
+    vendedorExiste,
     criarVendedor,
 }

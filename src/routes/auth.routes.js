@@ -66,7 +66,7 @@ router.post("/register", upload.none(), registrarVendedor);
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *          multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -85,6 +85,7 @@ router.post("/register", upload.none(), registrarVendedor);
  *       400:
  *         description: Dados inválidos
  */
-router.post("/login", loginVendedor);
+
+router.post("/login", upload.none(), loginVendedor);
 
 export default router;
