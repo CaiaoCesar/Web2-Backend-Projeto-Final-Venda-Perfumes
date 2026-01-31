@@ -32,13 +32,19 @@ const options = {
           type: 'http',
           scheme: 'bearer',
           bearerFormat: 'JWT',
-          description: 'Insira o token JWT no formato: Bearer {token}',
+          description: 'Insira o token JWT recebido no login',
         },
       },
     },
+    // ⭐ ADICIONE ESTA LINHA - Define segurança global
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
   },
   apis: [
-    './src/routes/*.js', // Rotas com anotações
+    './src/routes/*.js',
   ],
 };
 
@@ -52,6 +58,9 @@ export default (app) => {
       explorer: true,
       customCss: '.swagger-ui .topbar { display: none }',
       customSiteTitle: 'API Vendas de Perfumes',
+      swaggerOptions: {
+        persistAuthorization: true, // ⭐ Mantém o token após refresh
+      },
     })
   );
 

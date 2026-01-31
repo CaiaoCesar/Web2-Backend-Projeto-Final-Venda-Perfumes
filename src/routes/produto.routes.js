@@ -20,8 +20,6 @@ const router = Router();
  *     summary: Criar um novo perfume
  *     description: Cria um novo perfume no sistema (apenas vendedores autenticados)
  *     tags: [Perfumes]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -81,8 +79,6 @@ router.post('/', authMiddleware, upload.single('foto'), validarCriacaoProduto, p
  *     summary: Listar todos os perfumes
  *     description: Retorna uma lista de todos os perfumes disponíveis (pública)
  *     tags: [Perfumes]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
@@ -97,20 +93,10 @@ router.post('/', authMiddleware, upload.single('foto'), validarCriacaoProduto, p
  *           default: 10
  *         description: Quantidade por página
  *       - in: query
- *         name: marca
+ *         name: nome
  *         schema:
  *           type: string
- *         description: Filtrar por marca
- *       - in: query
- *         name: minPreco
- *         schema:
- *           type: number
- *         description: Preço mínimo
- *       - in: query
- *         name: maxPreco
- *         schema:
- *           type: number
- *         description: Preço máximo
+ *         description: Filtrar por nome
  *     responses:
  *       200:
  *         description: Lista de perfumes retornada com sucesso
@@ -126,8 +112,6 @@ router.get("/", authMiddleware, produtoController.listarPerfumes);
  *     summary: Atualizar estoque de um perfume
  *     description: Atualiza apenas a quantidade em estoque de um perfume
  *     tags: [Perfumes]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -166,8 +150,6 @@ router.put('/estoque/:id', authMiddleware, validarId, validarEditarEstoque, prod
  *     summary: Atualizar um perfume
  *     description: Atualiza os dados de um perfume existente (apenas vendedores autenticados)
  *     tags: [Perfumes]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -219,8 +201,6 @@ router.put('/:id', authMiddleware, validarId, upload.single('foto'), validarEdit
  *     summary: Deletar um perfume
  *     description: Remove um perfume do sistema (apenas vendedores autenticados)
  *     tags: [Perfumes]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id

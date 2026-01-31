@@ -17,12 +17,28 @@ const extrairUUID = (url) => {
 /**
  * Busca todos os perfumes do vendedor
  */
-export const listarPerfumes = async (vendedorId) => {
-  console.log("Este é o vendedor ",vendedorId);
-  return await prisma.perfume.findMany({
-    where: { 
-      vendedorId: vendedorId // Filtra apenas os perfumes deste dono
-    }, 
+export const listarPerfumes = async (vendedorId, filtros = {}) => {
+  const { nome, page = 1, limit = 10 } = filtros;
+  
+  // Construir o objeto where dinamicamente
+  const where = {
+    vendedorId: vendedorId
+  };
+  
+  // Adiciona filtro de nome se fornecido (busca parcial, case-insensitive)
+  if (nome) {
+    where.nome = {
+      contains: nome,
+      mode: 'insensitive' // Ignora maiúsculas/minúsculas
+    };
+  }
+  
+  // Calcular skip para paginação
+  const skip = (page - 1) * limit;
+  
+  // Buscar perfumes com filtros
+  const perfumes = await prisma.perfume.findMany({
+    where,
     select: {
       id: true,
       nome: true,
@@ -37,7 +53,17 @@ export const listarPerfumes = async (vendedorId) => {
     orderBy: {
       createdAt: 'desc',
     },
+    skip,
+    take: limit,
   });
+  
+  // Contar total de registros com os filtros
+  const total = await prisma.perfume.count({ where });
+  
+  return {
+    perfumes,
+    total
+  };
 };
 
 /**

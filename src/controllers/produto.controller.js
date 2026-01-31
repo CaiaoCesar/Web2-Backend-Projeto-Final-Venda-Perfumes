@@ -33,19 +33,31 @@ export const criarPerfume = async (req, res, next) => {
  * GET /api/produtos
  * Listar todos os perfumes
  */
+// src/controllers/produto.controller.js
+
 export const listarPerfumes = async (req, res, next) => {
   try {
-    // Captura o ID do vendedor que o authMiddleware extraiu do JWT
     const vendedorId = req.user.id;
+    
+    // Captura os filtros dos query parameters
+    const { nome, page, limit } = req.query;
+    
+    const filtros = {
+      nome,
+      page: page ? parseInt(page) : 1,
+      limit: limit ? parseInt(limit) : 10
+    };
 
-    // Passa o ID para o service 
-    const perfumes = await perfumeService.listarPerfumes(Number(vendedorId));
+    const resultado = await perfumeService.listarPerfumes(Number(vendedorId), filtros);
 
     res.status(200).json({
       message: 'Seus perfumes foram listados com sucesso!',
       success: true,
-      data: perfumes,
-      total: perfumes.length,
+      data: resultado.perfumes,
+      total: resultado.total,
+      page: filtros.page,
+      limit: filtros.limit,
+      totalPages: Math.ceil(resultado.total / filtros.limit)
     });
   } catch (error) {
     next(error);
