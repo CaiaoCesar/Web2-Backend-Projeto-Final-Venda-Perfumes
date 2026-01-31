@@ -238,6 +238,6 @@ router.put('/:id', authMiddleware, validarId, upload.single('foto'), validarEdit
  */
 
 // Rota para deletar um produto, é necessário validar o ID
-router.delete('/:id', validarId, produtoController.deletarPerfume);
+router.delete('/:id', authMiddleware, validarId, produtoController.deletarPerfume);
 
 export default router;

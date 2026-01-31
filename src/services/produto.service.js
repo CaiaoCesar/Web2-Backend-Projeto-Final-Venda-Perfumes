@@ -17,8 +17,12 @@ const extrairUUID = (url) => {
 /**
  * Busca todos os perfumes do vendedor
  */
-export const listarPerfumes = async () => {
-  return await prisma.perfume.findMany({where: { vendedorId: vendedorId },
+export const listarPerfumes = async (vendedorId) => {
+  console.log("Este é o vendedor ",vendedorId);
+  return await prisma.perfume.findMany({
+    where: { 
+      vendedorId: vendedorId // Filtra apenas os perfumes deste dono
+    }, 
     select: {
       id: true,
       nome: true,
@@ -34,16 +38,6 @@ export const listarPerfumes = async () => {
       createdAt: 'desc',
     },
   });
-};
-
-/**
- * Verifica se um perfume já está cadastrado pelo nome
- */
-const perfumeExiste = async (nome) => {
-  const perfume = await prisma.perfume.findFirst({
-    where: { nome: nome },
-  });
-  return !!perfume;
 };
 
 /**
@@ -95,63 +89,82 @@ export const criarPerfume = async (perfumeDados, file = null, vendedorId) => {
 /**
  * Atualiza um perfume existente
  */
-export const atualizarPerfume = async (id, perfumeDados, file = null) => {
+export const atualizarPerfume = async (id, perfumeDados, file = null, vendedorId) => {
   const perfumeId = Number(id);
 
+  // 1. Busca o perfume para verificar quem é o dono
   const perfumeExistente = await prisma.perfume.findUnique({
     where: { id: perfumeId },
   });
 
   if (!perfumeExistente) throw new Error(`Perfume com ID ${id} não encontrado`);
+  
+  // SEGURANÇA: O vendedor só pode editar o que é DELE
+  if (perfumeExistente.vendedorId !== vendedorId) {
+    throw new Error(`Perfume com ID ${id} não encontrado`);
+  }
 
+  // 2. Lógica de Upload
   let fotoUrl = null; 
   if (file) {
-    // 1. Sobe a nova foto
     fotoUrl = await uploadImgUploadcare(file.buffer, file.originalname, file.mimetype);
-    
-    // 2. Apaga a foto antiga do servidor
     if (fotoUrl && perfumeExistente.foto) {
         const uuidAntigo = extrairUUID(perfumeExistente.foto);
-        if (uuidAntigo) {
-            await apagaDoUploadCare(uuidAntigo); // Limpa o "lixo" do Uploadcare
-        }
+        if (uuidAntigo) await apagaDoUploadCare(uuidAntigo);
     }
   }
 
-  const dadosAtualizados = { ...perfumeDados };
-  if (fotoUrl) dadosAtualizados.foto = fotoUrl;
+  // 3. Conversão de tipos para o Prisma
+  // Lembre-se: no multipart/form-data, tudo chega como String
+  const dadosParaAtualizar = {
+    nome: perfumeDados.nome,
+    marca: perfumeDados.marca,
+    descricao: perfumeDados.descricao,
+    quantidade_estoque: perfumeDados.quantidade_estoque ? Number(perfumeDados.quantidade_estoque) : undefined,
+    preco: perfumeDados.preco ? parseFloat(perfumeDados.preco) : undefined,
+    frasco: perfumeDados.frasco ? parseFloat(perfumeDados.frasco) : undefined,
+  };
 
+  if (fotoUrl) dadosParaAtualizar.foto = fotoUrl;
+
+  // 4. Update final no banco
   return await prisma.perfume.update({
     where: { id: perfumeId },
-    data: dadosAtualizados,
+    data: dadosParaAtualizar,
   });
 };
 
 /**
  * Atualiza o estoque de um perfume existente
  */
-export const atualizarEstoquePerfume = async (id, perfumeDados) => {
-
+export const atualizarEstoquePerfume = async (id, perfumeDados, vendedorId) => {
   const perfumeId = Number(id);
 
+  // 1. Busca o perfume para verificar o dono
   const perfumeExistente = await prisma.perfume.findUnique({
     where: { id: perfumeId },
   });
 
+  // 2. Validações de existência e segurança
   if (!perfumeExistente) {
     throw new Error(`Perfume com ID ${id} não encontrado`);
   }
 
+  if (perfumeExistente.vendedorId !== vendedorId) {
+    throw new Error(`Perfume com ID ${id} não encontrado`);
+  }
+
+  // 3. Executa a atualização com a conversão de tipo
   return await prisma.perfume.update({
     where: { id: perfumeId },
     data: {
-      quantidade_estoque: perfumeDados.quantidade_estoque,
+      // Garante que o valor seja um número inteiro para o Prisma
+      quantidade_estoque: Number(perfumeDados.quantidade_estoque),
     },
     select: {
       id: true,
       nome: true,
       quantidade_estoque: true,
-      createdAt: true,
       updatedAt: true,
     },
   });
@@ -160,24 +173,31 @@ export const atualizarEstoquePerfume = async (id, perfumeDados) => {
 /**
  * Remove um perfume do sistema
  */
-export const excluirPerfume = async (id) => {
+export const excluirPerfume = async (id, vendedorId) => {
   const perfumeId = Number(id);
 
+  // 1. Busca o perfume para verificar a propriedade
   const perfumeExistente = await prisma.perfume.findUnique({
     where: { id: perfumeId },
   });
 
+  // 2. Validações de segurança
   if (!perfumeExistente) throw new Error(`Perfume com ID ${id} não encontrado`);
+  
+  if (perfumeExistente.vendedorId !== vendedorId) {
+    throw new Error(`Perfume com ID ${id} não encontrado`);
+  }
 
-  // FIX: Implementação da deleção da foto ao excluir o produto
+  // 3. Limpeza do Uploadcare: apaga a foto do servidor se ela existir
   if (perfumeExistente.foto) {
     const uuid = extrairUUID(perfumeExistente.foto);
     if (uuid) {
-      console.log(`Limpando foto do produto excluído: ${uuid}`);
-      await apagaDoUploadCare(uuid);
+      console.log(`[DEBUG] Limpando foto do produto excluído: ${uuid}`);
+      await apagaDoUploadCare(uuid); // Remove o arquivo do servidor externo
     }
   }
 
+  // 4. Deleção final no banco de dados
   return await prisma.perfume.delete({
     where: { id: perfumeId },
   });
