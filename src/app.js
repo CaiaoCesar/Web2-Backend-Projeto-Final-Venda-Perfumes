@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import 'express-async-errors';
 import setupSwagger from './docs/swagger.js';
+import authRoutes from './routes/auth.routes.js';
 
 // Importação do middleware
 import { errorHandler } from './middlewares/error.middleware.js';
@@ -31,15 +32,19 @@ app.use('/api', limiter);
 setupSwagger(app);
 
 // Rotas da API com prefixo /api/versão
+app.use('/api/v2/vendedores', authRoutes);
+
 app.use('/api/v2/perfumes', produtoRoutes);
-// app.use('/api/auth', authRoutes);
-// app.use('/api/pedidos', pedidoRoutes);
 
 // Rota de teste
 app.get('/', (req, res) => {
   res.json({
     message: 'API Sistema de Vendas de Perfumes',
     status: 'online',
+    version: '2.0.0',
+    docs: 'http://localhost:3000/api-docs',
+    endpoints: {
+      auth: '/api/v2/vendedores',
     version: '2.0',
     docs: 'http://localhost:3000/api-docs',
     endpoints: {

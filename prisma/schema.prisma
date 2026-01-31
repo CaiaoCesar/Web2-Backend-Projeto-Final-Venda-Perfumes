@@ -14,11 +14,11 @@ enum StatusPedido {
   CONFIRMADO    // Pedido confirmado pelo cliente mediante o acordo dos seus detalhes
 }
 
-// MODELO ADMINISTRADOR como foi definido anteriormente com seus atributos e tipos,
+// MODELO VENDEDOR como foi definido anteriormente com seus atributos e tipos,
 // Pensei no id cuid pois grante unicidade gerado automaticamente e com segurança
 // Campos de endereço (estado e cidade) adicionados conforme solicitado para gerir a localização dos administradores
 
-model Administrador {
+model Vendedor {
   id        String    @id @default(cuid())
   nome      String
   email     String    @unique
@@ -34,7 +34,7 @@ model Administrador {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   
-  @@map("administradores")
+  @@map("vendedores")
 }
 
 // MODELO PERFUME, com a quantidade em estoque que por padrão é 0 quando criado
@@ -68,11 +68,11 @@ model Pedido {
   telefone_cliente  String        @map("telefone_cliente")
   status            StatusPedido  @default(PENDENTE)
   data_pedido       DateTime      @default(now()) @map("data_pedido")
-  
-  // RELACIONAMENTO: Um Pedido pertence a UM Administrador
-  administradorId   String        @map("administrador_id")
-  administrador     Administrador @relation(fields: [administradorId], references: [id], onDelete: Cascade)
-  
+
+  // RELACIONAMENTO: Um Pedido pertence a UM Vendedor
+  vendedorId   String        @map("vendedor_id")
+  vendedor     Vendedor @relation(fields: [vendedorId], references: [id], onDelete: Cascade)
+
   // RELACIONAMENTO N:N com Perfume (através de PedidoItem)
   itens             PedidoItem[]
   
