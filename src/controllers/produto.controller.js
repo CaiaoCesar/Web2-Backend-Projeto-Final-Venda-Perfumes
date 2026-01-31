@@ -39,25 +39,27 @@ export const listarPerfumes = async (req, res, next) => {
   try {
     const vendedorId = req.user.id;
     
-    // Captura os filtros dos query parameters
+    // Os dados já vêm validados e transformados pelo middleware
     const { nome, page, limit } = req.query;
     
     const filtros = {
       nome,
-      page: page ? parseInt(page) : 1,
-      limit: limit ? parseInt(limit) : 10
+      page,
+      limit
     };
 
     const resultado = await perfumeService.listarPerfumes(Number(vendedorId), filtros);
 
     res.status(200).json({
-      message: 'Seus perfumes foram listados com sucesso!',
       success: true,
+      message: 'Seus perfumes foram listados com sucesso!',
       data: resultado.perfumes,
-      total: resultado.total,
-      page: filtros.page,
-      limit: filtros.limit,
-      totalPages: Math.ceil(resultado.total / filtros.limit)
+      pagination: {
+        total: resultado.total,
+        page: filtros.page,
+        limit: filtros.limit,
+        totalPages: Math.ceil(resultado.total / filtros.limit)
+      }
     });
   } catch (error) {
     next(error);

@@ -6,6 +6,7 @@ import {
   validarCriacaoProduto, 
   validarEditarProduto, 
   validarEditarEstoque,
+  validarListagemPerfumes, // ← NOVO
   validarId 
 } from '../middlewares/validation.middleware.js';
 
@@ -103,7 +104,7 @@ router.post('/', authMiddleware, upload.single('foto'), validarCriacaoProduto, p
  */
 
 // Rota para listar produtos do vendedor
-router.get("/", authMiddleware, produtoController.listarPerfumes);
+router.get("/", authMiddleware, validarListagemPerfumes, produtoController.listarPerfumes);
 
 /**
  * @swagger
