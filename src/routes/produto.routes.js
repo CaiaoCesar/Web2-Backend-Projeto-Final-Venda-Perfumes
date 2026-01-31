@@ -78,6 +78,8 @@ router.post('/', upload.single('foto'), validarCriacaoProduto, produtoController
  *     summary: Listar todos os perfumes
  *     description: Retorna uma lista de todos os perfumes disponíveis (pública)
  *     tags: [Perfumes]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page

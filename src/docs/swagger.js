@@ -9,8 +9,7 @@ const options = {
       version: '2.0.0',
       description: 'Backend para sistema de vendas de perfumes com checkout via WhatsApp',
       contact: {
-        name: 'Sua Equipe',
-        email: 'equipe@email.com',
+        name: 'Alunos do Bsi Salinas',
       },
       license: {
         name: 'MIT',
@@ -37,28 +36,9 @@ const options = {
         },
       },
     },
-    tags: [
-      {
-        name: 'Autenticação',
-        description: 'Rotas de autenticação de vendedores',
-      },
-      {
-        name: 'Produtos',
-        description: 'Rotas para gerenciamento de perfumes',
-      },
-      {
-        name: 'Pedidos',
-        description: 'Rotas para gerenciamento de pedidos',
-      },
-      {
-        name: 'Checkout',
-        description: 'Rotas para finalização de compra via WhatsApp',
-      },
-    ],
   },
   apis: [
     './src/routes/*.js', // Rotas com anotações
-    './src/docs/schemas/*.js', // Schemas reutilizáveis
   ],
 };
 
