@@ -49,11 +49,18 @@ const perfumeExiste = async (nome) => {
 /**
  * Cria um novo perfume
  */
-export const criarPerfume = async (perfumeDados, file = null) => {
-  // 1. Verificar regra de negócio 
-  const verificaPerfumeExiste = await perfumeExiste(perfumeDados.nome);
-  if (verificaPerfumeExiste) {
-    throw new Error('Perfume já cadastrado no sistema');
+export const criarPerfume = async (perfumeDados, file = null, vendedorId) => {
+  // 1. Verificar se o vendedor já possui um perfume com este nome
+  const perfumeJaCadastrado = await prisma.perfume.findFirst({
+    where: { 
+      nome: perfumeDados.nome,
+      vendedorId: vendedorId,
+    },
+  });
+
+  // Corrigido: Verificamos a constante acima e não damos 'return' ainda
+  if (perfumeJaCadastrado) {
+    throw new Error('Você já possui um perfume cadastrado com este nome.');
   }
 
   // 2. Upload da foto
@@ -62,26 +69,24 @@ export const criarPerfume = async (perfumeDados, file = null) => {
     fotoUrl = await uploadImgUploadcare(file.buffer, file.originalname, file.mimetype);
   }
 
-  // 3. Criar no banco
+  // 3. Criar no banco com as conversões de tipo necessárias
   return await prisma.perfume.create({
     data: {
       nome: perfumeDados.nome,
       marca: perfumeDados.marca,
-      quantidade_estoque: perfumeDados.quantidade_estoque,
-      foto: fotoUrl || perfumeDados.foto || null,
-      preco: perfumeDados.preco,
       descricao: perfumeDados.descricao,
-      frasco: perfumeDados.frasco,
+      foto: fotoUrl || perfumeDados.foto || null,
+      vendedorId: vendedorId,
+      quantidade_estoque: Number(perfumeDados.quantidade_estoque) || 0,
+      preco: parseFloat(perfumeDados.preco),
+      frasco: parseFloat(perfumeDados.frasco),
     },
     select: {
       id: true,
       nome: true,
       marca: true,
-      quantidade_estoque: true,
-      foto: true,
       preco: true,
-      descricao: true,
-      frasco: true,
+      vendedorId: true,
       createdAt: true,
     },
   });
