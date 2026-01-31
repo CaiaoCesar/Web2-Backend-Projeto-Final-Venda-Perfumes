@@ -4,14 +4,14 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import 'express-async-errors';
 import setupSwagger from './docs/swagger.js';
-import authRoutes from './routes/auth.routes.js';
 
 // Importação do middleware
 import { errorHandler } from './middlewares/error.middleware.js';
 
-// Importar rotas
+// Rota para produtos
 import produtoRoutes from './routes/produto.routes.js';
-// Importar outras rotas depois...
+// Rota para vendedores
+import authRoutes from './routes/auth.routes.js';
 
 const app = express();
 
@@ -43,13 +43,13 @@ app.get('/', (req, res) => {
     status: 'online',
     version: '2.0.0',
     docs: 'http://localhost:3000/api-docs',
-    endpoints: {
-      auth: '/api/v2/vendedores',
-    version: '2.0',
-    docs: 'http://localhost:3000/api-docs',
+    /*endpoints: {
+      auth: '/api/v2/vendedores',*/
+    /*version: '2.0',
+    docs: 'http://localhost:3000/api-docs',*/
     endpoints: {
       produtos: '/api/perfumes',
-      // auth: '/api/auth',
+      auth: '/api/auth',
       // pedidos: '/api/pedidos',
     },
   });
@@ -72,11 +72,6 @@ app.use((err, req, res, next) => {
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
   });
 });
-
-
-
-
-
 
 // Deve ser a última linha
 app.use(errorHandler);

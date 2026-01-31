@@ -24,7 +24,7 @@ export const criarVendedor = async (vendedorDados) => {
   if (verificaVendedorExiste) {
     throw new Error('Existe um Vendedor com este email já registrado');
   }
-
+  // Verifica existência da loja do vendedor
   const verificaLojaExiste = await lojaExiste(vendedorDados.nome_loja);
     if (verificaLojaExiste) {
       throw new Error('Já existe uma loja registrada com este nome');
@@ -83,6 +83,6 @@ export const autenticarVendedor = async (email, senha) => {
 };
 
 export default {
-  vendedorExiste,
+  autenticarVendedor,
   criarVendedor,
 };
