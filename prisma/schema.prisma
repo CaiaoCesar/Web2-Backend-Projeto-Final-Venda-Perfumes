@@ -19,13 +19,14 @@ enum StatusPedido {
 // Campos de endereço (estado e cidade) adicionados conforme solicitado para gerir a localização dos administradores
 
 model Vendedor {
-  id        String    @id @default(cuid())
+  id        Int    @id @default(autoincrement())  //Mudança do id para autoincremento  que antes era cuid
   nome      String
   email     String    @unique
   senha     String
   telefone  String
   estado     String  
   cidade    String
+  nome_loja String
   
   // RELACIONAMENTO: Um Administrador pode ter MUITOS Pedidos (0,N)
   pedidos   Pedido[]
@@ -70,7 +71,7 @@ model Pedido {
   data_pedido       DateTime      @default(now()) @map("data_pedido")
 
   // RELACIONAMENTO: Um Pedido pertence a UM Vendedor
-  vendedorId   String        @map("vendedor_id")
+  vendedorId   Int        @map("vendedor_id")
   vendedor     Vendedor @relation(fields: [vendedorId], references: [id], onDelete: Cascade)
 
   // RELACIONAMENTO N:N com Perfume (através de PedidoItem)

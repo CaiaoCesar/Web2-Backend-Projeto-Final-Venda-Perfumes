@@ -25,6 +25,7 @@ const router = Router();
  *               - telefone
  *               - estado
  *               - cidade
+ *               - nome_loja
  *             properties:
  *               nome:
  *                 type: string
@@ -44,6 +45,9 @@ const router = Router();
  *               cidade:
  *                 type: string
  *                 example: "Salinas"
+ *               nome_loja: 
+ *                type: string
+ *                example: "Loja do Vendedor"
  *     responses:
  *       201:
  *         description: Novo vendedor criado com sucesso

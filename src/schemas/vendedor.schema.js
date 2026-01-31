@@ -25,4 +25,8 @@ export const vendedorSchema = z.object({
   cidade: z
     .string({ required_error: 'A cidade é obrigatória' })
     .min(2, 'Nome da cidade muito curto'),
+
+  nome_loja: z
+    .string({ required_error: 'O nome da loja é obrigatório' })
+    .min(5, 'O nome da loja deve ter pelo menos 5 caracteres'),
 });
