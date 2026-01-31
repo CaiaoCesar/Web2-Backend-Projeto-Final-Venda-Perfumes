@@ -15,10 +15,10 @@ const extrairUUID = (url) => {
 };
 
 /**
- * Busca todos os perfumes do sistema
+ * Busca todos os perfumes do vendedor
  */
 export const listarPerfumes = async () => {
-  return await prisma.perfume.findMany({
+  return await prisma.perfume.findMany({where: { vendedorId: vendedorId },
     select: {
       id: true,
       nome: true,

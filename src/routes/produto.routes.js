@@ -69,7 +69,8 @@ const router = Router();
  */
 
 // Rota para criar novo perfume
-router.post('/', upload.single('foto'), validarCriacaoProduto, produtoController.criarPerfume);
+// 1º Autentica -> 2º Upload -> 3º Valida -> 4º Controller
+router.post('/', authMiddleware, upload.single('foto'), validarCriacaoProduto, produtoController.criarPerfume);
 
 /**
  * @swagger
@@ -113,8 +114,8 @@ router.post('/', upload.single('foto'), validarCriacaoProduto, produtoController
  *         description: Lista de perfumes retornada com sucesso
  */
 
-// Rota para listar produtos
-router.get('/', produtoController.listarPerfumes);
+// Rota para listar produtos do vendedor
+router.get("/meus-produtos", authMiddleware, produtoController.listarPerfumes);
 
 /**
  * @swagger
