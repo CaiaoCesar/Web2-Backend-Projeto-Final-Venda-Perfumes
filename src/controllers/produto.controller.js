@@ -13,8 +13,11 @@ import * as perfumeService from '../services/produto.service.js';
  */
 export const criarPerfume = async (req, res, next) => {
   try {
-    // req.file é populado pelo multer quando há upload
-    const novoPerfume = await perfumeService.criarPerfume(req.body, req.file);
+    // Captura o ID do vendedor autenticado
+    const vendedorId = req.user.id;
+    
+    // req.file é populado pelo multer quando há upload e passa o vendedor que está fazendo a solicitação
+    const novoPerfume = await perfumeService.criarPerfume(req.body, req.file, Number(vendedorId));
 
     res.status(201).json({
       success: true,
