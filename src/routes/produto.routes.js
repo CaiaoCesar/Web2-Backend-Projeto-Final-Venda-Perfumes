@@ -9,6 +9,8 @@ import {
   validarId 
 } from '../middlewares/validation.middleware.js';
 
+import { authMiddleware } from '../middlewares/auth.middleware.js';
+
 const router = Router();
 
 /**
@@ -115,7 +117,7 @@ router.post('/', authMiddleware, upload.single('foto'), validarCriacaoProduto, p
  */
 
 // Rota para listar produtos do vendedor
-router.get("/meus-produtos", authMiddleware, produtoController.listarPerfumes);
+router.get("/", authMiddleware, produtoController.listarPerfumes);
 
 /**
  * @swagger
@@ -155,7 +157,7 @@ router.get("/meus-produtos", authMiddleware, produtoController.listarPerfumes);
  */
 
 // Rota para editar estoque perfume, é necessário validar o ID
-router.put('/estoque/:id', validarId, validarEditarEstoque, produtoController.editarEstoquePerfume);
+router.put('/estoque/:id', authMiddleware, validarId, validarEditarEstoque, produtoController.editarEstoquePerfume);
 
 /**
  * @swagger
@@ -209,8 +211,7 @@ router.put('/estoque/:id', validarId, validarEditarEstoque, produtoController.ed
  */
 
 // Rota para editar perfume, é necessário validar ID
-router.put('/:id', validarId, upload.single('foto'), validarEditarProduto, produtoController.editarPerfume);
-
+router.put('/:id', authMiddleware, validarId, upload.single('foto'), validarEditarProduto, produtoController.editarPerfume);
 /**
  * @swagger
  * /api/v2/perfumes/{id}:
