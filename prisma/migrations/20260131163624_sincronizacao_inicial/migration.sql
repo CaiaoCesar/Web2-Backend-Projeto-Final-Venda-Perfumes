@@ -1,29 +1,32 @@
 -- CreateEnum
-CREATE TYPE "StatusPedido" AS ENUM ('PENDENTE', 'CONFIRMADO', 'PREPARACAO', 'CANCELADO', 'ENVIADO', 'ENTREGUE');
+CREATE TYPE "StatusPedido" AS ENUM ('PENDENTE', 'CONFIRMADO');
 
 -- CreateTable
-CREATE TABLE "administradores" (
-    "id" TEXT NOT NULL,
+CREATE TABLE "vendedores" (
+    "id" SERIAL NOT NULL,
     "nome" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "senha" TEXT NOT NULL,
     "telefone" TEXT NOT NULL,
+    "estado" TEXT NOT NULL,
+    "cidade" TEXT NOT NULL,
+    "nome_loja" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "administradores_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "vendedores_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "perfumes" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "nome" TEXT NOT NULL,
     "marca" TEXT NOT NULL,
     "quantidade_estoque" INTEGER NOT NULL DEFAULT 0,
-    "foto" TEXT,
+    "foto" TEXT NOT NULL,
     "preco" DOUBLE PRECISION NOT NULL,
-    "descricao" TEXT,
-    "frasco" DOUBLE PRECISION,
+    "descricao" TEXT NOT NULL,
+    "frasco" DOUBLE PRECISION NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -38,7 +41,7 @@ CREATE TABLE "pedidos" (
     "telefone_cliente" TEXT NOT NULL,
     "status" "StatusPedido" NOT NULL DEFAULT 'PENDENTE',
     "data_pedido" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "administrador_id" TEXT NOT NULL,
+    "vendedor_id" INTEGER NOT NULL,
     "mensagem_whatsapp" TEXT,
     "enviado_whatsapp" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -52,7 +55,7 @@ CREATE TABLE "pedido_itens" (
     "id" TEXT NOT NULL,
     "quantidade" INTEGER NOT NULL DEFAULT 1,
     "preco_unitario" DOUBLE PRECISION NOT NULL,
-    "perfume_id" TEXT NOT NULL,
+    "perfume_id" INTEGER NOT NULL,
     "pedido_id" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -60,13 +63,13 @@ CREATE TABLE "pedido_itens" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "administradores_email_key" ON "administradores"("email");
+CREATE UNIQUE INDEX "vendedores_email_key" ON "vendedores"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "pedido_itens_perfume_id_pedido_id_key" ON "pedido_itens"("perfume_id", "pedido_id");
 
 -- AddForeignKey
-ALTER TABLE "pedidos" ADD CONSTRAINT "pedidos_administrador_id_fkey" FOREIGN KEY ("administrador_id") REFERENCES "administradores"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "pedidos" ADD CONSTRAINT "pedidos_vendedor_id_fkey" FOREIGN KEY ("vendedor_id") REFERENCES "vendedores"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "pedido_itens" ADD CONSTRAINT "pedido_itens_perfume_id_fkey" FOREIGN KEY ("perfume_id") REFERENCES "perfumes"("id") ON DELETE CASCADE ON UPDATE CASCADE;

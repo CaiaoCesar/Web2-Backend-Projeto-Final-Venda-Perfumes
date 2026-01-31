@@ -13,8 +13,11 @@ import * as perfumeService from '../services/produto.service.js';
  */
 export const criarPerfume = async (req, res, next) => {
   try {
-    // req.file é populado pelo multer quando há upload
-    const novoPerfume = await perfumeService.criarPerfume(req.body, req.file);
+    // Captura o ID do vendedor autenticado
+    const vendedorId = req.user.id;
+
+    // req.file é populado pelo multer quando há upload e passa o vendedor que está fazendo a solicitação
+    const novoPerfume = await perfumeService.criarPerfume(req.body, req.file, Number(vendedorId));
 
     res.status(201).json({
       success: true,
@@ -30,14 +33,33 @@ export const criarPerfume = async (req, res, next) => {
  * GET /api/produtos
  * Listar todos os perfumes
  */
+// src/controllers/produto.controller.js
+
 export const listarPerfumes = async (req, res, next) => {
   try {
-    const perfumes = await perfumeService.listarPerfumes();
+    const vendedorId = req.user.id;
+    
+    // Os dados já vêm validados e transformados pelo middleware
+    const { nome, page, limit } = req.query;
+    
+    const filtros = {
+      nome,
+      page,
+      limit
+    };
+
+    const resultado = await perfumeService.listarPerfumes(Number(vendedorId), filtros);
+
     res.status(200).json({
-      message: 'Perfumes listados com sucesso!',
       success: true,
-      data: perfumes,
-      total: perfumes.length,
+      message: 'Seus perfumes foram listados com sucesso!',
+      data: resultado.perfumes,
+      pagination: {
+        total: resultado.total,
+        page: filtros.page,
+        limit: filtros.limit,
+        totalPages: Math.ceil(resultado.total / filtros.limit)
+      }
     });
   } catch (error) {
     next(error);
@@ -51,8 +73,16 @@ export const listarPerfumes = async (req, res, next) => {
 export const editarPerfume = async (req, res, next) => {
   try {
     const { id } = req.params;
-    // Passa o arquivo se houver upload
-    const perfumeAtualizado = await perfumeService.atualizarPerfume(id, req.body, req.file);
+    // Captura o ID do vendedor autenticado vindo do JWT
+    const vendedorId = req.user.id; 
+
+    // Passamos o vendedorId como o último argumento para conferir a propriedade
+    const perfumeAtualizado = await perfumeService.atualizarPerfume(
+      id, 
+      req.body, 
+      req.file, 
+      Number(vendedorId)
+    );
 
     res.status(200).json({
       message: 'Perfume atualizado com sucesso!',
@@ -71,10 +101,19 @@ export const editarPerfume = async (req, res, next) => {
 export const editarEstoquePerfume = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const estoqueAtualizado = await perfumeService.atualizarEstoquePerfume(id, req.body);
+    
+    // Captura o ID do vendedor autenticado
+    const vendedorId = req.user.id; 
+
+    // Passa o ID para o service validar a propriedade
+    const estoqueAtualizado = await perfumeService.atualizarEstoquePerfume(
+      id, 
+      req.body, 
+      Number(vendedorId)
+    );
 
     res.status(200).json({
-      message: 'Estoque do perfume atualizado com sucesso!',
+      message: 'Estoque atualizado com sucesso!',
       success: true,
       data: estoqueAtualizado,
     });
@@ -90,10 +129,14 @@ export const editarEstoquePerfume = async (req, res, next) => {
 export const deletarPerfume = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const perfumeDeletado = await perfumeService.excluirPerfume(id);
+    // Captura o ID do vendedor autenticado
+    const vendedorId = req.user.id; 
+
+    // Passa o ID do perfume e o ID do dono para validação
+    const perfumeDeletado = await perfumeService.excluirPerfume(id, Number(vendedorId));
 
     res.status(200).json({
-      message: 'Perfume deletado com sucesso!',
+      message: 'Perfume e imagem removidos com sucesso!',
       success: true,
       data: perfumeDeletado
     });

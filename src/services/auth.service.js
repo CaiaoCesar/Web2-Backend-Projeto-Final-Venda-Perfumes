@@ -10,12 +10,26 @@ export const vendedorExiste = async (email) => {
   return !!vendedor;
 };
 
+// Verifica se o vendedor existe pelo email
+export const lojaExiste = async (nome_loja) => {
+  const vendedor = await prisma.vendedor.findFirst({
+    where: { nome_loja: nome_loja },
+  });
+  return !!vendedor;
+};
+
 // Cria um novo vendedor
 export const criarVendedor = async (vendedorDados) => {
   const verificaVendedorExiste = await vendedorExiste(vendedorDados.email);
   if (verificaVendedorExiste) {
     throw new Error('Existe um Vendedor com este email já registrado');
   }
+  // Verifica existência da loja do vendedor
+  const verificaLojaExiste = await lojaExiste(vendedorDados.nome_loja);
+    if (verificaLojaExiste) {
+      throw new Error('Já existe uma loja registrada com este nome');
+    }
+  
 
   // Transforma os saltos da variável do ambiente para numero
   const saltos = Number(process.env.SALTS_BYCRIPT) || 10;
@@ -30,6 +44,7 @@ export const criarVendedor = async (vendedorDados) => {
       telefone: vendedorDados.telefone,
       estado: vendedorDados.estado,
       cidade: vendedorDados.cidade,
+      nome_loja: vendedorDados.nome_loja,
     },
     select: {
       id: true,
@@ -38,6 +53,7 @@ export const criarVendedor = async (vendedorDados) => {
       telefone: true,
       estado: true,
       cidade: true,
+      nome_loja: true,
     },
   });
 };
@@ -67,6 +83,6 @@ export const autenticarVendedor = async (email, senha) => {
 };
 
 export default {
-  vendedorExiste,
+  autenticarVendedor,
   criarVendedor,
 };
