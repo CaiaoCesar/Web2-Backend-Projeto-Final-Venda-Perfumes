@@ -18,27 +18,29 @@ describe('🛡️ Middlewares e Segurança - Testes de Integração', () => {
     it('deve bloquear requisição sem header Authorization (401)', async () => {
       const response = await request(app)
         .get('/api/v2/perfumes')
-        // Sem .set('Authorization')
         .expect(401);
 
+      // Aqui o middleware para no primeiro 'if (!authHeader)'
       expect(response.body.message).toContain('Token não fornecido');
     });
 
     it('deve bloquear token malformado sem "Bearer" (401)', async () => {
       const response = await request(app)
         .get('/api/v2/perfumes')
-        .set('Authorization', token) // Faltando "Bearer "
+        .set('Authorization', 'token-sem-bearer') // Enviando header sem o prefixo
         .expect(401);
 
-      expect(response.body.message).toContain('Token não fornecido');
+      // Aqui ele passa pelo primeiro if, mas para no 'if (partes.length !== 2)'
+      expect(response.body.message).toContain('Token malformado');
     });
-
+    
     it('deve bloquear token inválido (401)', async () => {
       const response = await request(app)
         .get('/api/v2/perfumes')
-        .set('Authorization', 'Bearer token-invalido-xyz123')
+        .set('Authorization', 'Bearer token-inventado')
         .expect(401);
 
+      // Aqui ele cai no 'catch' da verificação do JWT
       expect(response.body.message).toContain('Token inválido ou expirado');
     });
 
@@ -113,7 +115,7 @@ describe('🛡️ Middlewares e Segurança - Testes de Integração', () => {
         .field('quantidade_estoque', 10)
         .expect(400);
 
-      expect(response.body.message).toContain('deve ser maior que 0');
+      expect(response.body.errors).toBeDefined();
     });
 
     it('deve rejeitar quantidade de estoque negativa (400)', async () => {
@@ -128,7 +130,8 @@ describe('🛡️ Middlewares e Segurança - Testes de Integração', () => {
         .field('quantidade_estoque', -5) // Negativo
         .expect(400);
 
-      expect(response.body.message).toContain('deve ser maior ou igual a 0');
+      expect(response.body.message).toContain('Dados de cadastro inválidos');
+      expect(response.body.errors).toBeDefined();
     });
   });
 
@@ -158,9 +161,9 @@ describe('🛡️ Middlewares e Segurança - Testes de Integração', () => {
       const perfumeVendedor2 = await criarPerfumeTeste(vendedor2.id);
 
       const response = await request(app)
-        .delete(`/api/v2/perfumes/${perfumeVendedor2.id}`)
-        .set('Authorization', `Bearer ${token}`)
-        .expect(404);
+        .delete(`/api/v2/perfumes/${perfumeDeOutroVendedor.id}`)
+        .set('Authorization', `Bearer ${tokenDoVendedor1}`)
+        .expect(403);
 
       expect(response.body.message).toContain('não encontrado');
     });

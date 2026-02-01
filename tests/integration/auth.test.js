@@ -7,18 +7,21 @@ import prisma from '../../src/config/database.js';
 
 describe('🔐 Autenticação - Testes de Integração', () => {
   
-  describe('POST /api/v2/auth/registro', () => {
+  describe('POST /api/v2/vendedores', () => {
     
     it('deve criar vendedor com dados válidos (201)', async () => {
       const novoVendedor = {
         nome: 'João Silva',
-        email: 'joao@teste.com',
+        email: `joao-${Date.now()}@teste.com`, // Email único para evitar P2002
         senha: 'senha123',
         telefone: '31988887777',
+        nome_loja: 'Perfumes do João', // Adicionado
+        cidade: 'Salinas',            // Adicionado
+        estado: 'MG'                  // Adicionado
       };
 
       const response = await request(app)
-        .post('/api/v2/auth/registro')
+        .post('/api/v2/vendedores/register')
         .send(novoVendedor)
         .expect(201);
 
@@ -47,7 +50,7 @@ describe('🔐 Autenticação - Testes de Integração', () => {
 
       // Tentar criar segundo vendedor com mesmo email
       const response = await request(app)
-        .post('/api/v2/auth/registro')
+        .post('/api/v2/vendedores')
         .send({
           nome: 'Outro Vendedor',
           email, // Email duplicado
@@ -62,7 +65,7 @@ describe('🔐 Autenticação - Testes de Integração', () => {
 
     it('deve rejeitar registro com dados inválidos (400)', async () => {
       const response = await request(app)
-        .post('/api/v2/auth/registro')
+        .post('/api/v2/vendedores')
         .send({
           nome: 'Teste',
           email: 'email-invalido', // Email sem @
@@ -84,7 +87,7 @@ describe('🔐 Autenticação - Testes de Integração', () => {
       });
 
       const response = await request(app)
-        .post('/api/v2/auth/login')
+        .post('/api/v2/vendedores/login')
         .send({
           email: vendedor.email,
           senha, // Senha em texto puro (não hasheada)
@@ -92,7 +95,8 @@ describe('🔐 Autenticação - Testes de Integração', () => {
         .expect(200);
 
       expect(response.body).toHaveProperty('success', true);
-      expect(response.body).toHaveProperty('token');
+      expect(response.body.data).toHaveProperty('token');
+      expect(typeof response.body.data.token).toBe('string');
       expect(typeof response.body.token).toBe('string');
       expect(response.body.token.length).toBeGreaterThan(20); // JWT é longo
     });

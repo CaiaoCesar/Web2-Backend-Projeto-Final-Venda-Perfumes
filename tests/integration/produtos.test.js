@@ -135,7 +135,7 @@ describe('🧴 Produtos - Testes de Integração', () => {
         .expect(200);
 
       expect(response.body.data).toHaveLength(2);
-      expect(response.body.total).toBe(2);
+      expect(response.body.pagination.total).toBe(2);
       
       response.body.data.forEach(perfume => {
         expect(perfume.nome).toContain('V1');

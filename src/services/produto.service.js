@@ -1,6 +1,6 @@
 import prisma from '../config/database.js';
 import { uploadImgUploadcare, apagaDoUploadCare } from './upload.service.js';
-import { AppError } from '../utils/AppError.js';
+import { AppError } from '../utils/appError.js';
 
 /**
  * Auxiliar: Extrai o UUID do arquivo a partir da URL do Uploadcare
@@ -112,7 +112,7 @@ export const atualizarPerfume = async (id, perfumeDados, file = null, vendedorId
   }
   
   if (perfumeExistente.vendedorId !== vendedorId) {
-    throw new AppError('Perfume com ID ${id} não encontrado', 403);
+    throw new AppError(`Perfume com ID ${id} não encontrado`, 404);
   }
 
   let fotoUrl = null; 
@@ -156,7 +156,7 @@ export const atualizarEstoquePerfume = async (id, perfumeDados, vendedorId) => {
   }
 
   if (perfumeExistente.vendedorId !== vendedorId) {
-    throw new AppError('Perfume com ID ${id} não encontrado', 403);
+    throw new AppError(`Perfume com ID ${id} não encontrado`, 404);
   }
 
   return await prisma.perfume.update({
@@ -188,7 +188,7 @@ export const excluirPerfume = async (id, vendedorId) => {
   }
   
   if (perfumeExistente.vendedorId !== vendedorId) {
-    throw new AppError('Perfume com ID ${id} não encontrado', 403);
+    throw new AppError(`Perfume com ID ${id} não encontrado`, 404);
   }
 
   if (perfumeExistente.foto) {

@@ -1,5 +1,5 @@
 import { UploadClient } from "@uploadcare/upload-client";
-import { AppError } from '../utils/AppError.js'; // Importação obrigatória
+import { AppError } from '../utils/appError.js'; // Importação obrigatória
 
 const clientUploadcare = new UploadClient({
     publicKey: process.env.UPLOADCARE_PUBLIC_KEY,
