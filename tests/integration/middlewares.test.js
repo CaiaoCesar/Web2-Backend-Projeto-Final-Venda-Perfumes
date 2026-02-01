@@ -20,17 +20,15 @@ describe('🛡️ Middlewares e Segurança - Testes de Integração', () => {
         .get('/api/v2/perfumes')
         .expect(401);
 
-      // Aqui o middleware para no primeiro 'if (!authHeader)'
       expect(response.body.message).toContain('Token não fornecido');
     });
 
     it('deve bloquear token malformado sem "Bearer" (401)', async () => {
       const response = await request(app)
         .get('/api/v2/perfumes')
-        .set('Authorization', 'token-sem-bearer') // Enviando header sem o prefixo
+        .set('Authorization', 'token-sem-bearer')
         .expect(401);
 
-      // Aqui ele passa pelo primeiro if, mas para no 'if (partes.length !== 2)'
       expect(response.body.message).toContain('Token malformado');
     });
     
@@ -40,7 +38,6 @@ describe('🛡️ Middlewares e Segurança - Testes de Integração', () => {
         .set('Authorization', 'Bearer token-inventado')
         .expect(401);
 
-      // Aqui ele cai no 'catch' da verificação do JWT
       expect(response.body.message).toContain('Token inválido ou expirado');
     });
 
@@ -60,7 +57,7 @@ describe('🛡️ Middlewares e Segurança - Testes de Integração', () => {
     
     it('deve rejeitar ID não numérico na URL (400)', async () => {
       const response = await request(app)
-        .put('/api/v2/perfumes/abc') // ID inválido
+        .put('/api/v2/perfumes/abc')
         .set('Authorization', `Bearer ${token}`)
         .field('nome', 'Teste')
         .expect(400);
@@ -97,7 +94,7 @@ describe('🛡️ Middlewares e Segurança - Testes de Integração', () => {
       const response = await request(app)
         .post('/api/v2/perfumes')
         .set('Authorization', `Bearer ${token}`)
-        .field('nome', 'Apenas Nome') // Faltam outros campos
+        .field('nome', 'Apenas Nome')
         .expect(400);
 
       expect(response.body).toHaveProperty('success', false);
@@ -110,7 +107,7 @@ describe('🛡️ Middlewares e Segurança - Testes de Integração', () => {
         .field('nome', 'Perfume Teste')
         .field('marca', 'Marca')
         .field('descricao', 'Descrição')
-        .field('preco', -50) // Preço negativo
+        .field('preco', -50)
         .field('frasco', 100)
         .field('quantidade_estoque', 10)
         .expect(400);
@@ -127,7 +124,7 @@ describe('🛡️ Middlewares e Segurança - Testes de Integração', () => {
         .field('descricao', 'Descrição')
         .field('preco', 100)
         .field('frasco', 100)
-        .field('quantidade_estoque', -5) // Negativo
+        .field('quantidade_estoque', -5)
         .expect(400);
 
       expect(response.body.message).toContain('Dados de cadastro inválidos');
@@ -138,16 +135,14 @@ describe('🛡️ Middlewares e Segurança - Testes de Integração', () => {
   describe('Segurança de Propriedade (Ownership)', () => {
     
     it('deve impedir edição de perfume de outro vendedor (404)', async () => {
-      // Criar segundo vendedor
       const vendedor2 = await criarVendedorTeste({ 
-        email: 'vendedor2@teste.com' 
+        email: `vendedor2-${Date.now()}@teste.com` 
       });
       const perfumeVendedor2 = await criarPerfumeTeste(vendedor2.id);
 
-      // Vendedor 1 tenta editar perfume do vendedor 2
       const response = await request(app)
         .put(`/api/v2/perfumes/${perfumeVendedor2.id}`)
-        .set('Authorization', `Bearer ${token}`) // Token do vendedor 1
+        .set('Authorization', `Bearer ${token}`)
         .field('nome', 'Tentativa de Hack')
         .expect(404);
 
@@ -156,21 +151,21 @@ describe('🛡️ Middlewares e Segurança - Testes de Integração', () => {
 
     it('deve impedir deleção de perfume de outro vendedor (404)', async () => {
       const vendedor2 = await criarVendedorTeste({ 
-        email: 'vendedor2@teste.com' 
+        email: `vendedor2-delete-${Date.now()}@teste.com` 
       });
       const perfumeVendedor2 = await criarPerfumeTeste(vendedor2.id);
 
       const response = await request(app)
-        .delete(`/api/v2/perfumes/${perfumeDeOutroVendedor.id}`)
-        .set('Authorization', `Bearer ${tokenDoVendedor1}`)
-        .expect(403);
+        .delete(`/api/v2/perfumes/${perfumeVendedor2.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(404);
 
       expect(response.body.message).toContain('não encontrado');
     });
 
     it('deve impedir atualização de estoque de outro vendedor (404)', async () => {
       const vendedor2 = await criarVendedorTeste({ 
-        email: 'vendedor2@teste.com' 
+        email: `vendedor2-estoque-${Date.now()}@teste.com` 
       });
       const perfumeVendedor2 = await criarPerfumeTeste(vendedor2.id);
 
