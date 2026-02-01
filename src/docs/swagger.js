@@ -6,11 +6,10 @@ const options = {
     openapi: '3.0.0',
     info: {
       title: 'API Sistema de Vendas de Perfumes',
-      version: '1.0.0',
+      version: '2.0.0',
       description: 'Backend para sistema de vendas de perfumes com checkout via WhatsApp',
       contact: {
-        name: 'Sua Equipe',
-        email: 'equipe@email.com',
+        name: 'Alunos do Bsi Salinas',
       },
       license: {
         name: 'MIT',
@@ -33,32 +32,19 @@ const options = {
           type: 'http',
           scheme: 'bearer',
           bearerFormat: 'JWT',
-          description: 'Insira o token JWT no formato: Bearer {token}',
+          description: 'Insira o token JWT recebido no login',
         },
       },
     },
-    tags: [
+    // ⭐ ADICIONE ESTA LINHA - Define segurança global
+    security: [
       {
-        name: 'Autenticação',
-        description: 'Rotas de autenticação de vendedores',
-      },
-      {
-        name: 'Produtos',
-        description: 'Rotas para gerenciamento de perfumes',
-      },
-      {
-        name: 'Pedidos',
-        description: 'Rotas para gerenciamento de pedidos',
-      },
-      {
-        name: 'Checkout',
-        description: 'Rotas para finalização de compra via WhatsApp',
+        bearerAuth: [],
       },
     ],
   },
   apis: [
-    './src/routes/*.js', // Rotas com anotações
-    './src/docs/schemas/*.js', // Schemas reutilizáveis
+    './src/routes/*.js',
   ],
 };
 
@@ -72,6 +58,9 @@ export default (app) => {
       explorer: true,
       customCss: '.swagger-ui .topbar { display: none }',
       customSiteTitle: 'API Vendas de Perfumes',
+      swaggerOptions: {
+        persistAuthorization: true, // ⭐ Mantém o token após refresh
+      },
     })
   );
 

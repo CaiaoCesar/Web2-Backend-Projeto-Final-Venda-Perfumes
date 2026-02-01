@@ -8,9 +8,10 @@ import setupSwagger from './docs/swagger.js';
 // Importação do middleware
 import { errorHandler } from './middlewares/error.middleware.js';
 
-// Importar rotas
+// Rota para produtos
 import produtoRoutes from './routes/produto.routes.js';
-// Importar outras rotas depois...
+// Rota para vendedores
+import authRoutes from './routes/auth.routes.js';
 
 const app = express();
 
@@ -31,20 +32,24 @@ app.use('/api', limiter);
 setupSwagger(app);
 
 // Rotas da API com prefixo /api/versão
+app.use('/api/v2/vendedores', authRoutes);
+
 app.use('/api/v2/perfumes', produtoRoutes);
-// app.use('/api/auth', authRoutes);
-// app.use('/api/pedidos', pedidoRoutes);
 
 // Rota de teste
 app.get('/', (req, res) => {
   res.json({
     message: 'API Sistema de Vendas de Perfumes',
     status: 'online',
-    version: '2.0',
+    version: '2.0.0',
     docs: 'http://localhost:3000/api-docs',
+    /*endpoints: {
+      auth: '/api/v2/vendedores',*/
+    /*version: '2.0',
+    docs: 'http://localhost:3000/api-docs',*/
     endpoints: {
       produtos: '/api/perfumes',
-      // auth: '/api/auth',
+      auth: '/api/auth',
       // pedidos: '/api/pedidos',
     },
   });
@@ -67,11 +72,6 @@ app.use((err, req, res, next) => {
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
   });
 });
-
-
-
-
-
 
 // Deve ser a última linha
 app.use(errorHandler);

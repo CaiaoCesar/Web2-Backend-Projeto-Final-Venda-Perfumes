@@ -25,3 +25,22 @@ export const esquemaEditarPerfume = esquemaCriacaoPerfume
 export const esquemaEditarEstoque = z.object({
   quantidade_estoque: regrasPerfume.quantidade_estoque
 });
+
+export const esquemaListagemPerfumes = z.object({
+
+  nome: z.string().trim().min(1, "Nome deve ter pelo menos 1 caractere").optional(),
+  
+  // Paginação - com valores padrão
+  page: z.coerce
+    .number()
+    .int("Página deve ser um número inteiro")
+    .positive("Página deve ser maior que zero")
+    .default(1),
+  
+  limit: z.coerce
+    .number()
+    .int("Limite deve ser um número inteiro")
+    .positive("Limite deve ser maior que zero")
+    .max(20, "Limite máximo é 100 itens por página")
+    .default(10)
+});

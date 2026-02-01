@@ -6,8 +6,11 @@ import {
   validarCriacaoProduto, 
   validarEditarProduto, 
   validarEditarEstoque,
+  validarListagemPerfumes, // ← NOVO
   validarId 
 } from '../middlewares/validation.middleware.js';
+
+import { authMiddleware } from '../middlewares/auth.middleware.js';
 
 const router = Router();
 
@@ -18,8 +21,6 @@ const router = Router();
  *     summary: Criar um novo perfume
  *     description: Cria um novo perfume no sistema (apenas vendedores autenticados)
  *     tags: [Perfumes]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -69,7 +70,8 @@ const router = Router();
  */
 
 // Rota para criar novo perfume
-router.post('/', upload.single('foto'), validarCriacaoProduto, produtoController.criarPerfume);
+// 1º Autentica -> 2º Upload -> 3º Valida -> 4º Controller
+router.post('/', authMiddleware, upload.single('foto'), validarCriacaoProduto, produtoController.criarPerfume);
 
 /**
  * @swagger
@@ -92,27 +94,17 @@ router.post('/', upload.single('foto'), validarCriacaoProduto, produtoController
  *           default: 10
  *         description: Quantidade por página
  *       - in: query
- *         name: marca
+ *         name: nome
  *         schema:
  *           type: string
- *         description: Filtrar por marca
- *       - in: query
- *         name: minPreco
- *         schema:
- *           type: number
- *         description: Preço mínimo
- *       - in: query
- *         name: maxPreco
- *         schema:
- *           type: number
- *         description: Preço máximo
+ *         description: Filtrar por nome
  *     responses:
  *       200:
  *         description: Lista de perfumes retornada com sucesso
  */
 
-// Rota para listar produtos
-router.get('/', produtoController.listarPerfumes);
+// Rota para listar produtos do vendedor
+router.get("/", authMiddleware, validarListagemPerfumes, produtoController.listarPerfumes);
 
 /**
  * @swagger
@@ -121,8 +113,6 @@ router.get('/', produtoController.listarPerfumes);
  *     summary: Atualizar estoque de um perfume
  *     description: Atualiza apenas a quantidade em estoque de um perfume
  *     tags: [Perfumes]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -152,7 +142,7 @@ router.get('/', produtoController.listarPerfumes);
  */
 
 // Rota para editar estoque perfume, é necessário validar o ID
-router.put('/estoque/:id', validarId, validarEditarEstoque, produtoController.editarEstoquePerfume);
+router.put('/estoque/:id', authMiddleware, validarId, validarEditarEstoque, produtoController.editarEstoquePerfume);
 
 /**
  * @swagger
@@ -161,8 +151,6 @@ router.put('/estoque/:id', validarId, validarEditarEstoque, produtoController.ed
  *     summary: Atualizar um perfume
  *     description: Atualiza os dados de um perfume existente (apenas vendedores autenticados)
  *     tags: [Perfumes]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -206,8 +194,7 @@ router.put('/estoque/:id', validarId, validarEditarEstoque, produtoController.ed
  */
 
 // Rota para editar perfume, é necessário validar ID
-router.put('/:id', validarId, upload.single('foto'), validarEditarProduto, produtoController.editarPerfume);
-
+router.put('/:id', authMiddleware, validarId, upload.single('foto'), validarEditarProduto, produtoController.editarPerfume);
 /**
  * @swagger
  * /api/v2/perfumes/{id}:
@@ -215,8 +202,6 @@ router.put('/:id', validarId, upload.single('foto'), validarEditarProduto, produ
  *     summary: Deletar um perfume
  *     description: Remove um perfume do sistema (apenas vendedores autenticados)
  *     tags: [Perfumes]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -234,6 +219,6 @@ router.put('/:id', validarId, upload.single('foto'), validarEditarProduto, produ
  */
 
 // Rota para deletar um produto, é necessário validar o ID
-router.delete('/:id', validarId, produtoController.deletarPerfume);
+router.delete('/:id', authMiddleware, validarId, produtoController.deletarPerfume);
 
 export default router;

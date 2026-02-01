@@ -1,4 +1,28 @@
-import { esquemaCriacaoPerfume, esquemaEditarPerfume, esquemaEditarEstoque } from '../schemas/perfume.schema.js';
+import { esquemaCriacaoPerfume, esquemaEditarPerfume, esquemaEditarEstoque, esquemaListagemPerfumes } from '../schemas/perfume.schema.js';
+
+/**
+ * Middleware para validação de esquemas Zod
+ * @param {z.ZodObject} schema 
+ */
+export const validacao = (schema) => async (req, res, next) => {
+  try {
+
+    const dadosValidados = await schema.parseAsync(req.body);
+    req.body = dadosValidados; 
+
+    // Se passar na validação e transformação, segue para o Controller
+    next();
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: 'Dados de entrada inválidos',
+      errors: error.errors.map((err) => ({
+        campo: err.path[0],
+        mensagem: err.message,
+      })),
+    });
+  }
+};
 
 export const validarCriacaoProduto = (req, res, next) => {
   // Pega o nome do arquivo da foto e insere dentro do campo foto
@@ -62,5 +86,21 @@ export const validarId = (req, res, next) => {
       errors: { id: ["O ID deve ser um número inteiro positivo"] }
     });
   }
+  next();
+};
+
+export const validarListagemPerfumes = (req, res, next) => {
+  const result = esquemaListagemPerfumes.safeParse(req.query);
+  
+  if (!result.success) {
+    return res.status(400).json({ 
+      success: false, 
+      message: "Parâmetros de busca inválidos",
+      errors: result.error.flatten().fieldErrors 
+    });
+  }
+  
+  // Substitui os query params pelos dados validados e transformados
+  req.query = result.data;
   next();
 };
