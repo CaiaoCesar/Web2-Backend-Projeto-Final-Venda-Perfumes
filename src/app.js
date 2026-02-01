@@ -43,7 +43,7 @@ app.get('/', (req, res) => {
   res.json({
     message: 'API Sistema de Vendas de Perfumes',
     status: 'online',
-    version: '2.0.0',
+    version: '3.1.0',
     endpoints: {
       auth: '/api/v2/vendedores',
       produtos: '/api/v2/perfumes',
