@@ -112,7 +112,7 @@ export const atualizarPerfume = async (id, perfumeDados, file = null, vendedorId
   }
   
   if (perfumeExistente.vendedorId !== vendedorId) {
-    throw new AppError('Acesso negado: Este produto pertence a outro vendedor', 403);
+    throw new AppError('Perfume com ID ${id} não encontrado', 403);
   }
 
   let fotoUrl = null; 
