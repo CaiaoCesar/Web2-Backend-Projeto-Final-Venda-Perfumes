@@ -50,6 +50,7 @@ model Perfume {
   preco              Float
   descricao          String
   frasco             Float        // ml do frasco
+  genero             Genero?      // Gênero do perfume
   
   // RELACIONAMENTO: Cada perfume pertence a UM Vendedor
   vendedorId         Int          @map("vendedor_id")
@@ -61,6 +62,13 @@ model Perfume {
   updatedAt          DateTime     @updatedAt @map("updated_at")
   
   @@map("perfumes")
+}
+
+// Enum para o gênero do perfume
+enum Genero {
+  MASCULINO
+  FEMININO
+  UNISSEX
 }
 
 // MODELO PEDIDO
