@@ -179,6 +179,9 @@ Duration   5.48s
 
 ---
 
+## 👥 Responsáveis pelos Testes
+| **Caio César**, **Jéferson Ramos**, **Matheus Jorge** 
+
 **Documentação Mantida por:** Equipe de Desenvolvimento  
 **Última Atualização:** 02/02/2026   
 

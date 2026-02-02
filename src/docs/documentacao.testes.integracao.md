@@ -382,12 +382,7 @@ npm run test:watch
 **Última Atualização:** 31/01/2026  
 **Documentação mantida por:** Equipe de Desenvolvimento  
 
----
-```
+📚 **Documentação Relacionada:**  
+[Testes de Integração](./documentacao.testes.unitarios.md) 
 
-Este documento serve como:
-- ✅ **Referência técnica** para a equipe
-- ✅ **Documentação** para novos desenvolvedores
-- ✅ **Evidência** de qualidade para stakeholders
-- ✅ **Checklist** para releases futuras
-- ✅ **Base** para planejamento de novos testes
+---
