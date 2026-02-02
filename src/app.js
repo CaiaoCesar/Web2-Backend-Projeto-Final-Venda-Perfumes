@@ -2,25 +2,28 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import 'express-async-errors';
+import 'express-async-errors'; // Garante que erros em funções async sejam capturados
 import setupSwagger from './docs/swagger.js';
 
-// Importação do middleware
+// Importação do seu middleware padronizado
 import { errorHandler } from './middlewares/error.middleware.js';
 
-// Rota para produtos
+// Importação das rotas
 import produtoRoutes from './routes/produto.routes.js';
-// Rota para vendedores
 import authRoutes from './routes/auth.routes.js';
 
 const app = express();
 
-// Middlewares básicos
-app.use(express.json());
-app.use(cors());
-app.use(helmet());
+/**
+ * Middlewares de Segurança e Base
+ */
+app.use(helmet()); // Proteção de headers HTTP
+app.use(cors()); // Gerenciamento de acessos externos
+app.use(express.json()); // Permite receber JSON no corpo das requisições
 
-// Rate limiting
+/**
+ * Configuração de Limite de Requisições (Rate Limiting)
+ */
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
   max: 100, // limite de 100 requisições por IP
@@ -28,51 +31,45 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// Configurar Swagger
+/**
+ * Documentação Swagger
+ */
 setupSwagger(app);
 
-// Rotas da API com prefixo /api/versão
-app.use('/api/v2/vendedores', authRoutes);
-
-app.use('/api/v2/perfumes', produtoRoutes);
-
-// Rota de teste
+/**
+ * Rotas Públicas e de Verificação
+ */
 app.get('/', (req, res) => {
   res.json({
     message: 'API Sistema de Vendas de Perfumes',
     status: 'online',
-    version: '2.0.0',
-    docs: 'http://localhost:3000/api-docs',
-    /*endpoints: {
-      auth: '/api/v2/vendedores',*/
-    /*version: '2.0',
-    docs: 'http://localhost:3000/api-docs',*/
+    version: '3.1.0',
     endpoints: {
-      produtos: '/api/perfumes',
-      auth: '/api/auth',
-      // pedidos: '/api/pedidos',
+      auth: '/api/v2/vendedores',
+      produtos: '/api/v2/perfumes',
     },
   });
 });
 
-// Rota de health check
 app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    database: 'connected', // Você pode verificar conexão com DB aqui
+    database: 'connected',
   });
 });
 
-// Middleware de erro (deve vir por último)
-app.use((err, req, res, next) => {
-  console.error('Erro:', err);
-  res.status(err.status || 500).json({
-    error: err.message || 'Erro interno do servidor',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
-  });
-});
+/**
+ * Rotas da API (Prefixadas com /api/v2)
+ */
+app.use('/api/v2/vendedores', authRoutes);
+app.use('/api/v2/perfumes', produtoRoutes);
 
-// Deve ser a última linha
+/**
+ * Middleware de Erro Global
+ * OBRIGATORIAMENTE DEVE SER A ÚLTIMA LINHA ANTES DO EXPORT.
+ * Ele capturará todos os 'next(error)' enviados pelos controllers.
+ */
 app.use(errorHandler);
+
 export default app;
