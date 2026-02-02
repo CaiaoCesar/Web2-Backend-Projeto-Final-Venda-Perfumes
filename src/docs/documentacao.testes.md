@@ -1,10 +1,10 @@
-## **📄 Arquivo: `documentacao.testes.md`**
+## **📄 Arquivo: `documentacao.testes.integracao.md`**
 
 ```markdown
-# 📋 Documentação de Testes de Integração - Versão 3.0.0
+# 📋 Documentação de Testes de Integração - Versão 3.1.0
 
 **Data:** 31 de Janeiro de 2026  
-**Versão:** 3.0.0 - Sistema Multi-vendedor com Autenticação JWT  
+**Versão:** 3.1.0 - Sistema Multi-vendedor com Autenticação JWT  
 **Status:** ✅ Completamente testado e aprovado  
 
 ---
