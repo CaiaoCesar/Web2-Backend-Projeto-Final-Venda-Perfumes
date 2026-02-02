@@ -1,12 +1,7 @@
-Perfeito! Vou criar uma versão mais concisa e atualizada com a data correta:
-
-## **📄 Arquivo: `testes-unitarios.md`**
-
-````markdown
 # 🧪 Documentação de Testes Unitários
 
-**Data:** 02 de Fevereiro de 2026  
-**Versão:** 3.1.0  
+**Data:** 02 de Fevereiro de 2026
+**Versão:** 3.1.0
 **Status:** ✅ Completamente testado e aprovado
 
 ---
@@ -15,188 +10,130 @@ Perfeito! Vou criar uma versão mais concisa e atualizada com a data correta:
 
 | Categoria      | Arquivo              | Testes | Foco                  | Status      |
 | -------------- | -------------------- | ------ | --------------------- | ----------- |
-| ⚠️ Edge Cases  | `edge-cases.test.js` | 40     | Lógica de Negócio     | ✅ 100%     |
-| 🛡️ Validadores | `validators.test.js` | 35     | Schemas Zod           | ✅ 100%     |
-| **TOTAL**      | **2 arquivos**       | **75** | **Cobertura Crítica** | **✅ 100%** |
+| ⚠️ Edge Cases   | `edge-cases.test.js` | 33     | Lógica de Negócio     | ✅ 100%     |
+| 🛡️ Validadores | `validators.test.js` | 40     | Schemas Zod           | ✅ 100%     |
+| 📸 Upload      | `upload.test.js`     | 8      | Configuração Multer   | ✅ 100%     |
+| **TOTAL** | **3 arquivos** | **81** | **Cobertura Crítica** | **✅ 100%** |
 
-**Tempo de Execução:** 5.48s  
-**Framework:** Vitest + Mocks  
-**Ambiente:** Isolado (sem banco/APIs)
+**Tempo de Execução Estimado:** ~5.5s
+**Framework:** Vitest + Supertest + Express (Mock)
+**Ambiente:** Isolado (sem banco de dados real)
 
 ---
 
-## ⚠️ Edge Cases Críticos (40 testes)
+## ⚠️ Edge Cases Críticos (33 testes)
 
 ### **1. Paginação - Cálculos Precisos**
-
-- ✅ Primeira/última página
+- ✅ Primeira/última página e página do meio
 - ✅ Total menor que limite
-- ✅ Página maior que totalPages
-- ✅ Cálculos com resto
+- ✅ Página maior que totalPages (banco retorna vazio)
+- ✅ Cálculos com resto de divisão
+- ✅ Skip correto para páginas altas
+- ✅ Tratamento de total zero
 
 ### **2. Valores Monetários - Precisão**
-
 - ✅ Preço positivo apenas (>0)
 - ✅ Rejeita zero/negativo/Infinity/NaN
-- ✅ Apenas números (sem coerção automática)
+- ✅ Rejeita strings sem coerção automática
 
 ### **3. Estoque - Nunca Negativo**
-
 - ✅ Adição/subtração válida
-- ❌ Bloqueia estoque negativo
-- ✅ Apenas números inteiros
+- ❌ Bloqueia operações que deixariam estoque negativo
+- ✅ Valida apenas números inteiros
 - ✅ Zero é permitido
 
-### **4. Multi-tenancy - Duplicidade**
+### **4. Multi-tenancy - Duplicidade de Produtos**
+- ✅ Mesmo vendedor: não pode duplicar nome
+- ✅ Vendedores diferentes: podem ter produtos com mesmo nome
+- ✅ Validação Case-insensitive
 
-- ✅ Mesmo vendedor: não pode duplicar
-- ✅ Vendedores diferentes: pode mesmo nome
-- ✅ Case-insensitive
+### **5. Validação de Frasco**
+- ✅ Identifica tamanhos comuns (30, 50, 100ml...)
+- ✅ Aceita tamanhos personalizados
+- ❌ Rejeita Zero/negativo/Infinity
 
-### **5. Cálculo de Pedidos**
-
-- ✅ Valor total com arredondamento (2 casas)
-- ❌ Pedido vazio/bloqueado
-- ❌ Quantidade/preço inválidos
-
-### **6. Busca - Inteligente**
-
-- ✅ Case-insensitive
-- ✅ Busca parcial
-- ✅ Termo vazio = retorna tudo
-
-### **7. Validação de Frasco**
-
-- ✅ Tamanhos comuns (30, 50, 100ml...)
-- ✅ Tamanhos personalizados permitidos
-- ❌ Zero/negativo/Infinity
+### **6. Unicidade de Loja (Simulação de Service)**
+- ❌ Rejeita nome de loja exatamente igual
+- ❌ Rejeita nome com diferença de Case (maiúscula/minúscula)
+- ❌ Rejeita nome com espaços extras
+- ✅ Aceita nome de loja novo
+- ✅ Aceita nome parecido (ex: "Loja II")
 
 ---
 
-## 🛡️ Validadores Zod (35 testes)
+## 🛡️ Validadores Zod (40 testes)
 
-### **Perfume - Criação**
-
-| Campo                  | Validações  | Exemplos Bloqueados |
-| ---------------------- | ----------- | ------------------- |
-| **preco**              | >0, número  | -100, 0, "100abc"   |
-| **frasco**             | >0, número  | -50, 0              |
-| **quantidade_estoque** | ≥0, inteiro | -10, 10.5           |
-| **nome**               | 3-100 chars | "AB", "A"×101       |
-| **descricao**          | ≥10 chars   | "Curta"             |
-| **foto**               | obrigatória | ""                  |
+### **Perfume - Criação e Edição**
+| Campo | Validações | Exemplos Bloqueados |
+| :--- | :--- | :--- |
+| **preco** | >0, número | -100, 0, "100abc" |
+| **frasco** | >0, número | -50, 0 |
+| **quantidade_estoque** | ≥0, inteiro | -10, 10.5 |
+| **nome** | 3 chars min | "AB", "   " |
+| **descricao** | ≥10 chars | "Curta" |
+| **foto** | obrigatória | "" (vazia) |
 
 **Comportamentos:**
-
-- ✅ Coerção: `"299.90"` → `299.90`
+- ✅ Coerção de Strings numéricas (`"299.90"` → `299.90`)
 - ✅ Default: `quantidade_estoque` = 0 se omitido
-- ✅ Trim automático em strings
+- ✅ Trim automático em nomes e descrições
 
 ### **Estoque - Atualização**
-
-- ✅ Aceita 0
-- ✅ Default = 0
-- ❌ Negativos
-- ❌ Decimais
-- ✅ `"100"` → `100` (coerção)
+- ✅ Aceita 0 e valores positivos
+- ✅ Default = 0 se vazio
+- ✅ Conversão de string para número
+- ❌ Bloqueia negativos e decimais
 
 ### **Paginação - Listagem**
+| Parâmetro | Valores Válidos | Default | Bloqueados |
+| :--- | :--- | :--- | :--- |
+| **page** | ≥1, inteiro | 1 | -1, 0, 1.5 |
+| **limit** | 1-100 | 10 | -10, 0, 101 |
 
-| Parâmetro | Valores Válidos | Default | Bloqueados  |
-| --------- | --------------- | ------- | ----------- |
-| **page**  | ≥1, inteiro     | 1       | -1, 0, 1.5  |
-| **limit** | 1-100           | 10      | -10, 0, 101 |
+### **Vendedor - Cadastro (Regras Rígidas)**
+| Campo | Regra | Exemplo Bloqueado |
+| :--- | :--- | :--- |
+| **email** | formato válido | `email-invalido` |
+| **senha** | ≥8 caracteres | `1234567` |
+| **telefone** | exatos 11 números | `319999abc99`, `31999` |
+| **estado** | exatas 2 letras | `MGB`, `M1` |
+| **cidade** | ≥2 caracteres | `A`, `` (vazia) |
+| **nome_loja** | ≥5 caracteres | `Loja`, `` (vazia) |
 
-### **Vendedor - Cadastro**
+- ✅ Conversão automática de estado para maiúsculo (`mg` → `MG`)
 
-| Campo        | Regra          | Exemplo Bloqueado           |
-| ------------ | -------------- | --------------------------- |
-| **email**    | formato válido | `email-invalido`            |
-| **senha**    | ≥8 caracteres  | `1234567`                   |
-| **telefone** | 11 números     | `319999abc99`, `3199999999` |
-| **estado**   | 2 letras       | `MGB`, `M1`                 |
-| **estado**   | uppercase auto | `mg` → `MG`                 |
+---
+
+## 📸 Upload Middleware - Multer (8 testes)
+
+Testes realizados simulando uma aplicação Express para validar o middleware de upload.
+
+### **1. Tipos de Arquivo (MIME Types)**
+- ✅ **Aceita:** PNG, JPEG/JPG, WEBP
+- ❌ **Rejeita:** PDF, TXT, EXE (Executáveis)
+- **Erro:** Retorna 400 com mensagem "Formato de arquivo inválido"
+
+### **2. Limites de Tamanho**
+- ✅ **Aceita:** Arquivos ≤ 5MB (Simulado com Buffer de 4MB)
+- ❌ **Rejeita:** Arquivos > 5MB (Simulado com Buffer de 6MB)
+- **Erro:** Retorna 400 com mensagem de limite excedido
 
 ---
 
 ## 🚀 Como Executar
 
 ```bash
-# Todos os testes unitários
+# Executar todos os testes unitários
 npm test unit
 
-# Apenas edge cases
+# Executar arquivos específicos
 npx vitest run tests/unit/edge-cases.test.js
-
-# Apenas validadores
 npx vitest run tests/unit/validators.test.js
+npx vitest run tests/unit/upload.test.js
 
-# Watch mode (desenvolvimento)
+# Modo Watch (Desenvolvimento)
 npm run test:unit:watch
-```
-````
 
-### **Resultado Esperado:**
-
-```
-✓ tests/unit/validators.test.js (35) 2166ms
-✓ tests/unit/edge-cases.test.js (40) 1028ms
-Test Files  2 passed (2)
-Tests      75 passed (75)
-Duration   5.48s
-```
-
----
-
-## 🧠 Lógica de Negócio Protegida
-
-### **Regras Críticas Validadas:**
-
-1. **Financeira**: Preços sempre positivos, arredondamento correto
-2. **Estoque**: Nunca negativo, apenas números inteiros
-3. **Multi-tenancy**: Isolamento completo entre vendedores
-4. **Busca**: Case-insensitive, busca parcial
-5. **Paginação**: Cálculos matemáticos precisos
-6. **Validação**: Todos os inputs sanitizados
-
-### **Cenários de Borda Cobertos:**
-
-- Usuário página 999 com apenas 5 páginas
-- Estoque 10 tentando remover 11
-- Preço 0 ou negativo
-- Nome com 101 caracteres
-- Email sem @, telefone com letras
-- Estado com 3 letras ou números
-
----
-
-## ✅ Checklist de Qualidade
-
-### **Edge Cases:**
-
-- [x] Paginação em todos cenários
-- [x] Valores monetários válidos apenas
-- [x] Estoque nunca negativo
-- [x] Multi-tenancy funcionando
-- [x] Cálculos financeiros precisos
-- [x] Busca inteligente
-
-### **Validadores:**
-
-- [x] Todos schemas Zod testados
-- [x] Mensagens de erro claras
-- [x] Coerção automática quando seguro
-- [x] Valores padrão corretos
-- [x] Sanitização de inputs
-
-### **Infra:**
-
-- [x] Mocks completos (Prisma, bcrypt, JWT)
-- [x] Setup isolado sem dependências
-- [x] Execução rápida (<6s)
-- [x] Zero falsos positivos
-
----
 
 ## 👥 Responsáveis pelos Testes
 

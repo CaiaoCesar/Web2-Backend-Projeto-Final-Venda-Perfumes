@@ -40,6 +40,6 @@ export const esquemaListagemPerfumes = z.object({
     .number()
     .int('Limite deve ser um número inteiro')
     .positive('Limite deve ser maior que zero')
-    .max(20, 'Limite máximo é 100 itens por página')
+    .max(100, 'Limite máximo é 100 itens por página')
     .default(10),
 });
