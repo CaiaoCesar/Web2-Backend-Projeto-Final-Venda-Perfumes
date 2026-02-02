@@ -8,6 +8,8 @@
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "test": "cross-env NODE_ENV=test vitest run --pool=threads --poolOptions.threads.singleThread",
+    "test:unit": "vitest run --config=vitest.unit.config.js",
+    "test:integration": "vitest run --config=vitest.integration.config.js",
     "test:watch": "cross-env NODE_ENV=test vitest",
     "test:coverage": "cross-env NODE_ENV=test vitest run --coverage",
     "test:ui": "cross-env NODE_ENV=test vitest --ui",
