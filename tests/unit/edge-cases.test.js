@@ -214,122 +214,6 @@ describe('⚠️ Edge Cases Críticos - Lógica de Negócio', () => {
   });
 
   // ==========================================
-  // CÁLCULO DE VALOR TOTAL DO PEDIDO
-  // ==========================================
-  describe('Cálculo de Valor Total do Pedido', () => {
-    const calcularValorTotal = (itens) => {
-      if (!Array.isArray(itens) || itens.length === 0) {
-        throw new Error('Pedido deve ter pelo menos 1 item');
-      }
-
-      const total = itens.reduce((soma, item) => {
-        if (item.quantidade <= 0) {
-          throw new Error('Quantidade deve ser positiva');
-        }
-        if (item.preco_unitario <= 0) {
-          throw new Error('Preço unitário deve ser positivo');
-        }
-        return soma + item.quantidade * item.preco_unitario;
-      }, 0);
-
-      // Arredondar para 2 casas decimais (centavos)
-      return Math.round(total * 100) / 100;
-    };
-
-    it('deve calcular valor total corretamente', () => {
-      const itens = [
-        { quantidade: 2, preco_unitario: 100.0 },
-        { quantidade: 1, preco_unitario: 50.0 },
-      ];
-
-      expect(calcularValorTotal(itens)).toBe(250.0);
-    });
-
-    it('deve arredondar para 2 casas decimais', () => {
-      const itens = [
-        { quantidade: 3, preco_unitario: 33.33 }, // 99.99
-      ];
-
-      expect(calcularValorTotal(itens)).toBe(99.99);
-    });
-
-    it('deve lidar com valores com muitas casas decimais', () => {
-      const itens = [
-        { quantidade: 1, preco_unitario: 10.555 },
-        { quantidade: 2, preco_unitario: 20.777 },
-      ];
-
-      // 10.555 + 41.554 = 52.109 → arredonda para 52.11
-      expect(calcularValorTotal(itens)).toBe(52.11);
-    });
-
-    it('deve rejeitar pedido vazio', () => {
-      expect(() => calcularValorTotal([])).toThrow('Pedido deve ter pelo menos 1 item');
-    });
-
-    it('deve rejeitar quantidade zero', () => {
-      const itens = [{ quantidade: 0, preco_unitario: 100 }];
-
-      expect(() => calcularValorTotal(itens)).toThrow('Quantidade deve ser positiva');
-    });
-
-    it('deve rejeitar quantidade negativa', () => {
-      const itens = [{ quantidade: -2, preco_unitario: 100 }];
-
-      expect(() => calcularValorTotal(itens)).toThrow('Quantidade deve ser positiva');
-    });
-
-    it('deve rejeitar preço unitário zero', () => {
-      const itens = [{ quantidade: 2, preco_unitario: 0 }];
-
-      expect(() => calcularValorTotal(itens)).toThrow('Preço unitário deve ser positivo');
-    });
-  });
-
-  // ==========================================
-  // BUSCA CASE-INSENSITIVE
-  // ==========================================
-  describe('Busca de Perfumes (Case-Insensitive)', () => {
-    const perfumes = [
-      { id: 1, nome: 'Dior Sauvage' },
-      { id: 2, nome: 'Azzaro Pour Homme' },
-      { id: 3, nome: 'Chanel Bleu' },
-      { id: 4, nome: 'ARMANI CODE' },
-    ];
-
-    const buscarPerfume = (termo) => {
-      if (!termo || termo.trim() === '') return perfumes;
-
-      const termoLower = termo.toLowerCase();
-      return perfumes.filter((p) => p.nome.toLowerCase().includes(termoLower));
-    };
-
-    it('deve retornar todos se termo vazio', () => {
-      expect(buscarPerfume('')).toHaveLength(4);
-      expect(buscarPerfume('   ')).toHaveLength(4);
-    });
-
-    it('deve buscar case-insensitive', () => {
-      expect(buscarPerfume('dior')).toHaveLength(1);
-      expect(buscarPerfume('DIOR')).toHaveLength(1);
-      expect(buscarPerfume('DiOr')).toHaveLength(1);
-    });
-
-    it('deve buscar por parte do nome', () => {
-      expect(buscarPerfume('Azz')).toHaveLength(1);
-      expect(buscarPerfume('Pour')).toHaveLength(1);
-    });
-
-    it('deve retornar vazio se não encontrar', () => {
-      expect(buscarPerfume('XYZ')).toHaveLength(0);
-    });
-
-    it('deve buscar múltiplas palavras', () => {
-      expect(buscarPerfume('Azzaro Pour')).toHaveLength(1);
-    });
-  });
-
-  // ==========================================
   // VALIDAÇÃO DE FRASCO (ML)
   // ==========================================
   describe('Validação de Frasco (ML)', () => {
@@ -371,4 +255,59 @@ describe('⚠️ Edge Cases Críticos - Lógica de Negócio', () => {
       expect(() => validarFrasco(Infinity)).toThrow('ML deve ser finito');
     });
   });
+
+  // ==========================================
+  // VALIDAÇÃO DE UNICIDADE DE LOJA (Simulação)
+  // ==========================================
+  describe('Validação de Unicidade de Loja (Lógica de Service)', () => {
+    
+    // Simula o banco de dados com lojas já existentes
+    const bancoDeLojas = [
+      'Perfumes Salinas',
+      'O Boticário',
+      'Natura Store',
+      '  Loja Com Espaço  ' // Simula um erro de cadastro antigo
+    ];
+
+    // Função que simula a lógica do Service (Service Layer)
+    const verificarDisponibilidadeLoja = (nomeLoja) => {
+      if (!nomeLoja) return false;
+
+      // Normaliza para comparar (remove espaços e põe em minúsculo)
+      const nomeNormalizado = nomeLoja.trim().toLowerCase();
+
+      // Procura no "banco"
+      const existe = bancoDeLojas.some(loja => 
+        loja.trim().toLowerCase() === nomeNormalizado
+      );
+
+      if (existe) {
+        throw new Error('O nome da loja já está em uso');
+      }
+
+      return true; // Disponível
+    };
+
+    it('deve REJEITAR nome de loja exatamente igual', () => {
+      expect(() => verificarDisponibilidadeLoja('Perfumes Salinas')).toThrow('já está em uso');
+    });
+
+    it('deve REJEITAR nome de loja com diferença de maiúscula/minúscula (Case Insensitive)', () => {
+      expect(() => verificarDisponibilidadeLoja('perfumes salinas')).toThrow('já está em uso');
+      expect(() => verificarDisponibilidadeLoja('PERFUMES SALINAS')).toThrow('já está em uso');
+    });
+
+    it('deve REJEITAR nome de loja com espaços extras', () => {
+      expect(() => verificarDisponibilidadeLoja('  Perfumes Salinas  ')).toThrow('já está em uso');
+    });
+
+    it('deve ACEITAR um nome de loja novo', () => {
+      expect(verificarDisponibilidadeLoja('Loja Nova do Matheus')).toBe(true);
+    });
+
+    it('deve ACEITAR nome parecido, mas diferente', () => {
+      // "Perfumes Salinas" existe, mas "Perfumes Salinas II" não
+      expect(verificarDisponibilidadeLoja('Perfumes Salinas II')).toBe(true);
+    });
+  });  
 });

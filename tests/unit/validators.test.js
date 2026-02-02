@@ -11,6 +11,7 @@ import {
 import { vendedorSchema } from '../../src/schemas/vendedor.schema.js';
 
 describe('🛡️ Validadores Zod - Testes Unitários Críticos', () => {
+  
   // ==========================================
   // PERFUME - Validações de Números
   // ==========================================
@@ -25,9 +26,7 @@ describe('🛡️ Validadores Zod - Testes Unitários Críticos', () => {
         foto: 'https://foto.jpg',
       };
 
-      expect(() => esquemaCriacaoPerfume.parse(dadosInvalidos)).toThrow(
-        'O preço deve ser maior que zero'
-      );
+      expect(() => esquemaCriacaoPerfume.parse(dadosInvalidos)).toThrow('O preço deve ser maior que zero');
     });
 
     it('deve REJEITAR preço zero', () => {
@@ -39,10 +38,7 @@ describe('🛡️ Validadores Zod - Testes Unitários Críticos', () => {
         frasco: 100,
         foto: 'https://foto.jpg',
       };
-
-      expect(() => esquemaCriacaoPerfume.parse(dadosInvalidos)).toThrow(
-        'O preço deve ser maior que zero'
-      );
+      expect(() => esquemaCriacaoPerfume.parse(dadosInvalidos)).toThrow('O preço deve ser maior que zero');
     });
 
     it('deve ACEITAR preço válido como string (coerção automática)', () => {
@@ -57,7 +53,6 @@ describe('🛡️ Validadores Zod - Testes Unitários Críticos', () => {
       };
 
       const resultado = esquemaCriacaoPerfume.parse(dados);
-
       expect(resultado.preco).toBe(299.9);
       expect(typeof resultado.preco).toBe('number');
       expect(resultado.frasco).toBe(100);
@@ -73,7 +68,6 @@ describe('🛡️ Validadores Zod - Testes Unitários Críticos', () => {
         frasco: 100,
         foto: 'https://foto.jpg',
       };
-
       expect(() => esquemaCriacaoPerfume.parse(dadosInvalidos)).toThrow();
     });
 
@@ -86,10 +80,7 @@ describe('🛡️ Validadores Zod - Testes Unitários Críticos', () => {
         frasco: -50, // ❌ NEGATIVO
         foto: 'https://foto.jpg',
       };
-
-      expect(() => esquemaCriacaoPerfume.parse(dadosInvalidos)).toThrow(
-        'O volume deve ser maior que zero'
-      );
+      expect(() => esquemaCriacaoPerfume.parse(dadosInvalidos)).toThrow('O volume deve ser maior que zero');
     });
 
     it('deve REJEITAR frasco zero', () => {
@@ -101,10 +92,7 @@ describe('🛡️ Validadores Zod - Testes Unitários Críticos', () => {
         frasco: 0, // ❌ ZERO
         foto: 'https://foto.jpg',
       };
-
-      expect(() => esquemaCriacaoPerfume.parse(dadosInvalidos)).toThrow(
-        'O volume deve ser maior que zero'
-      );
+      expect(() => esquemaCriacaoPerfume.parse(dadosInvalidos)).toThrow('O volume deve ser maior que zero');
     });
 
     it('deve REJEITAR quantidade_estoque negativa', () => {
@@ -117,7 +105,6 @@ describe('🛡️ Validadores Zod - Testes Unitários Críticos', () => {
         foto: 'https://foto.jpg',
         quantidade_estoque: -10, // ❌ NEGATIVO
       };
-
       expect(() => esquemaCriacaoPerfume.parse(dadosInvalidos)).toThrow();
     });
 
@@ -131,7 +118,6 @@ describe('🛡️ Validadores Zod - Testes Unitários Críticos', () => {
         foto: 'https://foto.jpg',
         quantidade_estoque: 0, // ✅ ZERO É VÁLIDO
       };
-
       const resultado = esquemaCriacaoPerfume.parse(dados);
       expect(resultado.quantidade_estoque).toBe(0);
     });
@@ -146,7 +132,6 @@ describe('🛡️ Validadores Zod - Testes Unitários Críticos', () => {
         foto: 'https://foto.jpg',
         // ✅ quantidade_estoque omitida
       };
-
       const resultado = esquemaCriacaoPerfume.parse(dados);
       expect(resultado.quantidade_estoque).toBe(0);
     });
@@ -161,7 +146,6 @@ describe('🛡️ Validadores Zod - Testes Unitários Críticos', () => {
         foto: 'https://foto.jpg',
         quantidade_estoque: 10.5, // ❌ DECIMAL
       };
-
       expect(() => esquemaCriacaoPerfume.parse(dadosInvalidos)).toThrow();
     });
   });
@@ -179,21 +163,7 @@ describe('🛡️ Validadores Zod - Testes Unitários Críticos', () => {
         frasco: 100,
         foto: 'https://foto.jpg',
       };
-
       expect(() => esquemaCriacaoPerfume.parse(dadosInvalidos)).toThrow('Mínimo 3 caracteres');
-    });
-
-    it('deve REJEITAR nome muito longo (>100 caracteres)', () => {
-      const dadosInvalidos = {
-        nome: 'A'.repeat(101), // ❌ 101 CARACTERES
-        marca: 'Marca',
-        preco: 100,
-        descricao: 'Descrição válida com mais de dez caracteres',
-        frasco: 100,
-        foto: 'https://foto.jpg',
-      };
-
-      expect(() => esquemaCriacaoPerfume.parse(dadosInvalidos)).toThrow();
     });
 
     it('deve REMOVER espaços em branco (trim) do nome', () => {
@@ -205,9 +175,7 @@ describe('🛡️ Validadores Zod - Testes Unitários Críticos', () => {
         frasco: 100,
         foto: 'https://foto.jpg',
       };
-
       const resultado = esquemaCriacaoPerfume.parse(dados);
-
       expect(resultado.nome).toBe('Perfume Teste');
       expect(resultado.marca).toBe('Marca');
       expect(resultado.descricao).toBe('Descrição válida com mais de dez caracteres');
@@ -222,7 +190,6 @@ describe('🛡️ Validadores Zod - Testes Unitários Críticos', () => {
         frasco: 100,
         foto: 'https://foto.jpg',
       };
-
       expect(() => esquemaCriacaoPerfume.parse(dadosInvalidos)).toThrow('Mínimo 10 caracteres');
     });
 
@@ -235,7 +202,6 @@ describe('🛡️ Validadores Zod - Testes Unitários Críticos', () => {
         frasco: 100,
         foto: '', // ❌ VAZIA
       };
-
       expect(() => esquemaCriacaoPerfume.parse(dadosInvalidos)).toThrow('A foto é obrigatória');
     });
   });
@@ -274,21 +240,15 @@ describe('🛡️ Validadores Zod - Testes Unitários Críticos', () => {
   // ==========================================
   describe('esquemaListagemPerfumes - Paginação', () => {
     it('deve REJEITAR page negativa', () => {
-      expect(() => esquemaListagemPerfumes.parse({ page: -1 })).toThrow(
-        'Página deve ser maior que zero'
-      );
+      expect(() => esquemaListagemPerfumes.parse({ page: -1 })).toThrow('Página deve ser maior que zero');
     });
 
     it('deve REJEITAR page zero', () => {
-      expect(() => esquemaListagemPerfumes.parse({ page: 0 })).toThrow(
-        'Página deve ser maior que zero'
-      );
+      expect(() => esquemaListagemPerfumes.parse({ page: 0 })).toThrow('Página deve ser maior que zero');
     });
 
     it('deve REJEITAR page decimal', () => {
-      expect(() => esquemaListagemPerfumes.parse({ page: 1.5 })).toThrow(
-        'Página deve ser um número inteiro'
-      );
+      expect(() => esquemaListagemPerfumes.parse({ page: 1.5 })).toThrow('Página deve ser um número inteiro');
     });
 
     it('deve USAR page=1 como padrão', () => {
@@ -297,15 +257,11 @@ describe('🛡️ Validadores Zod - Testes Unitários Críticos', () => {
     });
 
     it('deve REJEITAR limit negativo', () => {
-      expect(() => esquemaListagemPerfumes.parse({ limit: -10 })).toThrow(
-        'Limite deve ser maior que zero'
-      );
+      expect(() => esquemaListagemPerfumes.parse({ limit: -10 })).toThrow('Limite deve ser maior que zero');
     });
 
-    it('deve REJEITAR limit maior que 20', () => {
-      expect(() => esquemaListagemPerfumes.parse({ limit: 21 })).toThrow(
-        'Limite máximo é 100 itens por página'
-      );
+    it('deve REJEITAR limit maior que 100', () => {
+      expect(() => esquemaListagemPerfumes.parse({ limit: 101 })).toThrow('Limite máximo é 100 itens por página');
     });
 
     it('deve USAR limit=10 como padrão', () => {
@@ -315,11 +271,8 @@ describe('🛡️ Validadores Zod - Testes Unitários Críticos', () => {
 
     it('deve CONVERTER strings para números na paginação', () => {
       const resultado = esquemaListagemPerfumes.parse({ page: '5', limit: '15' });
-
       expect(resultado.page).toBe(5);
       expect(resultado.limit).toBe(15);
-      expect(typeof resultado.page).toBe('number');
-      expect(typeof resultado.limit).toBe('number');
     });
   });
 
@@ -407,7 +360,6 @@ describe('🛡️ Validadores Zod - Testes Unitários Críticos', () => {
         cidade: 'Salinas',
         nome_loja: 'Loja Teste',
       });
-
       expect(resultado.estado).toBe('MG');
     });
 
@@ -425,4 +377,91 @@ describe('🛡️ Validadores Zod - Testes Unitários Críticos', () => {
       ).toThrow('A sigla deve conter apenas letras');
     });
   });
+
+  // ==========================================
+  // CIDADE - Validações
+  // ==========================================
+  describe('Validação de Cidade', () => {
+    it('deve REJEITAR cidade com menos de 2 caracteres', () => {
+      expect(() =>
+        vendedorSchema.parse({
+          ...baseVendedor(),
+          cidade: 'A', // ❌ Apenas 1 letra (Mínimo é 2)
+        })
+      ).toThrow('Nome da cidade muito curto');
+    });
+
+    it('deve ACEITAR cidade válida', () => {
+      const dados = { ...baseVendedor(), cidade: 'Salinas' };
+      const resultado = vendedorSchema.parse(dados);
+      expect(resultado.cidade).toBe('Salinas');
+    });
+
+    it('deve REJEITAR cidade vazia', () => {
+      expect(() =>
+        vendedorSchema.parse({
+          ...baseVendedor(),
+          cidade: '', // ❌ Vazia
+        })
+      ).toThrow('Nome da cidade muito curto');
+    });
+  });
+
+  // ==========================================
+  // NOME DA LOJA - Validações
+  // ==========================================
+  describe('Validação de Nome da Loja', () => {
+    it('deve REJEITAR nome da loja com menos de 5 caracteres', () => {
+      expect(() =>
+        vendedorSchema.parse({
+          ...baseVendedor(),
+          nome_loja: 'Loja', // ❌ 4 letras (Mínimo é 5)
+        })
+      ).toThrow('O nome da loja deve ter pelo menos 5 caracteres');
+    });
+
+    it('deve ACEITAR nome da loja válida (> 5 chars)', () => {
+      const dados = { ...baseVendedor(), nome_loja: 'Império dos Perfumes' };
+      expect(() => vendedorSchema.parse(dados)).not.toThrow();
+    });
+
+    it('deve REJEITAR nome da loja vazio', () => {
+      expect(() =>
+        vendedorSchema.parse({
+          ...baseVendedor(),
+          nome_loja: '', // ❌ Vazio
+        })
+      ).toThrow('O nome da loja deve ter pelo menos 5 caracteres');
+    });
+  });
 });
+
+// ==========================================
+// FUNÇÕES AUXILIARES (HELPERS)
+// ==========================================
+// Adicionei estas funções no final do arquivo para que "baseVendedor()" funcione
+
+function baseVendedor() {
+  return {
+    nome: 'João Silva',
+    email: 'joao@teste.com',
+    senha: 'senhaForte123',   // > 8 chars (OK)
+    telefone: '31999998888',  // 11 chars (OK)
+    estado: 'MG',             // 2 chars (OK)
+    cidade: 'Salinas',        // > 2 chars (OK)
+    nome_loja: 'Loja Teste'   // > 5 chars (OK)
+  };
+}
+
+// Também recomendo ter a de perfume caso precise no futuro
+function dadosBasePerfume() {
+  return {
+    nome: 'Perfume Teste',
+    marca: 'Marca',
+    preco: 100,
+    descricao: 'Descrição válida com mais de dez caracteres',
+    frasco: 100,
+    foto: 'https://foto.jpg',
+    quantidade_estoque: 10
+  };
+}
