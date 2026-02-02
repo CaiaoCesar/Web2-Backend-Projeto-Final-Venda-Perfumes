@@ -12,6 +12,8 @@ import { errorHandler } from './middlewares/error.middleware.js';
 import produtoRoutes from './routes/produto.routes.js';
 // Rota para vendedores
 import authRoutes from './routes/auth.routes.js';
+// Rota de busca pública
+import buscaRoutes from './routes/busca.routes.js';
 
 const app = express();
 
@@ -35,6 +37,7 @@ setupSwagger(app);
 app.use('/api/v2/vendedores', authRoutes);
 
 app.use('/api/v2/perfumes', produtoRoutes);
+app.use('/api/v2/buscas', buscaRoutes);
 
 // Rota de teste
 app.get('/', (req, res) => {
