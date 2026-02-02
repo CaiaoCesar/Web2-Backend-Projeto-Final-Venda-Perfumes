@@ -45,7 +45,7 @@ const router = Router();
  *               cidade:
  *                 type: string
  *                 example: "Salinas"
- *               nome_loja: 
+ *               nome_loja:
  *                type: string
  *                example: "Loja do Vendedor"
  *     responses:

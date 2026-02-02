@@ -1,23 +1,31 @@
 import jwt from 'jsonwebtoken';
+import { AppError } from '../utils/appError.js'; // Importação da sua classe padronizada
 
 export const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
-  console.log('🔑 Auth Header:', authHeader); // Debug
-  
+
   if (!authHeader) {
-    return res.status(401).json({ message: "Token não fornecido" });
+    return next(new AppError('Token não fornecido', 401));
   }
 
-  const token = authHeader.split(' ')[1];
-  console.log('🎫 Token extraído:', token); // Debug
+  // Verifica se o formato é "Bearer <token>"
+  const partes = authHeader.split(' ');
+  if (partes.length !== 2) {
+    return next(new AppError('Token malformado', 401));
+  }
+
+  const token = partes[1];
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('✅ Token válido. Vendedor ID:', decoded.id); // Debug
-    req.user = { id: decoded.id, email: decoded.email }; 
+
+    // Anexa os dados decodificados para uso nos controllers seguintes
+    req.user = { id: decoded.id, email: decoded.email };
+
+    // Sucesso: segue para o próximo middleware ou controller
     next();
   } catch (err) {
-    console.error('❌ Erro ao verificar token:', err.message);
-    return res.status(401).json({ message: "Token inválido ou expirado" });
+    // Padroniza a resposta para tokens expirados ou inválidos
+    next(new AppError('Token inválido ou expirado', 401));
   }
 };

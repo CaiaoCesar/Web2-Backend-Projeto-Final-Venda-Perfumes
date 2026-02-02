@@ -55,9 +55,9 @@ Repositório para a atividade do Projeto de Trabalho Final da Disciplina de Web 
 
 - **Responsável:** Dev 3
 - **Funcionalidades:**
-  - Busca de perfumes por nome
-  - Filtros: preço, gênero (masculino/feminino/unissex)
-  - Ordenação: preço, relevância, mais vendidos
+  - Busca de perfumes por nome e marca. OBS: Só aparece perfumes da localização do cliente.
+  - Filtros: preço.
+  - Ordenação: preço.
   - Paginação de resultados
 - **Dependências:** `feature/crud-produtos` (precisa dos produtos criados)
 
@@ -76,7 +76,7 @@ Repositório para a atividade do Projeto de Trabalho Final da Disciplina de Web 
 
 - **Responsável:** Dev 4
 - **Funcionalidades:**
-  - Captura do número de telefone do cliente
+  - Captura do número de telefone e nome do cliente
   - Formatação do número para link do WhatsApp
   - Geração da mensagem com produtos do carrinho
   - Redirecionamento para WhatsApp com mensagem pré-preenchida
@@ -88,10 +88,8 @@ Repositório para a atividade do Projeto de Trabalho Final da Disciplina de Web 
 - **Responsável:** Dev 5
 - **Funcionalidades:**
   - Criar pedido ao finalizar checkout
-  - Model de pedido com status (pendente, confirmado, enviado, entregue, cancelado)
-  - Dashboard do vendedor para ver pedidos
-  - Alterar status do pedido
-  - Histórico de pedidos por cliente
+  - O pedido tem que aparecer para o vendedor
+  - Model de pedido com status (pendente, confirmado)
 - **Dependências:** `feature/auth-vendedor` + `feature/checkout-whatsapp`
 
 ---

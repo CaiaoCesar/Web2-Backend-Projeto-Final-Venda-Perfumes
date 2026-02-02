@@ -13,7 +13,6 @@ import * as authService from '../services/auth.service.js';
 export const registrarVendedor = async (req, res, next) => {
   try {
     const novoVendedor = await authService.criarVendedor(req.body);
-    console.log(authService.criarVendedor.token);
     res.status(201).json({
       success: true,
       message: 'Vendedor registrado com sucesso!',
@@ -25,7 +24,7 @@ export const registrarVendedor = async (req, res, next) => {
 };
 
 // LOGIN DE VENDEDOR
-export const loginVendedor = async (req, res) => {
+export const loginVendedor = async (req, res, next) => {
   try {
     const { email, senha } = req.body;
 
@@ -38,7 +37,7 @@ export const loginVendedor = async (req, res) => {
       data: { vendedor, token },
     });
   } catch (error) {
-    return res.status(401).json({ message: error.message });
+    next(error);
   }
 };
 

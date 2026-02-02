@@ -2,12 +2,12 @@
 import { Router } from 'express';
 import * as produtoController from '../controllers/produto.controller.js';
 import upload from '../config/upload.js';
-import { 
-  validarCriacaoProduto, 
-  validarEditarProduto, 
+import {
+  validarCriacaoProduto,
+  validarEditarProduto,
   validarEditarEstoque,
   validarListagemPerfumes, // ← NOVO
-  validarId 
+  validarId,
 } from '../middlewares/validation.middleware.js';
 
 import { authMiddleware } from '../middlewares/auth.middleware.js';
@@ -71,7 +71,13 @@ const router = Router();
 
 // Rota para criar novo perfume
 // 1º Autentica -> 2º Upload -> 3º Valida -> 4º Controller
-router.post('/', authMiddleware, upload.single('foto'), validarCriacaoProduto, produtoController.criarPerfume);
+router.post(
+  '/',
+  authMiddleware,
+  upload.single('foto'),
+  validarCriacaoProduto,
+  produtoController.criarPerfume
+);
 
 /**
  * @swagger
@@ -104,7 +110,7 @@ router.post('/', authMiddleware, upload.single('foto'), validarCriacaoProduto, p
  */
 
 // Rota para listar produtos do vendedor
-router.get("/", authMiddleware, validarListagemPerfumes, produtoController.listarPerfumes);
+router.get('/', authMiddleware, validarListagemPerfumes, produtoController.listarPerfumes);
 
 /**
  * @swagger
@@ -142,13 +148,19 @@ router.get("/", authMiddleware, validarListagemPerfumes, produtoController.lista
  */
 
 // Rota para editar estoque perfume, é necessário validar o ID
-router.put('/estoque/:id', authMiddleware, validarId, validarEditarEstoque, produtoController.editarEstoquePerfume);
+router.put(
+  '/estoque/:id',
+  authMiddleware,
+  validarId,
+  validarEditarEstoque,
+  produtoController.editarEstoquePerfume
+);
 
 /**
  * @swagger
  * /api/v2/perfumes/{id}:
  *   put:
- *     summary: Atualizar um perfume
+ *     summary: Editar um perfume
  *     description: Atualiza os dados de um perfume existente (apenas vendedores autenticados)
  *     tags: [Perfumes]
  *     parameters:
@@ -183,7 +195,7 @@ router.put('/estoque/:id', authMiddleware, validarId, validarEditarEstoque, prod
  *               foto:
  *                 type: string
  *                 format: binary
- *                 description: Nova foto do produto (JPEG, PNG, WEBP, GIF - máx 5MB)
+ *                 description: Nova foto do produto (JPEG, JPG, PNG, WEBP, GIF - máx 5MB)
  *     responses:
  *       200:
  *         description: Perfume atualizado com sucesso
@@ -194,7 +206,14 @@ router.put('/estoque/:id', authMiddleware, validarId, validarEditarEstoque, prod
  */
 
 // Rota para editar perfume, é necessário validar ID
-router.put('/:id', authMiddleware, validarId, upload.single('foto'), validarEditarProduto, produtoController.editarPerfume);
+router.put(
+  '/:id',
+  authMiddleware,
+  validarId,
+  upload.single('foto'),
+  validarEditarProduto,
+  produtoController.editarPerfume
+);
 /**
  * @swagger
  * /api/v2/perfumes/{id}:
