@@ -1,106 +1,109 @@
-import { esquemaCriacaoPerfume, esquemaEditarPerfume, esquemaEditarEstoque, esquemaListagemPerfumes } from '../schemas/perfume.schema.js';
+import { AppError } from '../utils/AppError.js';
+import {
+  esquemaCriacaoPerfume,
+  esquemaEditarPerfume,
+  esquemaEditarEstoque,
+  esquemaListagemPerfumes,
+} from '../schemas/perfume.schema.js';
 
 /**
- * Middleware para validação de esquemas Zod
- * @param {z.ZodObject} schema 
+ * Middleware genérico para validação de esquemas Zod (Body)
  */
 export const validacao = (schema) => async (req, res, next) => {
   try {
-
     const dadosValidados = await schema.parseAsync(req.body);
-    req.body = dadosValidados; 
-
-    // Se passar na validação e transformação, segue para o Controller
+    req.body = dadosValidados;
     next();
   } catch (error) {
-    return res.status(400).json({
-      success: false,
-      message: 'Dados de entrada inválidos',
-      errors: error.errors.map((err) => ({
-        campo: err.path[0],
-        mensagem: err.message,
-      })),
-    });
+    // Criamos o erro e anexamos os detalhes do Zod para o errorHandler ler
+    const appError = new AppError('Dados de entrada inválidos', 400);
+    appError.errors = error.errors.map((err) => ({
+      campo: err.path[0],
+      mensagem: err.message,
+    }));
+    next(appError);
   }
 };
 
+/**
+ * Validação específica para criação com injeção de foto
+ */
 export const validarCriacaoProduto = (req, res, next) => {
-  // Pega o nome do arquivo da foto e insere dentro do campo foto
-  // Sem ele o zod não identifica que uma foto foi enviada
   if (req.file && !req.body.foto) {
-    req.body.foto = req.file.originalname; 
+    req.body.foto = req.file.originalname;
   }
 
-  // Confere os dados de entrada com as regras do zod
   const result = esquemaCriacaoPerfume.safeParse(req.body);
-  
-  // Se nã foi enviado algum dado ou estiver no formato errado é disparado um erro
+
   if (!result.success) {
-    return res.status(400).json({
-      success: false,
-      message: "Dados de cadastro inválidos",
-      errors: result.error.flatten().fieldErrors 
-    });
+    const appError = new AppError('Dados de cadastro inválidos', 400);
+    appError.errors = result.error.flatten().fieldErrors;
+    return next(appError); // Envia para o errorHandler
   }
-  
-  // Se tudo estiver OK, substitui os dados padrão pelos dados validados pelo zod
-  req.body = result.data; 
+
+  req.body = result.data;
   next();
 };
 
-// Verifica os dados para editar o produto
+/**
+ * Validação para edição de produto
+ */
 export const validarEditarProduto = (req, res, next) => {
   const result = esquemaEditarPerfume.safeParse(req.body);
+
   if (!result.success) {
-    return res.status(400).json({ 
-      success: false, 
-      message: "Dados de edição inválidos",
-      errors: result.error.flatten().fieldErrors 
-    });
+    const appError = new AppError('Dados de edição inválidos', 400);
+    appError.errors = result.error.flatten().fieldErrors;
+    return next(appError);
   }
+
   req.body = result.data;
   next();
 };
 
-// Verifica os dados para editar estoque
+/**
+ * Validação para edição de estoque
+ */
 export const validarEditarEstoque = (req, res, next) => {
   const result = esquemaEditarEstoque.safeParse(req.body);
+
   if (!result.success) {
-    return res.status(400).json({ 
-      success: false, 
-      message: "Dados de estoque inválidos",
-      errors: result.error.flatten().fieldErrors 
-    });
+    const appError = new AppError('Dados de estoque inválidos', 400);
+    appError.errors = result.error.flatten().fieldErrors;
+    return next(appError);
   }
+
   req.body = result.data;
   next();
 };
 
-// Verifica se o ID é um número
+/**
+ * Validação de ID de parâmetro
+ */
 export const validarId = (req, res, next) => {
   const id = Number(req.params.id);
+
   if (isNaN(id) || id <= 0) {
-    return res.status(400).json({
-      success: false,
-      message: "ID inválido",
-      errors: { id: ["O ID deve ser um número inteiro positivo"] }
-    });
+    const appError = new AppError('ID inválido', 400);
+    appError.errors = { id: ['O ID deve ser um número inteiro positivo'] };
+    return next(appError);
   }
+
   next();
 };
 
+/**
+ * Validação de parâmetros de busca (Query Params)
+ */
 export const validarListagemPerfumes = (req, res, next) => {
   const result = esquemaListagemPerfumes.safeParse(req.query);
-  
+
   if (!result.success) {
-    return res.status(400).json({ 
-      success: false, 
-      message: "Parâmetros de busca inválidos",
-      errors: result.error.flatten().fieldErrors 
-    });
+    const appError = new AppError('Parâmetros de busca inválidos', 400);
+    appError.errors = result.error.flatten().fieldErrors;
+    return next(appError);
   }
-  
-  // Substitui os query params pelos dados validados e transformados
+
   req.query = result.data;
   next();
 };
