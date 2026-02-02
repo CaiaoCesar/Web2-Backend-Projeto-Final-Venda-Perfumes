@@ -160,7 +160,7 @@ router.put(
  * @swagger
  * /api/v2/perfumes/{id}:
  *   put:
- *     summary: Atualizar um perfume
+ *     summary: Editar um perfume
  *     description: Atualiza os dados de um perfume existente (apenas vendedores autenticados)
  *     tags: [Perfumes]
  *     parameters:
@@ -195,7 +195,7 @@ router.put(
  *               foto:
  *                 type: string
  *                 format: binary
- *                 description: Nova foto do produto (JPEG, PNG, WEBP, GIF - máx 5MB)
+ *                 description: Nova foto do produto (JPEG, JPG, PNG, WEBP, GIF - máx 5MB)
  *     responses:
  *       200:
  *         description: Perfume atualizado com sucesso

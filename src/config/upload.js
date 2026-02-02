@@ -12,7 +12,7 @@ const fileFilter = (req, file, cb) => {
   } else {
     cb(
       new AppError(
-        'Formato de arquivo inválido. Apenas imagens são permitidas (JPEG, PNG, WEBP, GIF).',
+        'Formato de arquivo inválido. Apenas imagens são permitidas (JPEG, JPG, PNG, WEBP, GIF).',
         400
       ),
       false

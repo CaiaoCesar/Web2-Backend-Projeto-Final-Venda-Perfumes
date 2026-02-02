@@ -91,6 +91,8 @@ export const criarPerfume = async (perfumeDados, file = null, vendedorId) => {
       foto: true,
       marca: true,
       preco: true,
+      frasco: true,
+      quantidade_estoque: true,
       vendedorId: true,
       createdAt: true,
     },
