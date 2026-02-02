@@ -3,14 +3,31 @@ import { z } from 'zod';
 const regrasPerfume = {
   nome: z.string().trim().min(3, 'Mínimo 3 caracteres').max(100),
   marca: z.string().trim().min(2, 'Mínimo 2 caracteres').max(50),
-  preco: z.coerce.number().positive('O preço deve ser maior que zero'),
+  
+  // Customização da mensagem de tipo inválido
+  preco: z.coerce
+    .number({ 
+      invalid_type_error: 'O preço deve ser um número válido (ex: 150.50)',
+      required_error: 'O preço é obrigatório' 
+    })
+    .positive('O preço deve ser maior que zero'),
+
   descricao: z.string().trim().min(10, 'Mínimo 10 caracteres').max(500),
-  frasco: z.coerce.number().positive('O volume deve ser maior que zero'),
 
-  // Se não for passado nada o sistema coloca 0 como padrão
-  quantidade_estoque: z.coerce.number().int().nonnegative().default(0),
+  // Aplicando a mesma lógica para o volume
+  frasco: z.coerce
+    .number({ 
+      invalid_type_error: 'O volume do frasco deve ser um número inteiro (ex: 100)' 
+    })
+    .positive('O volume deve ser maior que zero'),
 
-  // É obrigatório ter uma foto na criação
+  quantidade_estoque: z.coerce
+    .number({ 
+      invalid_type_error: 'A quantidade em estoque deve ser um número inteiro (ex: 10)' 
+    })
+    .int('A quantidade deve ser um número inteiro')
+    .nonnegative('A quantidade não pode ser negativa')
+    .default(0),
   foto: z.string().min(1, 'A foto é obrigatória'),
 };
 
