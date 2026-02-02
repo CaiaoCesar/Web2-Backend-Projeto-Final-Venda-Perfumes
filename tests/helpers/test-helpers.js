@@ -21,14 +21,14 @@ export const vendedorPadrao = {
 export async function criarVendedorTeste(dadosPersonalizados = {}) {
   // O uso de sufixo aleatório impede colisões em testes paralelos
   const randomSuffix = Math.floor(Math.random() * 999999);
-  
-  const dados = { 
-    ...vendedorPadrao, 
+
+  const dados = {
+    ...vendedorPadrao,
     email: `vendedor-${Date.now()}-${randomSuffix}@teste.com`,
     nome_loja: `Loja ${randomSuffix}`,
-    ...dadosPersonalizados 
+    ...dadosPersonalizados,
   };
-  
+
   const senhaHash = await bcrypt.hash(dados.senha, 10);
 
   return await prisma.vendedor.create({
@@ -49,11 +49,9 @@ export async function criarVendedorTeste(dadosPersonalizados = {}) {
  * IMPORTANTE: O payload deve conter 'id' para bater com seu authMiddleware.
  */
 export function gerarTokenTeste(vendedorId, email) {
-  return jwt.sign(
-    { id: vendedorId, email: email }, 
-    process.env.JWT_SECRET || 'test-secret-key', 
-    { expiresIn: '24h' }
-  );
+  return jwt.sign({ id: vendedorId, email: email }, process.env.JWT_SECRET || 'test-secret-key', {
+    expiresIn: '24h',
+  });
 }
 
 /**

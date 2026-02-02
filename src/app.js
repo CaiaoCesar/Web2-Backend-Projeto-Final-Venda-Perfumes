@@ -12,7 +12,6 @@ import { errorHandler } from './middlewares/error.middleware.js';
 import produtoRoutes from './routes/produto.routes.js';
 import authRoutes from './routes/auth.routes.js';
 
-
 const app = express();
 
 /**
@@ -56,7 +55,7 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    database: 'connected', 
+    database: 'connected',
   });
 });
 
@@ -65,8 +64,6 @@ app.get('/health', (req, res) => {
  */
 app.use('/api/v2/vendedores', authRoutes);
 app.use('/api/v2/perfumes', produtoRoutes);
-
-
 
 /**
  * Middleware de Erro Global

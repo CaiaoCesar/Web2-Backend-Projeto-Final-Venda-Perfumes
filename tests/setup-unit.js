@@ -10,7 +10,7 @@ const mockPrisma = {
     update: vi.fn(),
     delete: vi.fn(),
     deleteMany: vi.fn(),
-    count: vi.fn()
+    count: vi.fn(),
   },
   vendedor: {
     findMany: vi.fn(),
@@ -19,24 +19,24 @@ const mockPrisma = {
     update: vi.fn(),
     delete: vi.fn(),
     deleteMany: vi.fn(),
-    count: vi.fn()
+    count: vi.fn(),
   },
-  $disconnect: vi.fn()
+  $disconnect: vi.fn(),
 };
 
 vi.mock('../../src/config/database.js', () => ({
-  default: mockPrisma
+  default: mockPrisma,
 }));
 
 // Mock bcrypt e jwt
 vi.mock('bcryptjs', () => ({
   hash: vi.fn(),
-  compare: vi.fn()
+  compare: vi.fn(),
 }));
 
 vi.mock('jsonwebtoken', () => ({
   sign: vi.fn(),
-  verify: vi.fn()
+  verify: vi.fn(),
 }));
 
 console.log('🧪 Mocks configurados para testes unitários');

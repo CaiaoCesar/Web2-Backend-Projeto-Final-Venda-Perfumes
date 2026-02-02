@@ -1,15 +1,14 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import request from 'supertest';
 import app from '../../src/app.js';
-import { 
-  criarVendedorTeste, 
-  gerarTokenTeste, 
+import {
+  criarVendedorTeste,
+  gerarTokenTeste,
   criarPerfumeTeste,
-  criarMultiplosPerfumes 
+  criarMultiplosPerfumes,
 } from '../helpers/test-helpers.js';
 
 describe('🧴 Produtos - Testes de Integração', () => {
-  
   // Declaração de variáveis globais para o escopo dos testes
   let vendedor, token;
 
@@ -23,15 +22,14 @@ describe('🧴 Produtos - Testes de Integração', () => {
   // POST /api/v2/perfumes - Criar Perfume
   // ==========================================
   describe('Criação de Perfumes', () => {
-    
     it('deve criar perfume com token válido (201)', async () => {
       const novoPerfume = {
         nome: `Perfume Teste ${Date.now()}`,
         marca: 'Chanel',
         descricao: 'Fragrância elegante e marcante para ambiente de testes.',
-        preco: 299.90,
+        preco: 299.9,
         frasco: 100,
-        quantidade_estoque: 50
+        quantidade_estoque: 50,
       };
 
       const response = await request(app)
@@ -63,10 +61,10 @@ describe('🧴 Produtos - Testes de Integração', () => {
 
     it('deve rejeitar nome duplicado para o mesmo vendedor (400)', async () => {
       const nomeDuplicado = `Perfume Duplicado ${Date.now()}`;
-      
-      await criarPerfumeTeste(vendedor.id, { 
+
+      await criarPerfumeTeste(vendedor.id, {
         nome: nomeDuplicado,
-        descricao: 'Descrição válida com mais de dez caracteres.' 
+        descricao: 'Descrição válida com mais de dez caracteres.',
       });
 
       const response = await request(app)
@@ -86,7 +84,7 @@ describe('🧴 Produtos - Testes de Integração', () => {
 
     it('deve permitir nomes iguais para vendedores diferentes (201)', async () => {
       const nomeComum = `Perfume Comum ${Date.now()}`;
-      
+
       await criarPerfumeTeste(vendedor.id, { nome: nomeComum });
 
       const vendedor2 = await criarVendedorTeste();
@@ -113,7 +111,6 @@ describe('🧴 Produtos - Testes de Integração', () => {
   // GET /api/v2/perfumes - Listar Perfumes
   // ==========================================
   describe('Listagem e Filtros', () => {
-
     it('deve listar apenas perfumes do vendedor autenticado (200)', async () => {
       await criarPerfumeTeste(vendedor.id, { nome: 'Meu Perfume A' });
       await criarPerfumeTeste(vendedor.id, { nome: 'Meu Perfume B' });
@@ -128,7 +125,7 @@ describe('🧴 Produtos - Testes de Integração', () => {
 
       expect(response.body.data).toHaveLength(2);
       expect(response.body.pagination.total).toBe(2);
-      expect(response.body.data.every(p => p.nome !== 'Perfume de Outro')).toBe(true);
+      expect(response.body.data.every((p) => p.nome !== 'Perfume de Outro')).toBe(true);
     });
 
     it('deve filtrar perfumes por nome (200)', async () => {
@@ -141,12 +138,12 @@ describe('🧴 Produtos - Testes de Integração', () => {
         .expect(200);
 
       expect(response.body.data.length).toBeGreaterThanOrEqual(1);
-      expect(response.body.data.every(p => p.nome.includes('Azzaro'))).toBe(true);
+      expect(response.body.data.every((p) => p.nome.includes('Azzaro'))).toBe(true);
     });
 
     it('deve paginar resultados corretamente (200)', async () => {
       await criarMultiplosPerfumes(vendedor.id, 15);
-      
+
       const response = await request(app)
         .get('/api/v2/perfumes?page=1&limit=10')
         .set('Authorization', `Bearer ${token}`)
@@ -162,7 +159,6 @@ describe('🧴 Produtos - Testes de Integração', () => {
   // PUT /api/v2/perfumes/:id - Atualizar Perfume
   // ==========================================
   describe('Atualização de Perfumes', () => {
-
     it('deve atualizar perfume do próprio vendedor (200)', async () => {
       const perfume = await criarPerfumeTeste(vendedor.id);
 
@@ -193,7 +189,6 @@ describe('🧴 Produtos - Testes de Integração', () => {
   // DELETE /api/v2/perfumes/:id - Deletar Perfume
   // ==========================================
   describe('Exclusão de Perfumes', () => {
-
     it('deve deletar perfume do próprio vendedor (200)', async () => {
       const perfume = await criarPerfumeTeste(vendedor.id);
 

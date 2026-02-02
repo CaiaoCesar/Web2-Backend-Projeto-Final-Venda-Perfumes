@@ -20,7 +20,7 @@ export const vendedorSchema = z.object({
     .string({ required_error: 'O estado é obrigatório' })
     .length(2, 'Use a sigla do estado com 2 letras (ex: MG)')
     .regex(/^[A-Za-z]+$/, 'A sigla deve conter apenas letras')
-    .transform(val => val.toUpperCase()), // Converte siglas minusculas para maiusculas
+    .transform((val) => val.toUpperCase()), // Converte siglas minusculas para maiusculas
 
   cidade: z
     .string({ required_error: 'A cidade é obrigatória' })

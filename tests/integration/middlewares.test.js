@@ -5,7 +5,6 @@ import app from '../../src/app.js';
 import { criarVendedorTeste, gerarTokenTeste, criarPerfumeTeste } from '../helpers/test-helpers.js';
 
 describe('🛡️ Middlewares e Segurança - Testes de Integração', () => {
-  
   let vendedor, token;
 
   beforeEach(async () => {
@@ -14,11 +13,8 @@ describe('🛡️ Middlewares e Segurança - Testes de Integração', () => {
   });
 
   describe('AuthMiddleware - Validação de Token', () => {
-    
     it('deve bloquear requisição sem header Authorization (401)', async () => {
-      const response = await request(app)
-        .get('/api/v2/perfumes')
-        .expect(401);
+      const response = await request(app).get('/api/v2/perfumes').expect(401);
 
       expect(response.body.message).toContain('Token não fornecido');
     });
@@ -31,7 +27,7 @@ describe('🛡️ Middlewares e Segurança - Testes de Integração', () => {
 
       expect(response.body.message).toContain('Token malformado');
     });
-    
+
     it('deve bloquear token inválido (401)', async () => {
       const response = await request(app)
         .get('/api/v2/perfumes')
@@ -54,7 +50,6 @@ describe('🛡️ Middlewares e Segurança - Testes de Integração', () => {
   });
 
   describe('ValidationMiddleware - Validação de Parâmetros', () => {
-    
     it('deve rejeitar ID não numérico na URL (400)', async () => {
       const response = await request(app)
         .put('/api/v2/perfumes/abc')
@@ -89,7 +84,6 @@ describe('🛡️ Middlewares e Segurança - Testes de Integração', () => {
   });
 
   describe('Validação de Dados - Criação de Perfume', () => {
-    
     it('deve rejeitar criação sem campos obrigatórios (400)', async () => {
       const response = await request(app)
         .post('/api/v2/perfumes')
@@ -133,10 +127,9 @@ describe('🛡️ Middlewares e Segurança - Testes de Integração', () => {
   });
 
   describe('Segurança de Propriedade (Ownership)', () => {
-    
     it('deve impedir edição de perfume de outro vendedor (404)', async () => {
-      const vendedor2 = await criarVendedorTeste({ 
-        email: `vendedor2-${Date.now()}@teste.com` 
+      const vendedor2 = await criarVendedorTeste({
+        email: `vendedor2-${Date.now()}@teste.com`,
       });
       const perfumeVendedor2 = await criarPerfumeTeste(vendedor2.id);
 
@@ -150,8 +143,8 @@ describe('🛡️ Middlewares e Segurança - Testes de Integração', () => {
     });
 
     it('deve impedir deleção de perfume de outro vendedor (404)', async () => {
-      const vendedor2 = await criarVendedorTeste({ 
-        email: `vendedor2-delete-${Date.now()}@teste.com` 
+      const vendedor2 = await criarVendedorTeste({
+        email: `vendedor2-delete-${Date.now()}@teste.com`,
       });
       const perfumeVendedor2 = await criarPerfumeTeste(vendedor2.id);
 
@@ -164,8 +157,8 @@ describe('🛡️ Middlewares e Segurança - Testes de Integração', () => {
     });
 
     it('deve impedir atualização de estoque de outro vendedor (404)', async () => {
-      const vendedor2 = await criarVendedorTeste({ 
-        email: `vendedor2-estoque-${Date.now()}@teste.com` 
+      const vendedor2 = await criarVendedorTeste({
+        email: `vendedor2-estoque-${Date.now()}@teste.com`,
       });
       const perfumeVendedor2 = await criarPerfumeTeste(vendedor2.id);
 

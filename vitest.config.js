@@ -8,12 +8,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      exclude: [
-        'node_modules/',
-        'tests/',
-        'prisma/',
-        '*.config.js',
-      ],
+      exclude: ['node_modules/', 'tests/', 'prisma/', '*.config.js'],
     },
     testTimeout: 10000,
   },

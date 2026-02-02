@@ -41,14 +41,12 @@ export const autenticarVendedor = async (email, senha) => {
 
   // 3. Erro de Login (Vendedor não encontrado ou senha errada)
   if (!vendedor || !(await bcrypt.compare(senha, vendedor.senha))) {
-    throw new AppError('E-mail ou senha incorretos', 401); 
+    throw new AppError('E-mail ou senha incorretos', 401);
   }
 
-  const token = jwt.sign(
-    { id: vendedor.id, email: vendedor.email }, 
-    process.env.JWT_SECRET, 
-    { expiresIn: process.env.EXPIRATION_TIME || '5h' }
-  );
+  const token = jwt.sign({ id: vendedor.id, email: vendedor.email }, process.env.JWT_SECRET, {
+    expiresIn: process.env.EXPIRATION_TIME || '5h',
+  });
 
   const { senha: _, ...vendedorSemSenha } = vendedor;
   return { vendedor: vendedorSemSenha, token };

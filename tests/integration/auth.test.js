@@ -6,9 +6,7 @@ import { criarVendedorTeste } from '../helpers/test-helpers.js';
 import prisma from '../../src/config/database.js';
 
 describe('🔐 Autenticação - Testes de Integração', () => {
-  
   describe('POST /api/v2/vendedores/register', () => {
-    
     it('deve criar vendedor com dados válidos (201)', async () => {
       const novoVendedor = {
         nome: 'João Silva',
@@ -17,7 +15,7 @@ describe('🔐 Autenticação - Testes de Integração', () => {
         telefone: '31988887777',
         nome_loja: 'Perfumes Salinas',
         cidade: 'Salinas',
-        estado: 'MG'                  
+        estado: 'MG',
       };
 
       const response = await request(app)
@@ -34,7 +32,7 @@ describe('🔐 Autenticação - Testes de Integração', () => {
       const vendedorNoBanco = await prisma.vendedor.findUnique({
         where: { email: novoVendedor.email },
       });
-      
+
       expect(vendedorNoBanco).not.toBeNull();
       expect(vendedorNoBanco.nome).toBe(novoVendedor.nome);
       expect(vendedorNoBanco.senha).not.toBe(novoVendedor.senha);
@@ -42,7 +40,7 @@ describe('🔐 Autenticação - Testes de Integração', () => {
 
     it('deve rejeitar registro com email duplicado (400)', async () => {
       const email = `duplicado-${Date.now()}@teste.com`;
-      
+
       // Criar primeiro vendedor
       await criarVendedorTeste({ email });
 
@@ -56,7 +54,7 @@ describe('🔐 Autenticação - Testes de Integração', () => {
           telefone: '31977776666',
           nome_loja: 'Loja Teste',
           cidade: 'Salinas',
-          estado: 'MG'
+          estado: 'MG',
         })
         .expect(400);
 
@@ -80,20 +78,19 @@ describe('🔐 Autenticação - Testes de Integração', () => {
   });
 
   describe('POST /api/v2/vendedores/login', () => {
-    
     it('deve fazer login com credenciais válidas e retornar JWT (200)', async () => {
       const senha = 'senha123';
-      
-      const vendedor = await criarVendedorTeste({ 
+
+      const vendedor = await criarVendedorTeste({
         email: `login-${Date.now()}@teste.com`,
-        senha 
+        senha,
       });
 
       const response = await request(app)
-        .post('/api/v2/vendedores/login') 
-        .send({ 
-          email: vendedor.email, 
-          senha: senha 
+        .post('/api/v2/vendedores/login')
+        .send({
+          email: vendedor.email,
+          senha: senha,
         })
         .expect(200);
 
@@ -105,9 +102,9 @@ describe('🔐 Autenticação - Testes de Integração', () => {
     });
 
     it('deve rejeitar login com senha incorreta (401)', async () => {
-      const vendedor = await criarVendedorTeste({ 
+      const vendedor = await criarVendedorTeste({
         email: `senhaerrada-${Date.now()}@teste.com`,
-        senha: 'senhaCorreta123' 
+        senha: 'senhaCorreta123',
       });
 
       const response = await request(app)

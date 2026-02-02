@@ -10,7 +10,13 @@ const fileFilter = (req, file, cb) => {
   if (allowedMimes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new AppError('Formato de arquivo inválido. Apenas imagens são permitidas (JPEG, PNG, WEBP, GIF).', 400), false);
+    cb(
+      new AppError(
+        'Formato de arquivo inválido. Apenas imagens são permitidas (JPEG, PNG, WEBP, GIF).',
+        400
+      ),
+      false
+    );
   }
 };
 

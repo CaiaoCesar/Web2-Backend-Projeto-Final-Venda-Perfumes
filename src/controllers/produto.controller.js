@@ -38,14 +38,14 @@ export const criarPerfume = async (req, res, next) => {
 export const listarPerfumes = async (req, res, next) => {
   try {
     const vendedorId = req.user.id;
-    
+
     // Os dados já vêm validados e transformados pelo middleware
     const { nome, page, limit } = req.query;
-    
+
     const filtros = {
       nome,
       page,
-      limit
+      limit,
     };
 
     const resultado = await perfumeService.listarPerfumes(Number(vendedorId), filtros);
@@ -58,8 +58,8 @@ export const listarPerfumes = async (req, res, next) => {
         total: resultado.total,
         page: filtros.page,
         limit: filtros.limit,
-        totalPages: Math.ceil(resultado.total / filtros.limit)
-      }
+        totalPages: Math.ceil(resultado.total / filtros.limit),
+      },
     });
   } catch (error) {
     next(error);
@@ -74,20 +74,20 @@ export const editarPerfume = async (req, res, next) => {
   try {
     const { id } = req.params;
     // Captura o ID do vendedor autenticado vindo do JWT
-    const vendedorId = req.user.id; 
+    const vendedorId = req.user.id;
 
     // Passamos o vendedorId como o último argumento para conferir a propriedade
     const perfumeAtualizado = await perfumeService.atualizarPerfume(
-      id, 
-      req.body, 
-      req.file, 
+      id,
+      req.body,
+      req.file,
       Number(vendedorId)
     );
 
     res.status(200).json({
       message: 'Perfume atualizado com sucesso!',
       success: true,
-      data: perfumeAtualizado
+      data: perfumeAtualizado,
     });
   } catch (error) {
     next(error);
@@ -101,14 +101,14 @@ export const editarPerfume = async (req, res, next) => {
 export const editarEstoquePerfume = async (req, res, next) => {
   try {
     const { id } = req.params;
-    
+
     // Captura o ID do vendedor autenticado
-    const vendedorId = req.user.id; 
+    const vendedorId = req.user.id;
 
     // Passa o ID para o service validar a propriedade
     const estoqueAtualizado = await perfumeService.atualizarEstoquePerfume(
-      id, 
-      req.body, 
+      id,
+      req.body,
       Number(vendedorId)
     );
 
@@ -130,7 +130,7 @@ export const deletarPerfume = async (req, res, next) => {
   try {
     const { id } = req.params;
     // Captura o ID do vendedor autenticado
-    const vendedorId = req.user.id; 
+    const vendedorId = req.user.id;
 
     // Passa o ID do perfume e o ID do dono para validação
     const perfumeDeletado = await perfumeService.excluirPerfume(id, Number(vendedorId));
@@ -138,7 +138,7 @@ export const deletarPerfume = async (req, res, next) => {
     res.status(200).json({
       message: 'Perfume e imagem removidos com sucesso!',
       success: true,
-      data: perfumeDeletado
+      data: perfumeDeletado,
     });
   } catch (error) {
     next(error);

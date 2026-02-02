@@ -1,9 +1,9 @@
 import { AppError } from '../utils/AppError.js';
-import { 
-  esquemaCriacaoPerfume, 
-  esquemaEditarPerfume, 
-  esquemaEditarEstoque, 
-  esquemaListagemPerfumes 
+import {
+  esquemaCriacaoPerfume,
+  esquemaEditarPerfume,
+  esquemaEditarEstoque,
+  esquemaListagemPerfumes,
 } from '../schemas/perfume.schema.js';
 
 /**
@@ -12,7 +12,7 @@ import {
 export const validacao = (schema) => async (req, res, next) => {
   try {
     const dadosValidados = await schema.parseAsync(req.body);
-    req.body = dadosValidados; 
+    req.body = dadosValidados;
     next();
   } catch (error) {
     // Criamos o erro e anexamos os detalhes do Zod para o errorHandler ler
@@ -30,18 +30,18 @@ export const validacao = (schema) => async (req, res, next) => {
  */
 export const validarCriacaoProduto = (req, res, next) => {
   if (req.file && !req.body.foto) {
-    req.body.foto = req.file.originalname; 
+    req.body.foto = req.file.originalname;
   }
 
   const result = esquemaCriacaoPerfume.safeParse(req.body);
-  
+
   if (!result.success) {
-    const appError = new AppError("Dados de cadastro inválidos", 400);
+    const appError = new AppError('Dados de cadastro inválidos', 400);
     appError.errors = result.error.flatten().fieldErrors;
     return next(appError); // Envia para o errorHandler
   }
-  
-  req.body = result.data; 
+
+  req.body = result.data;
   next();
 };
 
@@ -50,13 +50,13 @@ export const validarCriacaoProduto = (req, res, next) => {
  */
 export const validarEditarProduto = (req, res, next) => {
   const result = esquemaEditarPerfume.safeParse(req.body);
-  
+
   if (!result.success) {
-    const appError = new AppError("Dados de edição inválidos", 400);
+    const appError = new AppError('Dados de edição inválidos', 400);
     appError.errors = result.error.flatten().fieldErrors;
     return next(appError);
   }
-  
+
   req.body = result.data;
   next();
 };
@@ -66,13 +66,13 @@ export const validarEditarProduto = (req, res, next) => {
  */
 export const validarEditarEstoque = (req, res, next) => {
   const result = esquemaEditarEstoque.safeParse(req.body);
-  
+
   if (!result.success) {
-    const appError = new AppError("Dados de estoque inválidos", 400);
+    const appError = new AppError('Dados de estoque inválidos', 400);
     appError.errors = result.error.flatten().fieldErrors;
     return next(appError);
   }
-  
+
   req.body = result.data;
   next();
 };
@@ -82,13 +82,13 @@ export const validarEditarEstoque = (req, res, next) => {
  */
 export const validarId = (req, res, next) => {
   const id = Number(req.params.id);
-  
+
   if (isNaN(id) || id <= 0) {
-    const appError = new AppError("ID inválido", 400);
-    appError.errors = { id: ["O ID deve ser um número inteiro positivo"] };
+    const appError = new AppError('ID inválido', 400);
+    appError.errors = { id: ['O ID deve ser um número inteiro positivo'] };
     return next(appError);
   }
-  
+
   next();
 };
 
@@ -97,13 +97,13 @@ export const validarId = (req, res, next) => {
  */
 export const validarListagemPerfumes = (req, res, next) => {
   const result = esquemaListagemPerfumes.safeParse(req.query);
-  
+
   if (!result.success) {
-    const appError = new AppError("Parâmetros de busca inválidos", 400);
+    const appError = new AppError('Parâmetros de busca inválidos', 400);
     appError.errors = result.error.flatten().fieldErrors;
     return next(appError);
   }
-  
+
   req.query = result.data;
   next();
 };

@@ -17,18 +17,18 @@ const extrairUUID = (url) => {
  */
 export const listarPerfumes = async (vendedorId, filtros = {}) => {
   const { nome, page = 1, limit = 10 } = filtros;
-  
+
   const where = { vendedorId };
-  
+
   if (nome) {
     where.nome = {
       contains: nome,
-      mode: 'insensitive'
+      mode: 'insensitive',
     };
   }
-  
+
   const skip = (page - 1) * limit;
-  
+
   const [perfumes, total] = await Promise.all([
     prisma.perfume.findMany({
       where,
@@ -47,9 +47,9 @@ export const listarPerfumes = async (vendedorId, filtros = {}) => {
       skip,
       take: limit,
     }),
-    prisma.perfume.count({ where })
+    prisma.perfume.count({ where }),
   ]);
-  
+
   return { perfumes, total };
 };
 
@@ -58,7 +58,7 @@ export const listarPerfumes = async (vendedorId, filtros = {}) => {
  */
 export const criarPerfume = async (perfumeDados, file = null, vendedorId) => {
   const perfumeJaCadastrado = await prisma.perfume.findFirst({
-    where: { 
+    where: {
       nome: perfumeDados.nome,
       vendedorId: vendedorId,
     },
@@ -68,7 +68,7 @@ export const criarPerfume = async (perfumeDados, file = null, vendedorId) => {
     throw new AppError('Você já possui um perfume cadastrado com este nome.', 400);
   }
 
-  let fotoUrl = null; 
+  let fotoUrl = null;
   if (file) {
     fotoUrl = await uploadImgUploadcare(file.buffer, file.originalname, file.mimetype);
   }
@@ -110,17 +110,17 @@ export const atualizarPerfume = async (id, perfumeDados, file = null, vendedorId
   if (!perfumeExistente) {
     throw new AppError(`Perfume com ID ${id} não encontrado`, 404);
   }
-  
+
   if (perfumeExistente.vendedorId !== vendedorId) {
     throw new AppError(`Perfume com ID ${id} não encontrado`, 404);
   }
 
-  let fotoUrl = null; 
+  let fotoUrl = null;
   if (file) {
     fotoUrl = await uploadImgUploadcare(file.buffer, file.originalname, file.mimetype);
     if (fotoUrl && perfumeExistente.foto) {
-        const uuidAntigo = extrairUUID(perfumeExistente.foto);
-        if (uuidAntigo) await apagaDoUploadCare(uuidAntigo);
+      const uuidAntigo = extrairUUID(perfumeExistente.foto);
+      if (uuidAntigo) await apagaDoUploadCare(uuidAntigo);
     }
   }
 
@@ -128,7 +128,9 @@ export const atualizarPerfume = async (id, perfumeDados, file = null, vendedorId
     nome: perfumeDados.nome,
     marca: perfumeDados.marca,
     descricao: perfumeDados.descricao,
-    quantidade_estoque: perfumeDados.quantidade_estoque ? Number(perfumeDados.quantidade_estoque) : undefined,
+    quantidade_estoque: perfumeDados.quantidade_estoque
+      ? Number(perfumeDados.quantidade_estoque)
+      : undefined,
     preco: perfumeDados.preco ? parseFloat(perfumeDados.preco) : undefined,
     frasco: perfumeDados.frasco ? parseFloat(perfumeDados.frasco) : undefined,
   };
@@ -186,7 +188,7 @@ export const excluirPerfume = async (id, vendedorId) => {
   if (!perfumeExistente) {
     throw new AppError(`Perfume com ID ${id} não encontrado`, 404);
   }
-  
+
   if (perfumeExistente.vendedorId !== vendedorId) {
     throw new AppError(`Perfume com ID ${id} não encontrado`, 404);
   }
