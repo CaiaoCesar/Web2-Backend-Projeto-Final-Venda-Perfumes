@@ -55,7 +55,7 @@ Repositório para a atividade do Projeto de Trabalho Final da Disciplina de Web 
 
 - **Responsável:** Dev 3
 - **Funcionalidades:**
-  - Busca de perfumes por nome, marca, categoria
+  - Busca de perfumes por nome
   - Filtros: preço, gênero (masculino/feminino/unissex)
   - Ordenação: preço, relevância, mais vendidos
   - Paginação de resultados
