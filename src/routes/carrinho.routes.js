@@ -1,3 +1,10 @@
+import e, { Router } from 'express';
+import * as carrinhoController from '../controllers/carrinho.controller.js';
+import { validacao } from '../middlewares/validation.middleware.js';
+import { carrinhoSchema } from '../schemas/carrinho.schema.js';
+
+export const router = Router();
+
 /**
  * @swagger
  * tags:
@@ -221,3 +228,5 @@ router.delete('/:carrinhoId/items/:perfumeId', carrinhoController.removerItem);
  *         description: Carrinho não encontrado
  */
 router.delete('/:carrinhoId', validacao(carrinhoSchema), carrinhoController.limparCarrinho);
+
+export default router;
