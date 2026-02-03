@@ -65,15 +65,15 @@ describe('Integration: Checkout WhatsApp Controller', () => {
     expect(mockNext).not.toHaveBeenCalled();
 
     // Verifica se o redirect foi chamado
-    expect(res.redirect).toHaveBeenCalledTimes(1);
+    expect(res.json).toHaveBeenCalledTimes(1);
 
     // Analisa a URL gerada
-    const redirectUrl = res.redirect.mock.calls[0][0];
-    const urlObj = new URL(redirectUrl);
+    const link = res.json.mock.calls[0][0].link;
+    const urlObj = new URL(link);
     const params = urlObj.searchParams;
 
     // 1. Validar estrutura da URL
-    expect(redirectUrl).toContain('wa.me/5511999998888');
+    expect(link).toContain('wa.me/5511999998888');
 
     // 2. Validar conteúdo da mensagem decodificada
     const mensagemGerada = params.get('text');
@@ -95,7 +95,7 @@ describe('Integration: Checkout WhatsApp Controller', () => {
 
     await checkoutWhatsApp(req, res, mockNext);
 
-    expect(res.redirect).not.toHaveBeenCalled();
+    expect(res.json).not.toHaveBeenCalled();
     expect(mockNext).toHaveBeenCalledTimes(1);
     
     // Verifica se o erro passado para o next é o esperado
@@ -146,8 +146,8 @@ describe('Integration: Checkout WhatsApp Controller', () => {
 
     await checkoutWhatsApp(req, res, mockNext);
 
-    const redirectUrl = res.redirect.mock.calls[0][0];
+    const link = res.json.mock.calls[0][0].link;
     // Deve adicionar o 55 automaticamente
-    expect(redirectUrl).toContain('wa.me/5531988887777');
+    expect(link).toContain('wa.me/5531988887777');
   });
 });

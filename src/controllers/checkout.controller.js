@@ -31,9 +31,8 @@ export const checkoutWhatsApp = async (req, res, next) => {
 
     // 5. Gerar link
     const link = checkoutService.gerarLinkWhatsApp({ telefoneFormatado, mensagem });
-
-    // Redireciona o cliente para o WhatsApp
-    return res.redirect(link);
+    // Retorna o link para o cliente realizar a navegação (evita problemas de CORS/redirect em XHR)
+    return res.status(200).json({ link });
   } catch (error) {
     next(error);
   }
