@@ -4,10 +4,10 @@ import * as buscaService from '../../src/services/busca.service.js';
 import * as buscaSchema from '../../src/schemas/busca.schema.js';
 
 // Mock do Service
-vi.mock('../../services/busca.service.js');
+vi.mock('../../src/services/busca.service.js');
 
 // Mock do Schema (para isolamento do controller)
-vi.mock('../../schemas/busca.schema.js', () => ({
+vi.mock('../../src/schemas/busca.schema.js', () => ({
   esquemaListagemPerfumes: {
     parse: vi.fn() // Mock da função .parse() do Zod
   }
