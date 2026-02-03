@@ -80,8 +80,9 @@ describe('Checkout Controller - checkoutWhatsApp', () => {
       mensagem: mockMensagem,
     });
 
-    // 5. Verifica o redirecionamento final
-    expect(res.redirect).toHaveBeenCalledWith(mockLink);
+    // 5. Verifica que retornou o link em JSON
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ link: mockLink });
     expect(next).not.toHaveBeenCalled();
   });
 
@@ -123,6 +124,6 @@ describe('Checkout Controller - checkoutWhatsApp', () => {
     await checkoutWhatsApp(req, res, next);
 
     expect(next).toHaveBeenCalledWith(errorSimulado);
-    expect(res.redirect).not.toHaveBeenCalled();
+    expect(res.json).not.toHaveBeenCalled();
   });
 });
