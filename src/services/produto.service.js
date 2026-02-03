@@ -1,9 +1,16 @@
+/* Nesse service a lógica de negócio
+*  relacionada aos perfumes é implementada
+*/
 import prisma from '../config/database.js';
 import { uploadImgUploadcare, apagaDoUploadCare } from './upload.service.js';
 import { AppError } from '../utils/AppError.js';
 
 /**
- * Auxiliar: Extrai o UUID do arquivo a partir da URL do Uploadcare
+ * Extrai o UUID do arquivo a partir da URL do Uploadcare
+ * Faz isso da seguinte forma:
+ * Pega a URL completa: https://ucarecdn.com/abcd1234-ef56-7890-ab12-34567890cdef/
+ * Divide em partes usando '/' como separador
+ * Pega a penúltima parte que é o UUID
  */
 const extrairUUID = (url) => {
   if (!url) return null;
@@ -20,6 +27,7 @@ export const listarPerfumes = async (vendedorId, filtros = {}) => {
 
   const where = { vendedorId };
 
+  // Filtro por nome, case insensitive é  ignorando maiúsculas/minúsculas
   if (nome) {
     where.nome = {
       contains: nome,
@@ -27,7 +35,13 @@ export const listarPerfumes = async (vendedorId, filtros = {}) => {
     };
   }
 
+  // O skip é feito pegando a página atual menos 1, multiplicando pela quantidade por página
   const skip = (page - 1) * limit;
+
+  // Executa as duas consultas em paralelo para otimizar performance
+  // A primeira busca os perfumes com os filtros e paginação
+  // A segunda busca o total de perfumes com os filtros aplicados
+  // É otimizada pois evitar fazer duas idas ao banco de dados separadas
 
   const [perfumes, total] = await Promise.all([
     prisma.perfume.findMany({
@@ -73,6 +87,7 @@ export const criarPerfume = async (perfumeDados, file = null, vendedorId) => {
     fotoUrl = await uploadImgUploadcare(file.buffer, file.originalname, file.mimetype);
   }
 
+  // O preço e frasco são convertidos para float para garantir o tipo correto
   return await prisma.perfume.create({
     data: {
       nome: perfumeDados.nome,
@@ -117,6 +132,7 @@ export const atualizarPerfume = async (id, perfumeDados, file = null, vendedorId
     throw new AppError(`Perfume com ID ${id} não encontrado`, 404);
   }
 
+  // Se uma nova imagem foi enviada, faz o upload e remove a antiga
   let fotoUrl = null;
   if (file) {
     fotoUrl = await uploadImgUploadcare(file.buffer, file.originalname, file.mimetype);

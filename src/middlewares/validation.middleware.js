@@ -1,4 +1,4 @@
-import { AppError } from '../utils/AppError.js';
+import { AppError } from '../utils/appError.js';
 import {
   esquemaCriacaoPerfume,
   esquemaEditarPerfume,
@@ -7,7 +7,7 @@ import {
 } from '../schemas/perfume.schema.js';
 
 /**
- * Middleware genérico para validação de esquemas Zod (Body)
+ * Middleware para validação de esquemas Zod (Body)
  */
 export const validacao = (schema) => async (req, res, next) => {
   try {
@@ -25,9 +25,7 @@ export const validacao = (schema) => async (req, res, next) => {
   }
 };
 
-/**
- * Validação específica para criação com injeção de foto
- */
+//Validação específica para criação com injeção de foto
 export const validarCriacaoProduto = (req, res, next) => {
   if (req.file && !req.body.foto) {
     req.body.foto = req.file.originalname;
@@ -45,9 +43,7 @@ export const validarCriacaoProduto = (req, res, next) => {
   next();
 };
 
-/**
- * Validação para edição de produto
- */
+// Validação para edição de produto
 export const validarEditarProduto = (req, res, next) => {
   const result = esquemaEditarPerfume.safeParse(req.body);
 
@@ -61,9 +57,7 @@ export const validarEditarProduto = (req, res, next) => {
   next();
 };
 
-/**
- * Validação para edição de estoque
- */
+// Validação para edição de estoque
 export const validarEditarEstoque = (req, res, next) => {
   const result = esquemaEditarEstoque.safeParse(req.body);
 
@@ -77,9 +71,7 @@ export const validarEditarEstoque = (req, res, next) => {
   next();
 };
 
-/**
- * Validação de ID de parâmetro
- */
+// Validação de ID de parâmetro
 export const validarId = (req, res, next) => {
   const id = Number(req.params.id);
 
@@ -92,9 +84,7 @@ export const validarId = (req, res, next) => {
   next();
 };
 
-/**
- * Validação de parâmetros de busca (Query Params)
- */
+// Validação de parâmetros de busca
 export const validarListagemPerfumes = (req, res, next) => {
   const result = esquemaListagemPerfumes.safeParse(req.query);
 

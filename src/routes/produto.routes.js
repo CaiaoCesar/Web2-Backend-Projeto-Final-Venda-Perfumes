@@ -71,13 +71,7 @@ const router = Router();
 
 // Rota para criar novo perfume
 // 1º Autentica -> 2º Upload -> 3º Valida -> 4º Controller
-router.post(
-  '/',
-  authMiddleware,
-  upload.single('foto'),
-  validarCriacaoProduto,
-  produtoController.criarPerfume
-);
+router.post('/', authMiddleware, upload.single('foto'), validarCriacaoProduto, produtoController.criarPerfume);
 
 /**
  * @swagger
@@ -110,6 +104,7 @@ router.post(
  */
 
 // Rota para listar produtos do vendedor
+// 1º Autentica -> 2º Valida Filtros -> 3º Controller
 router.get('/', authMiddleware, validarListagemPerfumes, produtoController.listarPerfumes);
 
 /**
@@ -148,13 +143,8 @@ router.get('/', authMiddleware, validarListagemPerfumes, produtoController.lista
  */
 
 // Rota para editar estoque perfume, é necessário validar o ID
-router.put(
-  '/estoque/:id',
-  authMiddleware,
-  validarId,
-  validarEditarEstoque,
-  produtoController.editarEstoquePerfume
-);
+// 1º Autentica -> 2º Valida ID -> 3º Valida Estoque -> 4º Controller
+router.put('/estoque/:id', authMiddleware, validarId, validarEditarEstoque, produtoController.editarEstoquePerfume);
 
 /**
  * @swagger
@@ -206,14 +196,8 @@ router.put(
  */
 
 // Rota para editar perfume, é necessário validar ID
-router.put(
-  '/:id',
-  authMiddleware,
-  validarId,
-  upload.single('foto'),
-  validarEditarProduto,
-  produtoController.editarPerfume
-);
+// 1º Autentica -> 2º Valida ID -> 3º Upload -> 4º Valida Dados -> 5º Controller
+router.put('/:id', authMiddleware, validarId, upload.single('foto'), validarEditarProduto, produtoController.editarPerfume);
 /**
  * @swagger
  * /api/v2/perfumes/{id}:
@@ -238,6 +222,7 @@ router.put(
  */
 
 // Rota para deletar um produto, é necessário validar o ID
+// 1º Autentica -> 2º Valida ID -> 3º Controller
 router.delete('/:id', authMiddleware, validarId, produtoController.deletarPerfume);
 
 export default router;

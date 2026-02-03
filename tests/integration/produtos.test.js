@@ -1,3 +1,4 @@
+// tests/integration/produtos.test.js
 import { describe, it, expect, beforeEach } from 'vitest';
 import request from 'supertest';
 import app from '../../src/app.js';
@@ -8,21 +9,23 @@ import {
   criarMultiplosPerfumes,
 } from '../helpers/test-helpers.js';
 
-describe('🧴 Produtos - Testes de Integração', () => {
+// Este bloco organiza todos os testes de integração para as funcionalidades de perfumes
+describe('Produtos - Testes de Integração', () => {
   // Declaração de variáveis globais para o escopo dos testes
   let vendedor, token;
 
+  // Prepara o ambiente criando um vendedor e um token de acesso antes de cada teste
   beforeEach(async () => {
     // Inicializa o vendedor e o token antes de cada teste individual
     vendedor = await criarVendedorTeste();
     token = gerarTokenTeste(vendedor.id, vendedor.email);
   });
 
-  // ==========================================
   // POST /api/v2/perfumes - Criar Perfume
-  // ==========================================
+  // Agrupa os testes de validação para a rota de criação de produtos
   describe('Criação de Perfumes', () => {
-    it('deve criar perfume com token válido (201)', async () => {
+    // Verifica se o perfume é gravado corretamente no banco com dados e token válidos
+    it('deve criar perfume com token válido', async () => {
       const novoPerfume = {
         nome: `Perfume Teste ${Date.now()}`,
         marca: 'Chanel',
@@ -32,6 +35,7 @@ describe('🧴 Produtos - Testes de Integração', () => {
         quantidade_estoque: 50,
       };
 
+      // Dados do perfume de teste
       const response = await request(app)
         .post('/api/v2/perfumes')
         .set('Authorization', `Bearer ${token}`)
@@ -49,7 +53,8 @@ describe('🧴 Produtos - Testes de Integração', () => {
       expect(response.body.data.nome).toBe(novoPerfume.nome);
     });
 
-    it('deve rejeitar criação sem token (401)', async () => {
+    // Testa se o sistema bloqueia o cadastro de perfumes sem o token de login
+    it('deve rejeitar criação sem token', async () => {
       const response = await request(app)
         .post('/api/v2/perfumes')
         .field('nome', 'Perfume Sem Auth')
@@ -59,7 +64,8 @@ describe('🧴 Produtos - Testes de Integração', () => {
       expect(response.body.message).toContain('Token não fornecido');
     });
 
-    it('deve rejeitar nome duplicado para o mesmo vendedor (400)', async () => {
+    // Impede que o mesmo vendedor cadastre dois perfumes com o nome igual
+    it('deve rejeitar nome duplicado para o mesmo vendedor', async () => {
       const nomeDuplicado = `Perfume Duplicado ${Date.now()}`;
 
       await criarPerfumeTeste(vendedor.id, {
@@ -67,6 +73,7 @@ describe('🧴 Produtos - Testes de Integração', () => {
         descricao: 'Descrição válida com mais de dez caracteres.',
       });
 
+      // Dados do perfume de teste
       const response = await request(app)
         .post('/api/v2/perfumes')
         .set('Authorization', `Bearer ${token}`)
@@ -82,14 +89,17 @@ describe('🧴 Produtos - Testes de Integração', () => {
       expect(response.body.message).toContain('já possui um perfume cadastrado com este nome');
     });
 
-    it('deve permitir nomes iguais para vendedores diferentes (201)', async () => {
+    // Confirma que vendedores diferentes podem usar o mesmo nome em seus perfumes
+    it('deve permitir nomes iguais para vendedores diferentes', async () => {
       const nomeComum = `Perfume Comum ${Date.now()}`;
 
       await criarPerfumeTeste(vendedor.id, { nome: nomeComum });
 
+      // Cria o 2º vendedor para teste
       const vendedor2 = await criarVendedorTeste();
       const token2 = gerarTokenTeste(vendedor2.id, vendedor2.email);
 
+      //Dados do produto de teste
       const response2 = await request(app)
         .post('/api/v2/perfumes')
         .set('Authorization', `Bearer ${token2}`)
@@ -107,11 +117,11 @@ describe('🧴 Produtos - Testes de Integração', () => {
     });
   });
 
-  // ==========================================
   // GET /api/v2/perfumes - Listar Perfumes
-  // ==========================================
+  // Testa a lógica de busca, filtros e privacidade dos dados
   describe('Listagem e Filtros', () => {
-    it('deve listar apenas perfumes do vendedor autenticado (200)', async () => {
+    // Garante que o usuário logado não veja os produtos de outros vendedores
+    it('deve listar apenas perfumes do vendedor autenticado', async () => {
       await criarPerfumeTeste(vendedor.id, { nome: 'Meu Perfume A' });
       await criarPerfumeTeste(vendedor.id, { nome: 'Meu Perfume B' });
 
@@ -128,7 +138,8 @@ describe('🧴 Produtos - Testes de Integração', () => {
       expect(response.body.data.every((p) => p.nome !== 'Perfume de Outro')).toBe(true);
     });
 
-    it('deve filtrar perfumes por nome (200)', async () => {
+    // Valida se o filtro de pesquisa por nome na URL está funcionando
+    it('deve filtrar perfumes por nome', async () => {
       await criarPerfumeTeste(vendedor.id, { nome: 'Azzaro Pour Homme' });
       await criarPerfumeTeste(vendedor.id, { nome: 'Dior Sauvage' });
 
@@ -141,7 +152,8 @@ describe('🧴 Produtos - Testes de Integração', () => {
       expect(response.body.data.every((p) => p.nome.includes('Azzaro'))).toBe(true);
     });
 
-    it('deve paginar resultados corretamente (200)', async () => {
+    // Checa se a divisão de páginas e o limite de itens por página estão corretos
+    it('deve paginar resultados corretamente', async () => {
       await criarMultiplosPerfumes(vendedor.id, 15);
 
       const response = await request(app)
@@ -155,11 +167,11 @@ describe('🧴 Produtos - Testes de Integração', () => {
     });
   });
 
-  // ==========================================
   // PUT /api/v2/perfumes/:id - Atualizar Perfume
-  // ==========================================
+  // Valida as regras de edição de informações dos perfumes
   describe('Atualização de Perfumes', () => {
-    it('deve atualizar perfume do próprio vendedor (200)', async () => {
+    // Testa o sucesso ao atualizar o nome de um perfume que pertence ao usuário logado
+    it('deve atualizar perfume do próprio vendedor', async () => {
       const perfume = await criarPerfumeTeste(vendedor.id);
 
       const response = await request(app)
@@ -171,7 +183,8 @@ describe('🧴 Produtos - Testes de Integração', () => {
       expect(response.body.data.nome).toBe('Nome Atualizado');
     });
 
-    it('deve impedir atualização de perfume de outro vendedor (404)', async () => {
+    // Bloqueia tentativas de alterar perfumes que pertencem a outros IDs de vendedor
+    it('deve impedir atualização de perfume de outro vendedor', async () => {
       const outroVendedor = await criarVendedorTeste();
       const perfumeInvasor = await criarPerfumeTeste(outroVendedor.id);
 
@@ -185,11 +198,11 @@ describe('🧴 Produtos - Testes de Integração', () => {
     });
   });
 
-  // ==========================================
   // DELETE /api/v2/perfumes/:id - Deletar Perfume
-  // ==========================================
+  // Testa a remoção segura de produtos do banco de dados
   describe('Exclusão de Perfumes', () => {
-    it('deve deletar perfume do próprio vendedor (200)', async () => {
+    // Verifica se a exclusão funciona quando o vendedor é o dono real do perfume
+    it('deve deletar perfume do próprio vendedor', async () => {
       const perfume = await criarPerfumeTeste(vendedor.id);
 
       const response = await request(app)
@@ -200,6 +213,7 @@ describe('🧴 Produtos - Testes de Integração', () => {
       expect(response.body.success).toBe(true);
     });
 
+    // Garante que um usuário não consiga excluir o estoque de terceiros
     it('deve impedir deleção de perfume de outro vendedor (404)', async () => {
       const outroVendedor = await criarVendedorTeste();
       const perfumeInvasor = await criarPerfumeTeste(outroVendedor.id);
