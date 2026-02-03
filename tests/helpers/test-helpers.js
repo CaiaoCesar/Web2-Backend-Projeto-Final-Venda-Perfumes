@@ -45,8 +45,8 @@ export async function criarVendedorTeste(dadosPersonalizados = {}) {
 }
 
 /**
- * Gera um token JWT idêntico ao que o seu sistema gera no login real.
- * IMPORTANTE: O payload deve conter 'id' para bater com seu authMiddleware.
+ * Gera um token JWT idêntico ao que o sistema gera no login real.
+ * IMPORTANTE: O payload deve conter 'id' para bater com o authMiddleware.
  */
 export function gerarTokenTeste(vendedorId, email) {
   return jwt.sign({ id: vendedorId, email: email }, process.env.JWT_SECRET || 'test-secret-key', {
@@ -58,7 +58,7 @@ export function gerarTokenTeste(vendedorId, email) {
  * Remove os dados respeitando a integridade referencial.
  */
 export async function limparBanco() {
-  // SEMPRE delete perfumes antes de vendedores
+  // Deleta perfumes antes de vendedores
   await prisma.perfume.deleteMany();
   await prisma.vendedor.deleteMany();
 }

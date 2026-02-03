@@ -1,5 +1,8 @@
+/* Esse service faz o upload para o UploadCare
+*  Também faz a remoção de midia que sobe para o UploadCare
+*/
 import { UploadClient } from '@uploadcare/upload-client';
-import { AppError } from '../utils/appError.js'; // Importação obrigatória
+import { AppError } from '../utils/appError.js'; 
 
 const clientUploadcare = new UploadClient({
   publicKey: process.env.UPLOADCARE_PUBLIC_KEY,
@@ -7,6 +10,7 @@ const clientUploadcare = new UploadClient({
 
 /**
  * Faz o upload de uma imagem para o Uploadcare
+ * O buffer de um arquivo é exatamente o conteúdo binário do arquivo em si
  */
 export const uploadImgUploadcare = async (fileBuffer, fileName, mimeType) => {
   try {
@@ -20,6 +24,7 @@ export const uploadImgUploadcare = async (fileBuffer, fileName, mimeType) => {
       throw new AppError('Configuração do servidor incompleta (Chaves de Upload).', 500);
     }
 
+    // 3. Upload do arquivo para o Uploadcare, store: '1' indica armazenamento permanente
     const arquivo = await clientUploadcare.uploadFile(fileBuffer, {
       fileName: fileName,
       contentType: mimeType,
@@ -80,12 +85,11 @@ export const apagaDoUploadCare = async (fileId) => {
       return true;
     }
 
-    // Se falhar a deleção por outro motivo, lançamos erro para o Log
+    // Se falhar o deletar por outro motivo, o erro é enviado para o Log
     throw new Error(`Status ${response.status}`);
   } catch (error) {
     console.error(`[UPLOAD] Não foi possível remover a imagem ${fileId}:`, error.message);
-    // Em deleções, às vezes optamos por não travar o fluxo principal (ex: excluir perfume)
-    // mas é bom registrar o erro.
+    // mesmo não impedindo o fluxo, retorna false para indicar falha
     return false;
   }
 };

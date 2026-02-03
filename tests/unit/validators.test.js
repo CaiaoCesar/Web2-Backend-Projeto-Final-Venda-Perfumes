@@ -1,4 +1,7 @@
-// tests/unit/validators.test.js
+/*
+* Nesse arquivo testes unitários são focados no zod
+*/
+
 import { describe, it, expect } from 'vitest';
 
 import {
@@ -10,7 +13,7 @@ import {
 
 import { vendedorSchema } from '../../src/schemas/vendedor.schema.js';
 
-describe('🛡️ Validadores Zod - Testes Unitários Críticos', () => {
+describe(' Validadores Zod - Testes Unitários Críticos', () => {
   
   // ==========================================
   // PERFUME - Validações de Números
@@ -26,6 +29,7 @@ describe('🛡️ Validadores Zod - Testes Unitários Críticos', () => {
         foto: 'https://foto.jpg',
       };
 
+      //toThrow verifica se ao executar a função é lançado um erro
       expect(() => esquemaCriacaoPerfume.parse(dadosInvalidos)).toThrow('O preço deve ser maior que zero');
     });
 
@@ -439,7 +443,7 @@ describe('🛡️ Validadores Zod - Testes Unitários Críticos', () => {
 // ==========================================
 // FUNÇÕES AUXILIARES (HELPERS)
 // ==========================================
-// Adicionei estas funções no final do arquivo para que "baseVendedor()" funcione
+// funções no final do arquivo para que "baseVendedor()" e "dadosBasePerfume()" funcione
 
 function baseVendedor() {
   return {
@@ -453,7 +457,6 @@ function baseVendedor() {
   };
 }
 
-// Também recomendo ter a de perfume caso precise no futuro
 function dadosBasePerfume() {
   return {
     nome: 'Perfume Teste',
