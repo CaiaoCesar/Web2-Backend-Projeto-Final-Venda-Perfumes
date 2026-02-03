@@ -1,6 +1,6 @@
 // src/config/upload.js
 import multer from 'multer';
-import { AppError } from '../utils/appError.js'; // Importe o seu padronizador
+import { AppError } from '../utils/AppError.js'; // Importe o seu padronizador
 
 const storage = multer.memoryStorage();
 

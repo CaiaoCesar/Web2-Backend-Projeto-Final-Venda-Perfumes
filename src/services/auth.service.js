@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import prisma from '../config/database.js';
 import jwt from 'jsonwebtoken';
-import { AppError } from '../utils/appError.js'; // Importe a classe nova
+import { AppError } from '../utils/AppError.js'; // Importe a classe nova
 
 export const vendedorExiste = async (email) => {
   const vendedor = await prisma.vendedor.findFirst({ where: { email } });

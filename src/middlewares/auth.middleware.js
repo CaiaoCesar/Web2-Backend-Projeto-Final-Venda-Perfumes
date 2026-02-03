@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { AppError } from '../utils/appError.js'; // Importação da sua classe padronizada
+import { AppError } from '../utils/AppError'; // Importação da sua classe padronizada
 
 export const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
