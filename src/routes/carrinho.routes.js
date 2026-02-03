@@ -1,7 +1,7 @@
 import e, { Router } from 'express';
 import * as carrinhoController from '../controllers/carrinho.controller.js';
 import { validacao } from '../middlewares/validation.middleware.js';
-import { carrinhoSchema } from '../schemas/carrinho.schema.js';
+import * as carrinhoSchema from '../schemas/carrinho.schema.js';
 
 export const router = Router();
 
