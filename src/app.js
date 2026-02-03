@@ -14,7 +14,7 @@ import authRoutes from './routes/auth.routes.js';
 // Rota de busca pública
 import buscaRoutes from './routes/busca.routes.js';
 import carrinhoRoutes from './routes/carrinho.routes.js';
-import checkoutRoutes from './routes/checkout.routes.js';
+import pedidoRoutes from './routes/pedido.routes.js';
 
 const app = express();
 
@@ -69,7 +69,7 @@ app.use('/api/v2/vendedores', authRoutes);
 app.use('/api/v2/perfumes', produtoRoutes);
 app.use('/api/v2/buscas', buscaRoutes);
 app.use('/api/v2/carrinho', carrinhoRoutes);
-app.use('/api/v2/checkout', checkoutRoutes);
+app.use('/api/v2/pedidos', pedidoRoutes);
 
 
 // Middleware de Erro Global, formatação de qualquer 
