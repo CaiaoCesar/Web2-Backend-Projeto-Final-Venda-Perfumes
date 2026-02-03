@@ -83,7 +83,7 @@ const router = Router();
  *                     produtos:
  *                       type: array
  *                       items:
- *                         $ref: '#/components/schemas/Perfume'
+ *                         type: object
  *                     paginacao:
  *                       type: object
  *                       properties:
