@@ -1,13 +1,19 @@
-// tests/unit/upload.test.js
+/*
+* Aqui o objetivo é testar o upload de arquivos com Multer
+* Verificamos se os tipos de arquivos permitidos são aceitos
+* E se os tipos inválidos são rejeitados corretamente
+* Também testamos o limite de tamanho de arquivo configurado
+*/
+
 import { describe, it, expect } from 'vitest';
 import request from 'supertest';
 import express from 'express';
-import upload from '../../src/config/upload.js'; // Seu arquivo de config
+import upload from '../../src/config/upload.js';
 
 // ---------------------------------------------------
-// 🛠️ SETUP DO AMBIENTE DE TESTE
+//  SETUP DO AMBIENTE DE TESTE
 // ---------------------------------------------------
-// Criamos um app Express falso apenas para testar esse middleware
+// Cria um app Express falso apenas para testar esse middleware
 const app = express();
 
 // Rota de teste usando a configuração do multer
@@ -38,9 +44,9 @@ app.use((err, req, res, next) => {
 });
 
 // ---------------------------------------------------
-// 🧪 INÍCIO DOS TESTES
+//  INÍCIO DOS TESTES
 // ---------------------------------------------------
-describe('📸 Upload Middleware (Multer) - Testes de Configuração', () => {
+describe(' Upload Middleware (Multer) - Testes de Configuração', () => {
   
   // ==========================================
   // EXTENSÕES PERMITIDAS
@@ -51,6 +57,7 @@ describe('📸 Upload Middleware (Multer) - Testes de Configuração', () => {
       // Buffer.from('') cria um arquivo falso em memória
       const response = await request(app)
         .post('/test-upload')
+        // O attach simula o upload de um arquivo
         .attach('arquivo', Buffer.from('fake-image-content'), 'teste.png')
         .expect(200);
 
@@ -80,11 +87,11 @@ describe('📸 Upload Middleware (Multer) - Testes de Configuração', () => {
     it('deve REJEITAR arquivo PDF (AppError 400)', async () => {
       const response = await request(app)
         .post('/test-upload')
-        .attach('arquivo', Buffer.from('fake-pdf'), 'documento.pdf') // .pdf
+        .attach('arquivo', Buffer.from('fake-pdf'), 'documento.pdf') 
         .expect(400);
 
       expect(response.body.success).toBe(false);
-      // Verifica se a mensagem é exatamente a que você definiu no AppError
+      // Verifica se a mensagem é exatamente a definida no AppError
       expect(response.body.message).toContain('Formato de arquivo inválido');
     });
 

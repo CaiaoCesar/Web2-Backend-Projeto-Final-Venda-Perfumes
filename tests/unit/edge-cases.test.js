@@ -1,4 +1,11 @@
-// tests/unit/edge-cases.test.js
+
+/* Nesse teste verficamos os casos mais criticos que não estavam
+*  diretamente contidos nos testes de integração
+*/
+
+// O describe serve para agrupar testes relacionados
+// O it é um teste unitário individual
+// expect é usado para fazer verificações
 import { describe, it, expect } from 'vitest';
 
 describe('⚠️ Edge Cases Críticos - Lógica de Negócio', () => {

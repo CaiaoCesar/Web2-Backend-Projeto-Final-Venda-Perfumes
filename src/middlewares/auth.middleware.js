@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { AppError } from '../utils/appError.js'; // Importação da sua classe padronizada
+import { AppError } from '../utils/appError.js';
 
 /**
  * Middleware de Autenticação.
