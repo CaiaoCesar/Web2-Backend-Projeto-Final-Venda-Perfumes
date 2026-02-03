@@ -2,19 +2,13 @@
 export class AppError extends Error {
   // Inicialização da classe com a mensagem de erro e o código de status HTTP (400, 401, etc.)
   constructor(message, statusCode) {
+    // Chamada ao construtor da classe pai (Error) para processar a mensagem
     super(message);
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
     
+    // Definição do código de status para identificação do tipo de erro
     this.statusCode = statusCode; 
     
-    // Marcação do erro como operacional para diferenciar de falhas críticas de programação
-=======
-    this.statusCode = statusCode; // Aqui é definido se o codigo de status é 400, 404, etc.
->>>>>>> Stashed changes
-=======
-    this.statusCode = statusCode; // Aqui é definido se o codigo de status é 400, 404, etc.
->>>>>>> Stashed changes
+    // Marcação do erro como operacional para diferenciação de falhas críticas
     this.isOperational = true;
     
     // Captura do rastro de execução para facilitar a depuração no terminal
