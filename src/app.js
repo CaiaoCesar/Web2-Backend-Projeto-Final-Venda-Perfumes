@@ -11,6 +11,10 @@ import { errorHandler } from './middlewares/error.middleware.js';
 // Importação das rotas de produtos e autenticação
 import produtoRoutes from './routes/produto.routes.js';
 import authRoutes from './routes/auth.routes.js';
+// Rota de busca pública
+import buscaRoutes from './routes/busca.routes.js';
+import carrinhoRoutes from './routes/carrinho.routes.js';
+import checkoutRoutes from './routes/checkout.routes.js';
 
 const app = express();
 
@@ -33,6 +37,7 @@ app.use('/api', limiter); // Aplicação do limite em todas as rotas prefixadas 
 
 // Inicialização da interface interativa para testes da API
 setupSwagger(app); 
+
 
 /**
  * Rotas Públicas e de Verificação
@@ -62,6 +67,9 @@ app.get('/health', (req, res) => {
 // Registro das rotas de autenticação e gestão de perfumes
 app.use('/api/v2/vendedores', authRoutes);
 app.use('/api/v2/perfumes', produtoRoutes);
+app.use('/api/v2/buscas', buscaRoutes);
+app.use('/api/v2/carrinho', carrinhoRoutes);
+app.use('/api/v2/checkout', checkoutRoutes);
 
 
 // Middleware de Erro Global, formatação de qualquer 
