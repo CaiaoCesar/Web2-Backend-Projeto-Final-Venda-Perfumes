@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import * as buscaService from '../../services/busca.service.js';
+import * as buscaService from '../../src/services/busca.service.js';
 
 const { mPrisma } = vi.hoisted(() => {
   return {
