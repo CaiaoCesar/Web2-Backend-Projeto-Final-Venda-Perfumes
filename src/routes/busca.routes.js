@@ -72,6 +72,7 @@ const router = Router();
  *         content:
  *           application/json:
  *             schema:
+ *               Perfume:
  *               type: object
  *               properties:
  *                 status:

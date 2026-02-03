@@ -6,7 +6,7 @@ import {
   validarCriacaoProduto,
   validarEditarProduto,
   validarEditarEstoque,
-  validarListagemPerfumes, // ← NOVO
+  validarListagemPerfumes,
   validarId,
 } from '../middlewares/validation.middleware.js';
 

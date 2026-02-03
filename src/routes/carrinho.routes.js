@@ -1,7 +1,7 @@
 import e, { Router } from 'express';
 import * as carrinhoController from '../controllers/carrinho.controller.js';
 import { validacao } from '../middlewares/validation.middleware.js';
-import { carrinhoSchema } from '../schemas/carrinho.schema.js';
+import * as carrinhoSchema  from '../schemas/carrinho.schema.js';
 
 export const router = Router();
 
@@ -227,6 +227,6 @@ router.delete('/:carrinhoId/items/:perfumeId', carrinhoController.removerItem);
  *       404:
  *         description: Carrinho não encontrado
  */
-router.delete('/:carrinhoId', validacao(carrinhoSchema), carrinhoController.limparCarrinho);
+router.delete('/:carrinhoId', carrinhoController.limparCarrinho);
 
 export default router;

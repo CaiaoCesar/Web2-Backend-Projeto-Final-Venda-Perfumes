@@ -3,7 +3,7 @@
 */
 import prisma from '../config/database.js';
 import { uploadImgUploadcare, apagaDoUploadCare } from './upload.service.js';
-import { AppError } from '../utils/AppError.js';
+import { AppError } from '../utils/appError.js';
 
 /**
  * Extrai o UUID do arquivo a partir da URL do Uploadcare
