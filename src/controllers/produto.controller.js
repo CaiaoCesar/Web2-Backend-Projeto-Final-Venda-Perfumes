@@ -1,11 +1,9 @@
-// src/controllers/produto.controller.js
-import * as perfumeService from '../services/produto.service.js';
-
 /**
  * Perfume Controller
  * Responsável por gerenciar requisições HTTP relacionadas aos perfumes
  * Delega a lógica de negócio para o perfumeService
  */
+import * as perfumeService from '../services/produto.service.js';
 
 /**
  * POST /api/produtos
@@ -76,7 +74,7 @@ export const editarPerfume = async (req, res, next) => {
     // Captura o ID do vendedor autenticado vindo do JWT
     const vendedorId = req.user.id;
 
-    // Passamos o vendedorId como o último argumento para conferir a propriedade
+    // Passa o vendedorId como o último argumento para conferir a propriedade
     const perfumeAtualizado = await perfumeService.atualizarPerfume(
       id,
       req.body,

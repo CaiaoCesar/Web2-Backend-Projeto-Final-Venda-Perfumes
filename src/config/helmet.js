@@ -1,11 +1,10 @@
-import helmet from 'helmet';
-
 /**
  * Configuração do Helmet para headers de segurança HTTP
  *
  * Helmet ajuda a proteger a aplicação configurando vários headers HTTP.
- * Documentação: https://helmetjs.github.io/
  */
+import helmet from 'helmet';
+
 const helmetConfig = helmet({
   // Content Security Policy - define fontes confiáveis de conteúdo
   contentSecurityPolicy: {

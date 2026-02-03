@@ -1,9 +1,10 @@
-// src/config/upload.js
+// Aqui o multer é configurado para upload de imagens
 import multer from 'multer';
-import { AppError } from '../utils/appError.js'; // Importe o seu padronizador
+import { AppError } from '../utils/AppError.js'; 
 
 const storage = multer.memoryStorage();
 
+// Função que filtra os tipos de arquivos permitidos
 const fileFilter = (req, file, cb) => {
   const allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
 
