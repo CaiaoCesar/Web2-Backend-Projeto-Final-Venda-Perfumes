@@ -52,6 +52,7 @@ app.get('/', (req, res) => {
     endpoints: {
       auth: '/api/v2/vendedores',
       produtos: '/api/v2/perfumes',
+      pedidos: '/api/v2/pedidos',
     },
   });
 });
@@ -72,6 +73,7 @@ app.use('/api/v2/perfumes', produtoRoutes);
 app.use('/api/v2/buscas', buscaRoutes);
 app.use('/api/v2/carrinho', carrinhoRoutes);
 app.use('/api/v2/checkout', checkoutRoutes);
+app.use('/api/v2/pedidos', pedidoRoutes);
 
 /**
  * Middleware de Erro Global
