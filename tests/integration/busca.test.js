@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import request from 'supertest';
-import app from '../../app.js';
-import prisma from '../../config/database.js';
+import app from '../../src/app.js';
+import prisma from '../../src/config/database.js';
 
 describe('Feature: Busca de Produtos por Localidade', () => {
   let vendedorSP_Id;

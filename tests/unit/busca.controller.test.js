@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { buscarPerfumes } from '../../controllers/busca.controller.js';
-import * as buscaService from '../../services/busca.service.js';
-import * as buscaSchema from '../../schemas/busca.schema.js';
+import { buscarPerfumes } from '../../src/controllers/busca.controller.js';
+import * as buscaService from '../../src/services/busca.service.js';
+import * as buscaSchema from '../../src/schemas/busca.schema.js';
 
 // Mock do Service
 vi.mock('../../services/busca.service.js');
