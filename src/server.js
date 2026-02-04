@@ -13,6 +13,4 @@ app.use(helmetConfig);
 // Inicialização do servidor para escutar requisições na porta definida
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
-  // Link direto para facilitar o acesso inicial à rota de perfumes
-  console.log(`Perfumes: http://localhost:${PORT}/api/v2/perfumes\n`);
 });

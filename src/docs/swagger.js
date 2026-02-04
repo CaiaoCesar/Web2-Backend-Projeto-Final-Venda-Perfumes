@@ -62,5 +62,5 @@ export default (app) => {
     })
   );
 
-  console.log('\n📚 Swagger UI disponível em http://localhost:3000/api-docs');
+  console.log('\n📚 Swagger UI disponível em http://localhost:3000/api-docs\n');
 };

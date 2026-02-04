@@ -1,6 +1,6 @@
 {
-  "version": 3,
-  "name": "api-gerador-provas",
+  "version": 2,
+  "name": "sistema-vendas-perfumes",
   "builds": [
     {
       "src": "src/server.js",
