@@ -2,16 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import 'express-async-errors'; // Captura automática de erros em funções assíncronas
+import 'express-async-errors'; s
 import setupSwagger from './docs/swagger.js';
-
-// Importação do middleware centralizado para tratamento de erros
 import { errorHandler } from './middlewares/error.middleware.js';
-
-// Importação das rotas de produtos e autenticação
 import produtoRoutes from './routes/produto.routes.js';
 import authRoutes from './routes/auth.routes.js';
-// Rota de busca pública
 import buscaRoutes from './routes/busca.routes.js';
 import carrinhoRoutes from './routes/carrinho.routes.js';
 import checkoutRoutes from './routes/checkout.routes.js';
@@ -42,7 +37,7 @@ setupSwagger(app);
  * Rotas Públicas e de Verificação
  */
 
-// ✅ Redireciona a rota raiz para o Swagger
+// Redireciona a rota raiz para o Swagger
 app.get('/', (req, res) => {
   res.redirect('/api-docs');
 });
@@ -55,7 +50,7 @@ app.get('/health', (req, res) => {
   });
 });
 
-// ✅ Rota de informações da API (agora em /info)
+// Rota de informações da API 
 app.get('/info', (req, res) => {
   res.json({
     message: 'API Sistema de Vendas de Perfumes',
@@ -72,8 +67,15 @@ app.get('/info', (req, res) => {
   });
 });
 
-// Middleware de Erro Global, formatação de qualquer 
-// erro disparado pelos controllers ou middlewares anteriores.
+app.use('/api/v2/vendedores', authRoutes);
+app.use('/api/v2/perfumes', produtoRoutes);
+app.use('/api/v2/buscas', buscaRoutes);
+app.use('/api/v2/carrinho', carrinhoRoutes);
+app.use('/api/v2/checkout', checkoutRoutes);
+
+/**
+ * Middleware de Erro Global
+ */
 app.use(errorHandler);
 
 export default app;
