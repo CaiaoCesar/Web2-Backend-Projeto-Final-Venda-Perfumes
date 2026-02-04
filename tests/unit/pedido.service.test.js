@@ -1,28 +1,35 @@
-import { jest } from '@jest/globals';
-import { criarPedido, buscarPorId } from './pedido.service.js';
-import prisma from '../config/database.js';
-import * as whatsappUtils from '../utils/whatsapp.js';
-import { AppError } from '../utils/appError.js';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import pedidoService from '../../src/services/pedido.service.js'; // Ajuste o caminho conforme necessário
+import prisma from '../../src/config/database.js';
+import * as whatsappUtils from '../../src/utils/whatsapp.js';
 
-// Mock do Prisma
-jest.mock('../config/database.js', () => ({
-  __esModule: true,
+// 1. Mock das dependências
+vi.mock('../../src/config/database.js', () => ({
   default: {
-    $transaction: jest.fn(),
+    $transaction: vi.fn(),
     pedido: {
-      findMany: jest.fn(),
-      findUnique: jest.fn(),
-      update: jest.fn(),
+      create: vi.fn(),
+      findUnique: vi.fn(),
+      findMany: vi.fn(),
+      update: vi.fn(),
+    },
+    perfume: {
+      findUnique: vi.fn(),
+      update: vi.fn(),
     },
   },
 }));
 
-// Mock dos Utils de WhatsApp
-jest.mock('../utils/whatsapp.js');
+vi.mock('../../src/utils/whatsapp.js', () => ({
+  gerarMensagemDoCarrinho: vi.fn(),
+  formatarTelefone: vi.fn(),
+  gerarLinkWhatsApp: vi.fn(),
+}));
 
 describe('Pedido Service', () => {
-  afterEach(() => {
-    jest.clearAllMocks();
+  // Limpar os mocks antes de cada teste para evitar contaminação
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
   describe('criarPedido', () => {
@@ -30,86 +37,168 @@ describe('Pedido Service', () => {
       vendorId: 1,
       total: 100,
       items: [
-        { perfumeId: 10, quantidade: 2, preco: 50 }
-      ]
+        { perfumeId: 10, quantidade: 2, preco: 50 },
+      ],
     };
+    const mockCliente = { nomeCliente: 'João', telefoneCliente: '11999999999' };
 
-    const mockDadosCliente = {
-      nomeCliente: 'João Silva',
-      telefoneCliente: '11999999999'
-    };
-
-    it('deve lançar erro se o carrinho estiver vazio', async () => {
-      await expect(criarPedido({ ...mockDadosCliente, carrinho: { items: [] } }))
-        .rejects.toThrow(new AppError('Carrinho inválido ou vazio', 400));
+    it('deve lançar erro se o carrinho for inválido ou vazio', async () => {
+      await expect(pedidoService.criarPedido({ ...mockCliente, carrinho: null }))
+        .rejects.toThrow('Carrinho inválido ou vazio');
+        
+      await expect(pedidoService.criarPedido({ ...mockCliente, carrinho: { items: [] } }))
+        .rejects.toThrow('Carrinho inválido ou vazio');
     });
 
-    it('deve criar um pedido com sucesso e retornar o link do WhatsApp', async () => {
-      // Mock do comportamento interno da transação (tx)
-      const mockTx = {
-        perfume: {
-          findUnique: jest.fn().mockResolvedValue({ id: 10, nome: 'Perfume Luxo', quantidade_estoque: 10 }),
-          update: jest.fn(),
-        },
-        pedido: {
-          create: jest.fn().mockResolvedValue({
-            id: 1,
-            vendedor: { nome: 'Vendedor 1', telefone: '1188888888' },
-            ...mockDadosCliente
-          }),
-          update: jest.fn().mockResolvedValue({ id: 1, status: 'PENDENTE' }),
-        }
-      };
+    it('deve lançar erro se não houver vendedor associado', async () => {
+      const carrinhoSemVendor = { ...mockCarrinho, vendorId: null };
+      await expect(pedidoService.criarPedido({ ...mockCliente, carrinho: carrinhoSemVendor }))
+        .rejects.toThrow('Carrinho sem vendedor associado');
+    });
 
-      // Simula a execução da transação passando o mockTx
-      prisma.$transaction.mockImplementation(async (callback) => await callback(mockTx));
+    it('deve criar um pedido com sucesso dentro de uma transação', async () => {
+      // A transação recebe um callback e nós o executamos passando o próprio objeto prisma mockado como 'tx'
+      prisma.$transaction.mockImplementation(async (callback) => callback(prisma));
+
+      // Mock dos dados de retorno
+      const mockPerfume = { id: 10, nome: 'Perfume X', quantidade_estoque: 10 };
+      const mockPedidoCriado = { 
+        id: 1, 
+        vendedor: { nome: 'Vendedor Teste', telefone: '11888888888' } 
+      };
       
-      whatsappUtils.gerarMensagemDoCarrinho.mockReturnValue('Mensagem formatada');
-      whatsappUtils.formatarTelefone.mockReturnValue('551188888888');
-      whatsappUtils.gerarLinkWhatsApp.mockReturnValue('https://wa.me/551188888888?text=...');
+      prisma.perfume.findUnique.mockResolvedValue(mockPerfume);
+      prisma.pedido.create.mockResolvedValue(mockPedidoCriado);
+      prisma.perfume.update.mockResolvedValue({}); 
+      prisma.pedido.update.mockResolvedValue({ ...mockPedidoCriado, mensagem_whatsapp: 'Msg' });
+      
+      whatsappUtils.gerarMensagemDoCarrinho.mockReturnValue('Mensagem Formatada');
+      whatsappUtils.formatarTelefone.mockReturnValue('5511888888888');
+      whatsappUtils.gerarLinkWhatsApp.mockReturnValue('https://wa.me/xxx');
 
-      const resultado = await criarPedido({ ...mockDadosCliente, carrinho: mockCarrinho });
+      const result = await pedidoService.criarPedido({ ...mockCliente, carrinho: mockCarrinho });
 
-      expect(mockTx.perfume.findUnique).toHaveBeenCalled();
-      expect(mockTx.pedido.create).toHaveBeenCalled();
-      expect(mockTx.perfume.update).toHaveBeenCalledWith(expect.objectContaining({
+      expect(prisma.$transaction).toHaveBeenCalled();
+      
+      // 1. Verifica checagem de estoque
+      expect(prisma.perfume.findUnique).toHaveBeenCalledWith({ where: { id: 10 } });
+      
+      // 2. Verifica criação do pedido
+      expect(prisma.pedido.create).toHaveBeenCalled();
+      
+      // 3. Verifica baixa de estoque
+      expect(prisma.perfume.update).toHaveBeenCalledWith({
+        where: { id: 10 },
         data: { quantidade_estoque: { decrement: 2 } }
-      }));
-      expect(resultado).toHaveProperty('whatsapp_link');
+      });
+
+      // 4. Verifica geração de msg e link
+      expect(whatsappUtils.gerarMensagemDoCarrinho).toHaveBeenCalled();
+      expect(whatsappUtils.gerarLinkWhatsApp).toHaveBeenCalled();
+
+      // 5. Verifica retorno final
+      expect(result).toHaveProperty('whatsapp_link', 'https://wa.me/xxx');
     });
 
-    it('deve lançar erro se o estoque for insuficiente', async () => {
-      const mockTx = {
-        perfume: {
-          findUnique: jest.fn().mockResolvedValue({ id: 10, nome: 'Sem Estoque', quantidade_estoque: 1 }),
-        }
-      };
-      prisma.$transaction.mockImplementation(async (callback) => await callback(mockTx));
+    it('deve lançar erro se o produto não for encontrado (dentro da tx)', async () => {
+      prisma.$transaction.mockImplementation(async (callback) => callback(prisma));
+      prisma.perfume.findUnique.mockResolvedValue(null); // Produto não existe
 
-      await expect(criarPedido({ ...mockDadosCliente, carrinho: mockCarrinho }))
-        .rejects.toThrow(/Estoque insuficiente/);
+      await expect(pedidoService.criarPedido({ ...mockCliente, carrinho: mockCarrinho }))
+        .rejects.toThrow('Produto 10 não encontrado');
+    });
+
+    it('deve lançar erro se o estoque for insuficiente (dentro da tx)', async () => {
+      prisma.$transaction.mockImplementation(async (callback) => callback(prisma));
+      // Estoque 1, mas quer comprar 2
+      prisma.perfume.findUnique.mockResolvedValue({ id: 10, nome: 'Perfume X', quantidade_estoque: 1 });
+
+      await expect(pedidoService.criarPedido({ ...mockCliente, carrinho: mockCarrinho }))
+        .rejects.toThrow('Estoque insuficiente para Perfume X');
+    });
+  });
+
+  describe('listarPedidos', () => {
+    it('deve listar pedidos de um vendedor específico', async () => {
+      const mockPedidos = [{ id: 1 }, { id: 2 }];
+      prisma.pedido.findMany.mockResolvedValue(mockPedidos);
+
+      const result = await pedidoService.listarPedidos(5);
+
+      expect(prisma.pedido.findMany).toHaveBeenCalledWith({
+        where: { vendedorId: 5 },
+        include: { itens: { include: { perfume: true } } },
+        orderBy: { createdAt: 'desc' },
+      });
+      expect(result).toEqual(mockPedidos);
     });
   });
 
   describe('buscarPorId', () => {
-    it('deve retornar o pedido se encontrado e o vendedor for o dono', async () => {
-      const mockPedido = { id: 1, vendedorId: 1, total: 100 };
+    it('deve retornar o pedido se encontrado e pertencer ao vendedor', async () => {
+      const mockPedido = { id: 1, vendedorId: 5 };
       prisma.pedido.findUnique.mockResolvedValue(mockPedido);
 
-      const resultado = await buscarPorId(1, 1);
-      expect(resultado).toEqual(mockPedido);
+      const result = await pedidoService.buscarPorId(1, 5);
+      expect(result).toEqual(mockPedido);
     });
 
-    it('deve lançar 403 se o vendedor tentar acessar pedido de outro', async () => {
-      prisma.pedido.findUnique.mockResolvedValue({ id: 1, vendedorId: 2 });
-
-      await expect(buscarPorId(1, 1)).rejects.toThrow(new AppError('Acesso negado ao pedido', 403));
-    });
-
-    it('deve lançar 404 se o pedido não existir', async () => {
+    it('deve lançar erro 404 se o pedido não existir', async () => {
       prisma.pedido.findUnique.mockResolvedValue(null);
+      await expect(pedidoService.buscarPorId(99, 5))
+        .rejects.toThrow('Pedido não encontrado');
+    });
 
-      await expect(buscarPorId(999, 1)).rejects.toThrow(new AppError('Pedido não encontrado', 404));
+    it('deve lançar erro 403 se o pedido pertencer a outro vendedor', async () => {
+      const mockPedido = { id: 1, vendedorId: 999 }; // Outro ID
+      prisma.pedido.findUnique.mockResolvedValue(mockPedido);
+
+      await expect(pedidoService.buscarPorId(1, 5))
+        .rejects.toThrow('Acesso negado ao pedido');
+    });
+  });
+
+  describe('atualizarStatus', () => {
+    it('deve atualizar o status se as credenciais forem válidas', async () => {
+      const mockPedido = { id: 1, vendedorId: 5, status: 'PENDENTE' };
+      prisma.pedido.findUnique.mockResolvedValue(mockPedido);
+      prisma.pedido.update.mockResolvedValue({ ...mockPedido, status: 'ENTREGUE' });
+
+      const result = await pedidoService.atualizarStatus(1, 5, 'ENTREGUE');
+
+      expect(prisma.pedido.update).toHaveBeenCalledWith({
+        where: { id: 1 },
+        data: { status: 'ENTREGUE' }
+      });
+      expect(result.status).toBe('ENTREGUE');
+    });
+
+    it('deve bloquear atualização de status se vendedor for incorreto', async () => {
+      const mockPedido = { id: 1, vendedorId: 999 }; 
+      prisma.pedido.findUnique.mockResolvedValue(mockPedido);
+
+      await expect(pedidoService.atualizarStatus(1, 5, 'ENTREGUE'))
+        .rejects.toThrow('Acesso negado');
+    });
+  });
+
+  describe('atualizarPedido', () => {
+    it('deve atualizar apenas campos permitidos (nome, telefone)', async () => {
+      const mockPedido = { id: 1, vendedorId: 5, nome_cliente: 'Antigo' };
+      prisma.pedido.findUnique.mockResolvedValue(mockPedido);
+      prisma.pedido.update.mockResolvedValue({ ...mockPedido, nome_cliente: 'Novo' });
+
+      const dadosParaAtualizar = { 
+        nome_cliente: 'Novo', 
+        campo_invalido: 'Hack' // Deve ser ignorado pelo service
+      };
+
+      await pedidoService.atualizarPedido(1, 5, dadosParaAtualizar);
+
+      expect(prisma.pedido.update).toHaveBeenCalledWith({
+        where: { id: 1 },
+        data: { nome_cliente: 'Novo' } // Verifica que campo_invalido não foi passado
+      });
     });
   });
 });
