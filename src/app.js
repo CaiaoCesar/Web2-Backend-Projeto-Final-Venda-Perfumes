@@ -14,7 +14,7 @@ import pedidoRoutes from './routes/pedido.routes.js';
 
 // Swagger Imports
 import swaggerUi from 'swagger-ui-express';
-import swaggerSpec from './config/swagger.js'; 
+import swaggerSpec from './docs/swagger.js'; 
 
 const app = express();
 
