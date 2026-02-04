@@ -36,7 +36,7 @@ const limiter = rateLimit({
 app.use('/api', limiter); // Aplicação do limite em todas as rotas prefixadas com /api
 
 // Inicialização da interface interativa para testes da API
-setupSwagger(app); 
+setupSwagger(app);
 
 
 /**
