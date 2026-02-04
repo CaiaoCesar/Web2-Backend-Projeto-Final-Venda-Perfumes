@@ -1,5 +1,4 @@
 import swaggerJsdoc from 'swagger-jsdoc';
-import swaggerUi from 'swagger-ui-express';
 
 const options = {
   definition: {
@@ -33,7 +32,6 @@ const options = {
       { name: 'Vendedores', description: 'Criação de vendedores' },  // Ficará por quarto
       { name: 'Perfumes', description: 'Gestão e criação de perfumes' }  // Ficará por último
     ],
-
     components: {
       securitySchemes: {
         bearerAuth: {
@@ -44,7 +42,6 @@ const options = {
         },
       },
     },
-    // Define segurança global
     security: [
       {
         bearerAuth: [],
@@ -52,24 +49,9 @@ const options = {
     ],
   },
   
-  apis: ['./src/routes/*.js'],
+  apis: ['./src/routes/*.js'], 
 };
 
-const specs = swaggerJsdoc(options);
+const swaggerSpec = swaggerJsdoc(options);
 
-export default (app) => {
-  app.use(
-    '/api-docs',
-    swaggerUi.serve,
-    swaggerUi.setup(specs, {
-      explorer: true,
-      customCss: '.swagger-ui .topbar { display: none }',
-      customSiteTitle: 'API Vendas de Perfumes',
-      swaggerOptions: {
-        persistAuthorization: true, //  Mantém o token após refresh
-      },
-    })
-  );
-
-  console.log('\n📚 Swagger UI disponível em http://localhost:3000/api-docs\n');
-};
+export default swaggerSpec;
