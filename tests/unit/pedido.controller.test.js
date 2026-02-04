@@ -1,8 +1,14 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as pedidoController from '../../src/controllers/pedido.controller.js';
 import * as pedidoService from '../../src/services/pedido.service.js';
 import * as carrinhoService from '../../src/services/carrinho.service.js';
 import { AppError } from '../../src/utils/appError.js';
+// Importação dos Schemas para teste de cobertura
+import defaultSchema, { 
+  esquemaCriacaoPedido, 
+  esquemaAtualizarStatusPedido, 
+  esquemaAtualizarPedido 
+} from '../../src/schemas/pedido.schema.js';
 
 // Mock dos serviços
 vi.mock('../../src/services/pedido.service.js');
@@ -30,7 +36,6 @@ describe('Pedido Controller', () => {
 
   describe('criarPedido', () => {
     it('deve criar um pedido com sucesso e limpar o carrinho (201)', async () => {
-
       req.body = {
         nome: 'João Silva',
         telefone: '11999999999',
@@ -187,6 +192,72 @@ describe('Pedido Controller', () => {
 
       expect(pedidoService.atualizarPedido).toHaveBeenCalledWith(1, 10, req.body);
       expect(res.json).toHaveBeenCalledWith(mockAtualizado);
+    });
+  });
+});
+
+describe('Pedido Schemas (Validações Zod)', () => {
+  it('deve exportar corretamente os schemas (default export)', () => {
+    expect(defaultSchema).toHaveProperty('esquemaCriacaoPedido');
+    expect(defaultSchema).toHaveProperty('esquemaAtualizarStatusPedido');
+    expect(defaultSchema).toHaveProperty('esquemaAtualizarPedido');
+  });
+
+  describe('esquemaCriacaoPedido', () => {
+    it('deve validar payload correto', () => {
+      const input = { nome: 'João', telefone: '11999998888', carrinhoId: 'abc-123' };
+      const result = esquemaCriacaoPedido.safeParse(input);
+      expect(result.success).toBe(true);
+    });
+
+    it('deve falhar com dados inválidos', () => {
+      // Teste combinando vários erros para cobrir as linhas de validação
+      const input = { nome: '', telefone: '123', carrinhoId: '' };
+      const result = esquemaCriacaoPedido.safeParse(input);
+      expect(result.success).toBe(false);
+      
+      const erros = result.error.flatten().fieldErrors;
+      expect(erros.nome).toBeDefined(); // Nome vazio
+      expect(erros.telefone).toBeDefined(); // Telefone curto
+      expect(erros.carrinhoId).toBeDefined(); // ID vazio
+    });
+
+    it('deve validar formato do telefone', () => {
+      const input = { nome: 'João', telefone: '1199999aaaa', carrinhoId: '123' };
+      const result = esquemaCriacaoPedido.safeParse(input);
+      expect(result.success).toBe(false);
+      expect(result.error.issues[0].message).toContain('apenas dígitos');
+    });
+  });
+
+  describe('esquemaAtualizarStatusPedido', () => {
+    it('deve aceitar status válidos', () => {
+      ['PENDENTE', 'CONFIRMADO', 'CONCLUIDO', 'CANCELADO'].forEach(status => {
+        const result = esquemaAtualizarStatusPedido.safeParse({ status });
+        expect(result.success).toBe(true);
+      });
+    });
+
+    it('deve rejeitar status inválido', () => {
+      const result = esquemaAtualizarStatusPedido.safeParse({ status: 'INVALIDO' });
+      expect(result.success).toBe(false);
+    });
+  });
+
+  describe('esquemaAtualizarPedido', () => {
+    it('deve aceitar atualização parcial', () => {
+      const result = esquemaAtualizarPedido.safeParse({ nome_cliente: 'Maria' });
+      expect(result.success).toBe(true);
+    });
+
+    it('deve validar campos opcionais se fornecidos incorretamente', () => {
+      const result = esquemaAtualizarPedido.safeParse({ telefone_cliente: '123' }); // Muito curto
+      expect(result.success).toBe(false);
+    });
+
+    it('deve aceitar objeto vazio (tudo opcional)', () => {
+      const result = esquemaAtualizarPedido.safeParse({});
+      expect(result.success).toBe(true);
     });
   });
 });
