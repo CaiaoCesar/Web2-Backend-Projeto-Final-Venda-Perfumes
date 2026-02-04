@@ -110,7 +110,7 @@ router.get('/', authMiddleware, validarListagemPerfumes, produtoController.lista
 /**
  * @swagger
  * /api/v2/perfumes/estoque/{id}:
- *   patch:
+ *   put:
  *     summary: Atualizar estoque de um perfume
  *     description: Atualiza apenas a quantidade em estoque de um perfume
  *     tags: [Perfumes]
