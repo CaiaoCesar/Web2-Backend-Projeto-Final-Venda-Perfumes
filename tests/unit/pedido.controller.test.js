@@ -1,121 +1,192 @@
-import { jest } from '@jest/globals';
-import * as pedidoController from './pedido.controller.js';
-import * as pedidoService from '../services/pedido.service.js';
-import * as carrinhoService from '../services/carrinho.service.js';
-import { AppError } from '../utils/appError.js';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import * as pedidoController from '../../src/controllers/pedido.controller.js';
+import * as pedidoService from '../../src/services/pedido.service.js';
+import * as carrinhoService from '../../src/services/carrinho.service.js';
+import { AppError } from '../../src/utils/appError.js';
 
 // Mock dos serviços
-jest.mock('../services/pedido.service.js');
-jest.mock('../services/carrinho.service.js');
+vi.mock('../../src/services/pedido.service.js');
+vi.mock('../../src/services/carrinho.service.js');
 
 describe('Pedido Controller', () => {
-  let req, res, next;
+  let req;
+  let res;
+  let next;
 
   beforeEach(() => {
+    // Resetar mocks e objetos antes de cada teste
     req = {
       body: {},
       params: {},
-      user: { id: 1 } // Simula usuário autenticado
+      user: {}
     };
     res = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn().mockReturnThis()
+      status: vi.fn().mockReturnThis(),
+      json: vi.fn()
     };
-    next = jest.fn();
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
+    next = vi.fn();
+    vi.clearAllMocks();
   });
 
   describe('criarPedido', () => {
-    it('deve criar um pedido e retornar status 201', async () => {
-      req.body = { nome: 'Cliente Teste', telefone: '123', carrinhoId: 'cart-123' };
-      
-      const mockCarrinho = { items: [{ id: 1 }], vendorId: 1 };
-      const mockPedido = { id: 100, status: 'PENDENTE' };
+    it('deve criar um pedido com sucesso e limpar o carrinho (201)', async () => {
+
+      req.body = {
+        nome: 'João Silva',
+        telefone: '11999999999',
+        carrinhoId: 'carrinho_123'
+      };
+
+      const mockCarrinho = {
+        id: 'carrinho_123',
+        items: [{ perfumeId: 1, quantidade: 1, preco: 100 }],
+        total: 100
+      };
+
+      const mockPedidoCriado = {
+        id: 1,
+        nome_cliente: 'João Silva',
+        valor_total: 100
+      };
 
       carrinhoService.verCarrinho.mockReturnValue(mockCarrinho);
-      pedidoService.criarPedido.mockResolvedValue(mockPedido);
+      pedidoService.criarPedido.mockResolvedValue(mockPedidoCriado);
 
       await pedidoController.criarPedido(req, res, next);
 
+      expect(carrinhoService.verCarrinho).toHaveBeenCalledWith('carrinho_123');
+      expect(pedidoService.criarPedido).toHaveBeenCalledWith({
+        nomeCliente: 'João Silva',
+        telefoneCliente: '11999999999',
+        carrinho: mockCarrinho
+      });
+      expect(carrinhoService.limparCarrinho).toHaveBeenCalledWith('carrinho_123');
       expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith(mockPedido);
-      expect(carrinhoService.limparCarrinho).toHaveBeenCalledWith('cart-123');
+      expect(res.json).toHaveBeenCalledWith(mockPedidoCriado);
     });
 
-    it('deve chamar next com AppError se faltarem dados no body', async () => {
-      req.body = { nome: 'Incompleto' };
+    it('deve falhar se dados estiverem incompletos', async () => {
+      req.body = { nome: 'João' }; // Falta telefone e carrinhoId
 
       await pedidoController.criarPedido(req, res, next);
 
-      expect(next).toHaveBeenCalledWith(expect.any(AppError));
-      expect(next.mock.calls[0][0].statusCode).toBe(400);
+      expect(next).toHaveBeenCalled();
+      const erro = next.mock.calls[0][0];
+      expect(erro).toBeInstanceOf(AppError);
+      expect(erro.message).toBe('Dados incompletos');
+      expect(erro.statusCode).toBe(400);
     });
 
-    it('deve lançar erro se o carrinho estiver vazio', async () => {
-      req.body = { nome: 'C', telefone: 'T', carrinhoId: 'id' };
+    it('deve falhar se o carrinho estiver vazio', async () => {
+      req.body = {
+        nome: 'João',
+        telefone: '11999',
+        carrinhoId: 'carrinho_vazio'
+      };
+
       carrinhoService.verCarrinho.mockReturnValue({ items: [] });
 
       await pedidoController.criarPedido(req, res, next);
 
-      expect(next).toHaveBeenCalledWith(expect.objectContaining({
-        message: 'O carrinho está vazio. Adicione itens antes de finalizar.'
-      }));
+      expect(next).toHaveBeenCalled();
+      const erro = next.mock.calls[0][0];
+      expect(erro.message).toContain('carrinho está vazio');
     });
   });
 
   describe('listarPedidos', () => {
-    it('deve retornar a lista de pedidos do vendedor logado', async () => {
-      const mockLista = [{ id: 1 }, { id: 2 }];
-      pedidoService.listarPedidos.mockResolvedValue(mockLista);
+    it('deve listar pedidos do vendedor autenticado', async () => {
+      req.user = { id: 10 };
+      const mockPedidos = [{ id: 1, status: 'PENDENTE' }];
+      
+      pedidoService.listarPedidos.mockResolvedValue(mockPedidos);
 
       await pedidoController.listarPedidos(req, res, next);
 
-      expect(pedidoService.listarPedidos).toHaveBeenCalledWith(1);
-      expect(res.json).toHaveBeenCalledWith(mockLista);
+      expect(pedidoService.listarPedidos).toHaveBeenCalledWith(10);
+      expect(res.json).toHaveBeenCalledWith(mockPedidos);
     });
 
-    it('deve retornar 401 se não houver usuário na requisição', async () => {
-      req.user = null;
+    it('deve retornar erro 401 se não houver vendedor logado', async () => {
+      req.user = undefined; // Usuário não autenticado
 
       await pedidoController.listarPedidos(req, res, next);
 
-      expect(next).toHaveBeenCalledWith(expect.any(AppError));
-      expect(next.mock.calls[0][0].statusCode).toBe(401);
+      expect(next).toHaveBeenCalled();
+      const erro = next.mock.calls[0][0];
+      expect(erro.statusCode).toBe(401);
+      expect(erro.message).toBe('Não autorizado');
     });
   });
 
   describe('buscarPedido', () => {
-    it('deve buscar o pedido pelo ID e vendedor', async () => {
-      req.params.id = '50';
-      const mockPedido = { id: 50, nome_cliente: 'João' };
+    it('deve buscar um pedido por ID', async () => {
+      req.params.id = 5;
+      req.user = { id: 10 };
+      const mockPedido = { id: 5, vendedorId: 10 };
+
       pedidoService.buscarPorId.mockResolvedValue(mockPedido);
 
       await pedidoController.buscarPedido(req, res, next);
 
-      expect(pedidoService.buscarPorId).toHaveBeenCalledWith('50', 1);
+      expect(pedidoService.buscarPorId).toHaveBeenCalledWith(5, 10);
       expect(res.json).toHaveBeenCalledWith(mockPedido);
+    });
+
+    it('deve repassar erro do serviço se pedido não for encontrado', async () => {
+      req.params.id = 99;
+      req.user = { id: 10 };
+      
+      const errorMock = new AppError('Pedido não encontrado', 404);
+      pedidoService.buscarPorId.mockRejectedValue(errorMock);
+
+      await pedidoController.buscarPedido(req, res, next);
+
+      expect(next).toHaveBeenCalledWith(errorMock);
     });
   });
 
   describe('atualizarStatus', () => {
-    it('deve atualizar o status com sucesso', async () => {
-      req.params.id = '10';
-      req.body = { status: 'ENTREGUE' };
-      pedidoService.atualizarStatus.mockResolvedValue({ id: 10, status: 'ENTREGUE' });
+    it('deve atualizar o status do pedido', async () => {
+      req.params.id = 1;
+      req.body.status = 'ENVIADO';
+      req.user = { id: 10 };
+
+      const mockAtualizado = { id: 1, status: 'ENVIADO' };
+      pedidoService.atualizarStatus.mockResolvedValue(mockAtualizado);
 
       await pedidoController.atualizarStatus(req, res, next);
 
-      expect(res.json).toHaveBeenCalled();
-      expect(pedidoService.atualizarStatus).toHaveBeenCalledWith('10', 1, 'ENTREGUE');
+      expect(pedidoService.atualizarStatus).toHaveBeenCalledWith(1, 10, 'ENVIADO');
+      expect(res.json).toHaveBeenCalledWith(mockAtualizado);
     });
 
-    it('deve dar erro se o status não for enviado', async () => {
-      req.body = {};
+    it('deve falhar se status não for fornecido', async () => {
+      req.params.id = 1;
+      req.body = {}; // Sem status
+      req.user = { id: 10 };
+
       await pedidoController.atualizarStatus(req, res, next);
-      expect(next).toHaveBeenCalledWith(expect.any(AppError));
+
+      expect(next).toHaveBeenCalled();
+      const erro = next.mock.calls[0][0];
+      expect(erro.message).toBe('Status é obrigatório');
+    });
+  });
+
+  describe('atualizarPedido', () => {
+    it('deve atualizar dados do pedido', async () => {
+      req.params.id = 1;
+      req.user = { id: 10 };
+      req.body = { nome_cliente: 'Novo Nome' };
+
+      const mockAtualizado = { id: 1, nome_cliente: 'Novo Nome' };
+      pedidoService.atualizarPedido.mockResolvedValue(mockAtualizado);
+
+      await pedidoController.atualizarPedido(req, res, next);
+
+      expect(pedidoService.atualizarPedido).toHaveBeenCalledWith(1, 10, req.body);
+      expect(res.json).toHaveBeenCalledWith(mockAtualizado);
     });
   });
 });
