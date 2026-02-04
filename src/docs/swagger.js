@@ -6,7 +6,7 @@ const options = {
     openapi: '3.0.0',
     info: {
       title: 'API Sistema de Vendas de Perfumes',
-      version: '2.0.0',
+      version: '3.2.1',
       description: 'Backend para sistema de vendas de perfumes com checkout via WhatsApp',
       contact: {
         name: 'Alunos do Bsi Salinas',
@@ -18,12 +18,12 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:3000',
-        description: 'Servidor de desenvolvimento',
+        url: 'https://web2-backend-projeto-final-venda-pe.vercel.app/',
+        description: 'Servidor de produção',
       },
       {
-        url: 'https://api-seu-projeto.vercel.com/api',
-        description: 'Servidor de produção',
+        url: 'http://localhost:3000',
+        description: 'Servidor de desenvolvimento',
       },
     ],
     components: {
