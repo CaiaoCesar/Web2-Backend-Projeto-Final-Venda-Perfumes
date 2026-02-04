@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import helmet from 'helmet';
+import helmetConfig from './config/helmet.js';
 import rateLimit from 'express-rate-limit';
 import 'express-async-errors'; s
 import setupSwagger from './docs/swagger.js';
@@ -16,7 +16,7 @@ const app = express();
 /**
  * Middlewares de Segurança e Base
  */
-app.use(helmet()); // Reforço na segurança dos headers HTTP
+app.use(helmetConfig); // Reforço na segurança dos headers HTTP
 app.use(cors()); // Permissão para acesso da API por outras origens (Frontend)
 app.use(express.json()); // Suporte para leitura de dados em formato JSON
 
