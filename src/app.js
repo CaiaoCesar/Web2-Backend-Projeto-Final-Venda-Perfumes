@@ -2,14 +2,15 @@ import express from 'express';
 import cors from 'cors';
 import helmetConfig from './config/helmet.js';
 import rateLimit from 'express-rate-limit';
-import 'express-async-errors'; s
-import setupSwagger from './docs/swagger.js';
+import 'express-async-errors';
 import { errorHandler } from './middlewares/error.middleware.js';
 import produtoRoutes from './routes/produto.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import buscaRoutes from './routes/busca.routes.js';
 import carrinhoRoutes from './routes/carrinho.routes.js';
 import pedidoRoutes from './routes/pedido.routes.js';
+import swaggerUi from 'swagger-ui-express';  
+import swaggerSpec from './config/swagger.js';
 
 const app = express();
 
@@ -36,6 +37,20 @@ setupSwagger(app);
 /**
  * Rotas Públicas e de Verificação
  */
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'API Gerador de Provas - Documentação',
+  }),
+);
+
+// Rota para baixar a especificação OpenAPI em JSON
+app.get('/api-docs.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
 
 // Redireciona a rota raiz para o Swagger
 app.get('/', (req, res) => {
