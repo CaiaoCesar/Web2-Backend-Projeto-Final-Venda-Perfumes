@@ -38,25 +38,16 @@ app.use('/api', limiter); // Aplicação do limite em todas as rotas prefixadas 
 // Inicialização da interface interativa para testes da API
 setupSwagger(app); 
 
-
 /**
  * Rotas Públicas e de Verificação
  */
+
+// ✅ Redireciona a rota raiz para o Swagger
 app.get('/', (req, res) => {
-  // Rota inicial com informações básicas e versão do sistema
-  res.json({
-    message: 'API Sistema de Vendas de Perfumes',
-    status: 'online',
-    version: '3.1.0',
-    endpoints: {
-      auth: '/api/v2/vendedores',
-      produtos: '/api/v2/perfumes',
-    },
-  });
+  res.redirect('/api-docs');
 });
 
 app.get('/health', (req, res) => {
-  // Verificação rápida do estado de saúde da aplicação e banco de dados
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
@@ -64,13 +55,22 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Registro das rotas de autenticação e gestão de perfumes
-app.use('/api/v2/vendedores', authRoutes);
-app.use('/api/v2/perfumes', produtoRoutes);
-app.use('/api/v2/buscas', buscaRoutes);
-app.use('/api/v2/carrinho', carrinhoRoutes);
-app.use('/api/v2/checkout', checkoutRoutes);
-
+// ✅ Rota de informações da API (agora em /info)
+app.get('/info', (req, res) => {
+  res.json({
+    message: 'API Sistema de Vendas de Perfumes',
+    status: 'online',
+    version: '3.2.1',
+    endpoints: {
+      auth: '/api/v2/vendedores',
+      produtos: '/api/v2/perfumes',
+      busca: '/api/v2/buscas',
+      carrinho: '/api/v2/carrinho',
+      checkout: '/api/v2/checkout',
+    },
+    documentation: '/api-docs',
+  });
+});
 
 // Middleware de Erro Global, formatação de qualquer 
 // erro disparado pelos controllers ou middlewares anteriores.
