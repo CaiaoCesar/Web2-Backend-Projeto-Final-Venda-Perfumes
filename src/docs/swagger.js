@@ -26,6 +26,14 @@ const options = {
         description: 'Servidor de desenvolvimento',
       },
     ],
+    tags: [
+      { name: 'Busca', description: 'Busca pública de perfumes' }, // Ficará em primeiro
+      { name: 'Carrinho', description: 'Carrinho para compra' },   // Ficará em segundo
+      { name: 'Pedidos', description: 'Gestão e criação de pedidos' },  // Ficará por terceiro
+      { name: 'Vendedores', description: 'Criação de vendedores' },  // Ficará por quarto
+      { name: 'Perfumes', description: 'Gestão e criação de perfumes' }  // Ficará por último
+    ],
+
     components: {
       securitySchemes: {
         bearerAuth: {
@@ -36,13 +44,14 @@ const options = {
         },
       },
     },
-    // ⭐ ADICIONE ESTA LINHA - Define segurança global
+    // Define segurança global
     security: [
       {
         bearerAuth: [],
       },
     ],
   },
+  
   apis: ['./src/routes/*.js'],
 };
 
@@ -57,7 +66,7 @@ export default (app) => {
       customCss: '.swagger-ui .topbar { display: none }',
       customSiteTitle: 'API Vendas de Perfumes',
       swaggerOptions: {
-        persistAuthorization: true, // ⭐ Mantém o token após refresh
+        persistAuthorization: true, //  Mantém o token após refresh
       },
     })
   );

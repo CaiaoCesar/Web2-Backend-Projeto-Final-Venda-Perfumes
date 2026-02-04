@@ -12,6 +12,8 @@ datasource db {
 enum StatusPedido {
   PENDENTE      // Pedido criado, aguardando confirmação de compra do cliente
   CONFIRMADO    // Pedido confirmado pelo cliente mediante o acordo dos seus detalhes
+  CONCLUIDO     // Pedido entregue ao cliente, finalizando o processo de compra
+  CANCELADO     // Pedido cancelado, seja por solicitação do cliente ou por indisponibilidade do produto
 }
 
 // MODELO VENDEDOR como foi definido anteriormente com seus atributos e tipos,
