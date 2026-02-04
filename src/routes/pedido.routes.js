@@ -149,7 +149,7 @@ const router = Router();
 
 /**
  * @swagger
- * /pedidos:
+ * /api/v2/pedidos:
  *   post:
  *     summary: Finaliza um pedido a partir de um carrinho (Checkout)
  *     description: Cria um pedido baseando-se no ID de um carrinho temporário existente. O carrinho é limpo após a criação.
@@ -181,7 +181,7 @@ router.post('/', pedidoController.criarPedido);
 
 /**
  * @swagger
- * /pedidos:
+ * /api/v2/pedidos:
  *   get:
  *     summary: Lista todos os pedidos do vendedor autenticado
  *     tags:
@@ -202,7 +202,7 @@ router.get('/', authMiddleware, pedidoController.listarPedidos);
 
 /**
  * @swagger
- * /pedidos/{id}:
+ * /api/v2/pedidos/{id}:
  *   get:
  *     summary: Busca detalhes de um pedido específico
  *     tags:
@@ -214,7 +214,7 @@ router.get('/', authMiddleware, pedidoController.listarPedidos);
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *         description: ID do pedido
  *     responses:
  *       200:
@@ -234,7 +234,7 @@ router.get('/:id', authMiddleware, pedidoController.buscarPedido);
 
 /**
  * @swagger
- * /pedidos/{id}/status:
+ * /api/v2/pedidos/{id}/status:
  *   patch:
  *     summary: Atualiza o status do pedido
  *     tags:
@@ -246,7 +246,7 @@ router.get('/:id', authMiddleware, pedidoController.buscarPedido);
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *         description: ID do pedido
  *     requestBody:
  *       required: true
@@ -272,7 +272,7 @@ router.patch('/:id/status', authMiddleware, pedidoController.atualizarStatus);
 
 /**
  * @swagger
- * /pedidos/{id}:
+ * /api/v2/pedidos/{id}:
  *   patch:
  *     summary: Atualiza dados do cliente no pedido
  *     tags:
@@ -284,7 +284,7 @@ router.patch('/:id/status', authMiddleware, pedidoController.atualizarStatus);
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *         description: ID do pedido
  *     requestBody:
  *       content:
