@@ -57,7 +57,19 @@ app.get('/api-docs.json', (req, res) => {
 
 // --- 4. Rotas da Aplicação ---
 app.get('/', (req, res) => {
-  res.redirect('/api-docs');
+  res.json({
+    message: 'API Sistema de Vendas de Perfumes',
+    status: 'online',
+    version: '3.1.0',
+    endpoints: {
+      auth: '/api/v2/vendedores',
+      produtos: '/api/v2/perfumes',
+      busca: '/api/v2/buscas',
+      carrinho: '/api/v2/carrinho',
+      pedidos: '/api/v2/pedidos',
+      docs: '/api-docs',
+    },
+  });
 });
 
 app.get('/health', (req, res) => {
