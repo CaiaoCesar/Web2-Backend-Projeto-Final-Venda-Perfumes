@@ -7,9 +7,6 @@ dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 
-// Aplicação das configurações de segurança nos headers HTTP via Helmet
-app.use(helmetConfig);
-
 // Inicialização do servidor para escutar requisições na porta definida
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}\n`);

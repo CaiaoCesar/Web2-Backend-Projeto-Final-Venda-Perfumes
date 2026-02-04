@@ -1,58 +1,47 @@
-/**
- * Configuração do Helmet para headers de segurança HTTP
- *
- * Helmet ajuda a proteger a aplicação configurando vários headers HTTP.
- */
 import helmet from 'helmet';
 
 const helmetConfig = helmet({
-  // Content Security Policy - define fontes confiáveis de conteúdo
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"], // Necessário para Swagger UI
-      scriptSrc: ["'self'", "'unsafe-inline'"], // Necessário para Swagger UI
-      imgSrc: ["'self'", 'data:', 'https:'],
+      // Permite estilos internos e de fontes/CDNs externos
+      styleSrc: [
+        "'self'", 
+        "'unsafe-inline'", 
+        "https://fonts.googleapis.com", 
+        "https://cdnjs.cloudflare.com"
+      ],
+      // Permite a execução dos scripts necessários para o Swagger funcionar
+      scriptSrc: [
+        "'self'", 
+        "'unsafe-inline'", 
+        "https://cdnjs.cloudflare.com"
+      ],
+      // Permite imagens locais, dados em base64 e o validador do Swagger
+      imgSrc: ["'self'", "data:", "https://validator.swagger.io", "https:"],
+      // Permite que o Swagger UI faça requisições para a sua própria API
+      connectSrc: [
+        "'self'", 
+        "https://web2-backend-projeto-final-venda-pe.vercel.app", 
+        "http://localhost:3000"
+      ],
     },
   },
 
-  // Cross-Origin-Embedder-Policy - desabilitado para compatibilidade com Swagger
+  // Mantém as demais proteções que você já configurou
   crossOriginEmbedderPolicy: false,
-
-  // Cross-Origin-Resource-Policy - permite recursos de mesma origem
   crossOriginResourcePolicy: { policy: 'same-origin' },
-
-  // DNS Prefetch Control - desabilita pré-carregamento de DNS
   dnsPrefetchControl: { allow: false },
-
-  // Frameguard - previne clickjacking
   frameguard: { action: 'deny' },
-
-  // Hide Powered-By - remove header X-Powered-By
   hidePoweredBy: true,
-
-  // HSTS - força HTTPS (desabilitado em desenvolvimento)
-  hsts:
-    process.env.NODE_ENV === 'production'
+  hsts: process.env.NODE_ENV === 'production'
       ? { maxAge: 31536000, includeSubDomains: true, preload: true }
       : false,
-
-  // IE No Open - previne downloads automáticos no IE
   ieNoOpen: true,
-
-  // No Sniff - previne MIME type sniffing
   noSniff: true,
-
-  // Origin Agent Cluster - isola a origem
   originAgentCluster: true,
-
-  // Permitted Cross-Domain Policies - restringe políticas Adobe
   permittedCrossDomainPolicies: { permittedPolicies: 'none' },
-
-  // Referrer Policy - controla informações de referência
   referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-
-  // XSS Filter - ativa filtro XSS do navegador
   xssFilter: true,
 });
 

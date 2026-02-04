@@ -1,79 +1,93 @@
 import express from 'express';
 import cors from 'cors';
-import helmet from 'helmet';
+import helmetConfig from './config/helmet.js';
 import rateLimit from 'express-rate-limit';
-import 'express-async-errors'; // Captura automática de erros em funções assíncronas
-import setupSwagger from './docs/swagger.js';
-
-// Importação do middleware centralizado para tratamento de erros
+import 'express-async-errors';
 import { errorHandler } from './middlewares/error.middleware.js';
 
-// Importação das rotas de produtos e autenticação
+// Rotas
 import produtoRoutes from './routes/produto.routes.js';
 import authRoutes from './routes/auth.routes.js';
-// Rota de busca pública
 import buscaRoutes from './routes/busca.routes.js';
 import carrinhoRoutes from './routes/carrinho.routes.js';
 import pedidoRoutes from './routes/pedido.routes.js';
 
+// Swagger Imports
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './docs/swagger.js'; 
+
 const app = express();
 
-/**
- * Middlewares de Segurança e Base
- */
-app.use(helmet()); // Reforço na segurança dos headers HTTP
-app.use(cors()); // Permissão para acesso da API por outras origens (Frontend)
-app.use(express.json()); // Suporte para leitura de dados em formato JSON
+// --- 1. Segurança e Parsers ---
+app.use(helmetConfig);
+app.use(cors());
+app.use(express.json());
 
-/**
- * Configuração de Limite de Requisições
- */
+// --- 2. Rate Limit ---
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // Janela de tempo de 15 minutos
-  max: 100, // Limite máximo de 100 acessos por IP dentro do tempo definido
-  message: 'Muitas requisições deste IP. Tente novamente em 15 minutos.',
+  windowMs: 15 * 60 * 1000,
+  max: 500,
+  message: 'Muitas requisições deste IP.',
 });
-app.use('/api', limiter); // Aplicação do limite em todas as rotas prefixadas com /api
+app.use('/api', limiter);
 
-// Inicialização da interface interativa para testes da API
-setupSwagger(app);
+// --- 3. Configuração do Swagger ---
+// (Removida a linha setupSwagger(app) que causaria erro)
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'API Vendas - Documentação',
+    // Adicione as linhas abaixo para corrigir o erro de MIME type na Vercel
+    customCssUrl:
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css',
+    customJs: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.js',
+    ],
+  })
+);
 
+// Rota para Debug do Swagger JSON
+app.get('/api-docs.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
 
-/**
- * Rotas Públicas e de Verificação
- */
+// --- 4. Rotas da Aplicação ---
 app.get('/', (req, res) => {
-  // Rota inicial com informações básicas e versão do sistema
-  res.json({
-    message: 'API Sistema de Vendas de Perfumes',
-    status: 'online',
-    version: '3.1.0',
-    endpoints: {
-      auth: '/api/v2/vendedores',
-      produtos: '/api/v2/perfumes',
-    },
-  });
+  res.redirect('/api-docs');
 });
 
 app.get('/health', (req, res) => {
-  // Verificação rápida do estado de saúde da aplicação e banco de dados
+  res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+});
+
+// Rota de Informações
+app.get('/info', (req, res) => {
   res.json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    database: 'connected',
+    message: 'API Sistema de Vendas de Perfumes',
+    status: 'online',
+    version: '3.3.0',
+    endpoints: {
+      auth: '/api/v2/vendedores',
+      produtos: '/api/v2/perfumes',
+      busca: '/api/v2/buscas',
+      carrinho: '/api/v2/carrinho',
+      pedidos: '/api/v2/pedidos',
+    },
+    documentation: '/api-docs',
   });
 });
 
-// Registro das rotas de autenticação e gestão de perfumes
 app.use('/api/v2/vendedores', authRoutes);
 app.use('/api/v2/perfumes', produtoRoutes);
 app.use('/api/v2/buscas', buscaRoutes);
 app.use('/api/v2/carrinho', carrinhoRoutes);
 app.use('/api/v2/pedidos', pedidoRoutes);
 
-
-// Middleware de Erro Global, formatação de qualquer 
-// erro disparado pelos controllers ou middlewares anteriores.
+// --- 5. Tratamento de Erros ---
 app.use(errorHandler);
 
 export default app;
